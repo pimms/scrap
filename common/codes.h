@@ -17,12 +17,13 @@
 #define HIGH_NIBBLE 	0xF0
 #define LOW_NIBBLE  	0x0F
 
-/***** VARIABLE CONSTANTS *****
+/***** VARIABLE CONSTANTS ****
 * Variables are stored in a lookup-table in the
 * Environment class. 
-* There may only ever be (2^31)-1 variables allocated.
+* There may only ever be (2^28)-1 variables allocated.
 *****/
 #define VAR_GLOBAL 		0x80000000
+#define VAR_LOCAL		0x40000000
 
 
 

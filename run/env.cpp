@@ -21,8 +21,16 @@ int Environment::Execute() {
 		Operation();
 	}
 
-	printf("Execution finished\n");
-	return 0;
+	mOpPtr++;
+	int exitId = GetOpcodeInt();
+
+	if (exitId & (VAR_GLOBAL | VAR_LOCAL)) {
+		Var *var = GetVarById(exitId);
+		exitId = var->GetInt();
+	}
+
+	printf("Program terminated with status %i\n", exitId);
+	return exitId;
 }
 
 

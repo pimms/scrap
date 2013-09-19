@@ -20,12 +20,11 @@ int main(int argc, char *argv[]) {
 	opsCalc.AddByte(OP_MUL);
 	opsCalc.AddByte(OP_PUSH)->AddInt(VAR_GLOBAL  | 3);
 	opsCalc.AddByte(OP_DIV);
-	opsCalc.AddByte(OP_EXIT)->AddInt(0);
+	opsCalc.AddByte(OP_EXIT)->AddInt(VAR_GLOBAL  | 1);
 
+	
 	Environment env(&opsCalc);
 	int retval = env.Execute();
-
-	printf("Program terminated with status %i.\n", retval);
 	getchar();
 
 	return retval;
