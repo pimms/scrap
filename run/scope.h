@@ -9,6 +9,8 @@ using namespace std;
 
 class Scope {
 public:
+					~Scope();
+
 	bool 			Alloc(uint id);
 	Var* 			GetVar(uint id);
 

@@ -3,13 +3,15 @@
 #include <cstring>
 #include <stdio.h>
 
-Environment::Environment(byte *ops) {
-	mOpcodes = ops;
+Environment::Environment(Opcode *opcode) {
+	mOpcodes = opcode->GetRaw();
 	mOpPtr = 0;
 }
 
 Environment::~Environment() {
-	
+	if (mOpcodes) {
+		delete[] mOpcodes;
+	}
 }
 
 int Environment::Execute() {
@@ -114,11 +116,18 @@ void Environment::OpCall() {
 	mPStack.Push(mOpPtr);
 	mOpPtr = funcPos;
 
+	Scope *localScope = new Scope();
+	mLScope.Push(localScope);
+
 	LOGF(("Calling %x\n", funcId));
 }
 
 void Environment::OpRet() {
 	mOpPtr = mPStack.Pop();
+
+	Scope *localScope = mLScope.Pop();
+	delete localScope;
+
 	LOGF(("Returning to %u\n", mOpPtr));
 }
 
@@ -196,7 +205,7 @@ void Environment::OpAdd() {
 	*left += *right;	
 	mPStack.Push(left->GetId());
 
-	LOGF(("Var %x += Var %x\n", left->GetId(), right->GetId()));
+	LOGF(("Var %x += Var %x = %i\n", left->GetId(), right->GetId(), left->GetInt()));
 }
 
 void Environment::OpSub() {
@@ -209,7 +218,7 @@ void Environment::OpSub() {
 	*left -= *right;	
 	mPStack.Push(left->GetId());
 
-	LOGF(("Var %x -= Var %x\n", left->GetId(), right->GetId()));
+	LOGF(("Var %x -= Var %x = %i\n", left->GetId(), right->GetId(), left->GetInt()));
 }
 
 void Environment::OpMul() {
@@ -235,7 +244,7 @@ void Environment::OpDiv() {
 	*left /= *right;	
 	mPStack.Push(left->GetId());
 
-	LOGF(("Var %x /= Var %x\n", left->GetId(), right->GetId()));
+	LOGF(("Var %x /= Var %x = %i\n", left->GetId(), right->GetId(), left->GetInt()));
 }
 
 void Environment::OpMod() {

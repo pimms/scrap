@@ -4,6 +4,7 @@
 #include "scope.h"
 #include "../common/stack.h"
 #include "../common/codes.h"
+#include "../common/opcode.h"
 
 #include <map>
 using namespace std;
@@ -16,7 +17,7 @@ using namespace std;
 
 class Environment {
 public:
-					Environment(byte *ops);
+					Environment(Opcode *opcode);
 					~Environment();
 
 	int 			Execute();

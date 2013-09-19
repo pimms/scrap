@@ -3,27 +3,26 @@
 #include <stdio.h>
 
 #include "run/env.h"
+#include "common/opcode.h"
 
 int main(int argc, char *argv[]) {
-	byte opcodes[] = {
-		OP_ALLOC,	0x01,0x00,0x00,0x80,
-		OP_MOVI,	0x01,0x00,0x00,0x80, 0x04,0x00,0x00,0x00,
-		OP_ALLOC,	0x02,0x00,0x00,0x80,
-		OP_MOVI, 	0x02,0x00,0x00,0x80, 0x0A,0x00,0x00,0x00,
-		OP_ALLOC,	0x03,0x00,0x00,0x80,
-		OP_MOVI, 	0x03,0x00,0x00,0x80, 0x03,0x00,0x00,0x00,
+	/* Example program calculating (10 * 4) / 3
+	 */
+	Opcode opsCalc;
+	opsCalc.AddByte(OP_ALLOC)->AddInt(VAR_GLOBAL | 1);
+	opsCalc.AddByte(OP_MOVI)->AddInt(VAR_GLOBAL  | 1)->AddInt(4);
+	opsCalc.AddByte(OP_ALLOC)->AddInt(VAR_GLOBAL | 2);
+	opsCalc.AddByte(OP_MOVI)->AddInt(VAR_GLOBAL  | 2)->AddInt(10);
+	opsCalc.AddByte(OP_ALLOC)->AddInt(VAR_GLOBAL | 3);
+	opsCalc.AddByte(OP_MOVI)->AddInt(VAR_GLOBAL  | 3)->AddInt(3);
+	opsCalc.AddByte(OP_PUSH)->AddInt(VAR_GLOBAL  | 1);
+	opsCalc.AddByte(OP_PUSH)->AddInt(VAR_GLOBAL  | 2);
+	opsCalc.AddByte(OP_MUL);
+	opsCalc.AddByte(OP_PUSH)->AddInt(VAR_GLOBAL  | 3);
+	opsCalc.AddByte(OP_DIV);
+	opsCalc.AddByte(OP_EXIT)->AddInt(0);
 
-		OP_PUSH, 	0x03,0x00,0x00,0x80,
-		OP_PUSH,	0x01,0x00,0x00,0x80,
-		OP_PUSH, 	0x02,0x00,0x00,0x80,
-
-		OP_MUL,
-		OP_DIV,
-
-		OP_EXIT,
-	};
-
-	Environment env(opcodes);
+	Environment env(&opsCalc);
 	int retval = env.Execute();
 
 	printf("Program terminated with status %i.\n", retval);

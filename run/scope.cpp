@@ -1,6 +1,16 @@
 #include "scope.h"
 #include <stdlib.h>
 
+
+Scope::~Scope() {
+	map<uint,Var*>::iterator it;
+
+	for (it = mVars.begin(); it != mVars.end(); it++) {
+		delete it->second;
+	}
+}
+
+
 bool Scope::Alloc(uint id) {
 #ifdef _DEBUG
 	if (GetVar(id) != NULL) {
