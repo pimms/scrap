@@ -39,32 +39,45 @@ int Environment::Execute() {
 void Environment::Operation() {
 	byte op = mOpcodes[mOpPtr++];
 
-	if (op <= 0x1F) {
+	if (op >= 0xF0) {
 		switch (op) {
-			case OP_PUSH: 		OpPush();		break;
-			case OP_PUSH_DATA:	OpPushData();	break;
-			case OP_POP:		OpPop();		break;
-			case OP_CALL:		OpCall();		break;
-			case OP_RET:		OpRet();		break;
-			case OP_ALLOC:		OpAlloc();		break;
-			case OP_POPMOV:		OpPopMov();		break;
-			case OP_MOV: 		OpMov();		break;
-			case OP_MOVI: 		OpMovI();		break;
-			case OP_MOVF: 		OpMovF();		break;
-			case OP_MOVS: 		OpMovS();		break;
-
-			case OP_ADD: 		OpAdd();		break;
-			case OP_SUB: 		OpSub();		break;
-			case OP_MUL: 		OpMul();		break;
-			case OP_DIV: 		OpDiv();		break;
-			case OP_MOD: 		OpMod();		break;
-
-			case OP_EXIT: 		/* TODO */		break;
+			case OP_DATA_BEGIN:		OpDataBegin();	break;
+			case OP_DATA_STRING:	OpDataString();	break;
+			case OP_DATA_FUNC:		OpDataFunc();	break;
+			case OP_DATA_END:		OpDataEnd();	break;
 		}
-	} else if (op <= 0x2F) {
-		// Jump and comparisons
 	} else {
-		// Corrupted binary
+		if (mDataDef) {
+			throw InvalidOpException("Cannot perform common operations when defining data");
+		}
+
+		if (op <= 0x1F) {
+			switch (op) {
+				case OP_PUSH: 		OpPush();		break;
+				case OP_PUSH_DATA:	OpPushData();	break;
+				case OP_POP:		OpPop();		break;
+				case OP_CALL:		OpCall();		break;
+				case OP_RET:		OpRet();		break;
+				case OP_ALLOC:		OpAlloc();		break;
+				case OP_POPMOV:		OpPopMov();		break;
+				case OP_MOV: 		OpMov();		break;
+				case OP_MOVI: 		OpMovI();		break;
+				case OP_MOVF: 		OpMovF();		break;
+				case OP_MOVS: 		OpMovS();		break;
+
+				case OP_ADD: 		OpAdd();		break;
+				case OP_SUB: 		OpSub();		break;
+				case OP_MUL: 		OpMul();		break;
+				case OP_DIV: 		OpDiv();		break;
+				case OP_MOD: 		OpMod();		break;
+
+				case OP_EXIT: 		/* TODO */		break;
+			}
+		} else if (op <= 0x2F) {
+			// Jump and comparisons
+		} else {
+			// Corrupted binary
+		}
 	}
 }
 
@@ -299,4 +312,35 @@ void Environment::OpJl() {
 
 void Environment::OpJle() {
 
+}
+
+
+void Environment::OpDataBegin() {
+	if (mDataDef) {
+		throw InvalidOpException("Already defining data");
+	}
+
+	mDataDef = true;
+}
+
+void Environment::OpDataString() {
+	// TODO
+}
+
+void Environment::OpDataFunc() {
+	int funcId = 0;
+	int funcPos = 0;
+
+	funcId = GetOpcodeInt();
+	funcPos = GetOpcodeInt();
+
+	mFunctions[funcId] = funcPos;
+}
+
+void Environment::OpDataEnd() {
+	if (!mDataDef) {
+		throw InvalidOpException("Was not defining data");
+	}
+
+	mDataDef = false;
 }
