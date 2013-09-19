@@ -274,7 +274,7 @@ bool Var::Convert(const char *str) {
 	}
 
 	if (dbl) {
-		Set(strtof(str, NULL));
+		Set((float)strtod(str, NULL));
 	} else {
 		Set(atoi(str));
 	}

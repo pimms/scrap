@@ -3,22 +3,19 @@
 #include <cstring>
 #include <stdio.h>
 
-Environment::Environment(void *ops, int oplen) {
-	mOpcodes = malloc(oplen);
-	memcpy(mOpcodes, ops, oplen);
-
-	mOpLen = oplen;
+Environment::Environment(byte *ops) {
+	mOpcodes = ops;
 	mOpPtr = 0;
 }
 
 Environment::~Environment() {
-	free(mOpcodes);
+	
 }
 
 int Environment::Execute() {
 	printf("Starting execution...\n");
 
-	while (((char*)mOpcodes)[mOpPtr] != OP_EXIT) {
+	while (mOpcodes[mOpPtr] != OP_EXIT) {
 		Operation();
 	}
 
@@ -30,7 +27,7 @@ int Environment::Execute() {
 
 
 void Environment::Operation() {
-	char op = ((char*)mOpcodes)[mOpPtr++];
+	byte op = mOpcodes[mOpPtr++];
 
 	if (op <= 0x1F) {
 		switch (op) {

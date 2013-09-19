@@ -1,11 +1,11 @@
 #include <iostream>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "run/env.h"
 
 int main(int argc, char *argv[]) {
-	// Program to calculate (10 * 4) / 3
-	u_char opcodes[] = {
+	byte opcodes[] = {
 		OP_ALLOC,	0x01,0x00,0x00,0x80,
 		OP_MOVI,	0x01,0x00,0x00,0x80, 0x04,0x00,0x00,0x00,
 		OP_ALLOC,	0x02,0x00,0x00,0x80,
@@ -23,8 +23,11 @@ int main(int argc, char *argv[]) {
 		OP_EXIT,
 	};
 
-	Environment env(opcodes, 40);
-	env.Execute();
+	Environment env(opcodes);
+	int retval = env.Execute();
 
-	return 0;
+	printf("Program terminated with status %i.\n", retval);
+	getchar();
+
+	return retval;
 }
