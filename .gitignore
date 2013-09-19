@@ -14,3 +14,6 @@
 
 # The final executable
 scrap
+
+# Visual studio project folder
+vs11/
