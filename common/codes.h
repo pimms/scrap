@@ -82,11 +82,15 @@
 *
 * (*) 	Requires four bytes (string length),
 * 		followed by a NULL-terminated string.
+* (**)	Required an int defining the ID of the 
+*		function, followed by an int containing
+*		the byte offset of the first instruction
+*		in the function.
 *****/
 #define OP_DATA_BEGIN			0xF0
 #define OP_DATA_STRING			0xF1 	// PARAM (*)
-#define OP_DATA_FUNC			0xF2	// PARAM
-#define OP_DATA_CLASS_POS		0xF3	// PARAM
+#define OP_DATA_FUNC			0xF2	// PARAM (**)
+//#define OP_DATA_CLASS_POS		0xF3	// PARAM
 
 #define OP_DATA_END 			0xFF
 

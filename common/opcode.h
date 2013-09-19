@@ -15,6 +15,7 @@ public:
 						Opcode();
 
 	byte*				GetRaw();
+	int					Length();
 
 	Opcode*				AddByte(byte val);
 	Opcode*				AddInt(int val);

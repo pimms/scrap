@@ -23,6 +23,11 @@ byte* Opcode::GetRaw() {
 	return ret;
 }
 
+int Opcode::Length() {
+	return mBytes.size();
+}
+
+
 Opcode* Opcode::AddByte(byte val) {
 	mBytes.push_back(val);
 	return this;
