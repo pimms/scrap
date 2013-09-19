@@ -24,6 +24,7 @@
 *****/
 #define VAR_GLOBAL 		0x80000000
 #define VAR_LOCAL		0x40000000
+#define VAR_RETURN		0xFFFFFFFF
 
 
 
@@ -41,7 +42,7 @@
 #define OP_PUSH_DATA			0x02	// PARAM
 #define OP_POP 					0x03	// PARAM
 #define OP_CALL 				0x04	// PARAM
-#define OP_RET 					0x05
+#define OP_RET 					0x05	// PARAM
 #define OP_ALLOC 				0x06 	// PARAM
 #define OP_POPMOV 				0x07	// PARAM (*)
 #define OP_EXIT 				0x08	// PARAM

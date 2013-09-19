@@ -12,7 +12,7 @@
 using namespace std;
 
 #ifdef _DEBUG
-#	define LOGF(A) printf A
+#	define LOGF(A) printf("[%i]: ",mOpPtr); printf A
 #else
 # 	define LOGF(A) false
 #endif
@@ -36,11 +36,17 @@ private:
 
 	bool			mDataDef;
 
-	/***** Program Stack ****
-	* Variable IDs and opcode pointers are pushed
-	* onto this stack. 
+	/***** Program Stack *****
+	* Variable IDs are pushed onto this stack. 
 	*****/
 	Stack<uint>		mPStack;
+
+	/***** Function stack *****
+	* Previous opcode positions are pushed onto
+	* this stack when calling a function. The value
+	* is popped and moved to when the function returns.
+	*****/
+	Stack<uint>		mFStack;
 
 	/***** Global Scope *****
 	* Global variable scope. 
@@ -62,7 +68,7 @@ private:
 	void 			Operation();
 
 	Var* 			GetVarById(uint id);
-	void 			GetStackVar(Var *&var);
+	void 			PopStackVar(Var *&var);
 
 	uint 			GetOpcodeInt();
 	Var* 			GetOpcodeVar();

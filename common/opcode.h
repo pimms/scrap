@@ -19,6 +19,7 @@ public:
 
 	Opcode*				AddByte(byte val);
 	Opcode*				AddInt(int val);
+	Opcode*				AddUint(uint val);
 
 private:
 	list<byte>			mBytes;

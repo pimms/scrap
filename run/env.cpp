@@ -6,6 +6,10 @@
 Environment::Environment(Opcode *opcode) {
 	mOpcodes = opcode->GetRaw();
 	mOpPtr = 0;
+	mDataDef = false;
+
+	// Allocate the global return value 
+	mGScope.Alloc(VAR_RETURN);
 }
 
 Environment::~Environment() {
@@ -93,8 +97,8 @@ Var* Environment::GetVarById(uint id) {
 	return ret;
 }
 
-void Environment::GetStackVar(Var *&var) {
-	int varId = 0;
+void Environment::PopStackVar(Var *&var) {
+	uint varId = 0;
 
 	varId = mPStack.Pop();
 	var = GetVarById(varId);
@@ -134,7 +138,8 @@ void Environment::OpCall() {
 	uint funcId = GetOpcodeInt();
 	uint funcPos = mFunctions[funcId];
 
-	mPStack.Push(mOpPtr);
+	// Push the next instruction to be executed.
+	mFStack.Push(mOpPtr);
 	mOpPtr = funcPos;
 
 	Scope *localScope = new Scope();
@@ -144,10 +149,27 @@ void Environment::OpCall() {
 }
 
 void Environment::OpRet() {
-	mOpPtr = mPStack.Pop();
+	Scope *localScope = NULL;
+	int retId = 0;
 
-	Scope *localScope = mLScope.Pop();
+	// Copy the value of the local var
+	// to the return variable.
+	retId = GetOpcodeInt();
+	Var *retSrc = NULL;
+	if ((retSrc = GetVarById(retId))) {
+		Var *retDst = GetVarById(VAR_RETURN);
+		*retDst = *retSrc;
+		mPStack.Push(VAR_RETURN);
+	} else {
+		mPStack.Push(0);
+	}
+
+	// Delete the current scope
+	localScope = mLScope.Pop();
 	delete localScope;
+
+	// Pop the previous position
+	mOpPtr = mFStack.Pop();
 
 	LOGF(("Returning to %u\n", mOpPtr));
 }
@@ -168,18 +190,20 @@ void Environment::OpPopMov() {
 	Var *source = NULL;
 	Var *dest = NULL;
 
-	GetStackVar(source);
+	PopStackVar(source);
 
 	dest = GetOpcodeVar();
 	*dest = *source;
+
+	LOGF(("Popping Var %x into Var %x\n", source->GetId(), dest->GetId()));
 }
 
 void Environment::OpMov() {
 	Var *source = NULL;
 	Var *dest = NULL;
 
-	GetStackVar(source);
-	GetStackVar(dest);
+	PopStackVar(source);
+	PopStackVar(dest);
 
 	*dest = *source;
 }
@@ -203,7 +227,7 @@ void Environment::OpMovF() {
 	float literal = 0;
 
 	literal = mPStack.Pop();
-	GetStackVar(dest);
+	PopStackVar(dest);
 
 	dest->Set(literal);
 
@@ -220,8 +244,8 @@ void Environment::OpAdd() {
 	Var *left = NULL;
 	Var *right = NULL;
 	
-	GetStackVar(right);
-	GetStackVar(left);
+	PopStackVar(right);
+	PopStackVar(left);
 
 	*left += *right;	
 	mPStack.Push(left->GetId());
@@ -233,8 +257,8 @@ void Environment::OpSub() {
 	Var *left = NULL;
 	Var *right = NULL;
 	
-	GetStackVar(right);
-	GetStackVar(left);
+	PopStackVar(right);
+	PopStackVar(left);
 
 	*left -= *right;	
 	mPStack.Push(left->GetId());
@@ -246,8 +270,8 @@ void Environment::OpMul() {
 	Var *left = NULL;
 	Var *right = NULL;
 	
-	GetStackVar(right);
-	GetStackVar(left);
+	PopStackVar(right);
+	PopStackVar(left);
 
 	*left *= *right;
 	mPStack.Push(left->GetId());
@@ -259,8 +283,8 @@ void Environment::OpDiv() {
 	Var *left = NULL;
 	Var *right = NULL;
 	
-	GetStackVar(right);
-	GetStackVar(left);
+	PopStackVar(right);
+	PopStackVar(left);
 
 	*left /= *right;	
 	mPStack.Push(left->GetId());
@@ -272,8 +296,8 @@ void Environment::OpMod() {
 	Var *left = NULL;
 	Var *right = NULL;
 	
-	GetStackVar(right);
-	GetStackVar(left);
+	PopStackVar(right);
+	PopStackVar(left);
 
 	*left %= *right;	
 	mPStack.Push(left->GetId());

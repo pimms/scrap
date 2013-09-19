@@ -22,10 +22,44 @@ int main(int argc, char *argv[]) {
 	opsCalc.AddByte(OP_DIV);
 	opsCalc.AddByte(OP_EXIT)->AddInt(VAR_GLOBAL  | 1);
 
-	
-	Environment env(&opsCalc);
-	int retval = env.Execute();
-	getchar();
+	/* Example program calling a function taking a parameter.
+	 * The parameter is multiplied by 14 and returned. The
+	 * program then exits with the return value (5*14=70).
+	 */
+	Opcode opsFunc;
+	opsFunc.AddByte(OP_DATA_BEGIN);
+	opsFunc.AddByte(OP_DATA_FUNC)->AddUint(1)->AddUint(45);
+	opsFunc.AddByte(OP_DATA_END);
+	opsFunc.AddByte(OP_ALLOC)->AddUint(VAR_GLOBAL | 1);
+	opsFunc.AddByte(OP_MOVI)->AddUint(VAR_GLOBAL  | 1)->AddInt(5);
+	opsFunc.AddByte(OP_PUSH)->AddUint(VAR_GLOBAL  | 1);
+	opsFunc.AddByte(OP_CALL)->AddUint(1);
+	opsFunc.AddByte(OP_POPMOV)->AddUint(VAR_GLOBAL| 1);
+	opsFunc.AddByte(OP_EXIT)->AddUint(VAR_GLOBAL  | 1);
 
-	return retval;
+	opsFunc.AddByte(OP_ALLOC)->AddUint(VAR_LOCAL  | 1);
+	opsFunc.AddByte(OP_POPMOV)->AddUint(VAR_LOCAL | 1);
+	opsFunc.AddByte(OP_ALLOC)->AddUint(VAR_LOCAL  | 2);
+	opsFunc.AddByte(OP_MOVI)->AddUint(VAR_LOCAL   | 2)->AddInt(14);
+	opsFunc.AddByte(OP_PUSH)->AddUint(VAR_LOCAL | 1);
+	opsFunc.AddByte(OP_PUSH)->AddUint(VAR_LOCAL | 2);
+	opsFunc.AddByte(OP_MUL);
+	opsFunc.AddByte(OP_POP);
+	opsFunc.AddByte(OP_RET)->AddUint(VAR_LOCAL | 1);
+
+	{
+		printf("Calculation program:\n");
+		Environment env(&opsCalc);
+		//env.Execute();
+		printf("\n\n");
+	}
+	{
+		printf("Function program:\n");
+		Environment env(&opsFunc);
+		env.Execute();
+		printf("\n\n");
+	}
+	
+	getchar();
+	return 0;
 }

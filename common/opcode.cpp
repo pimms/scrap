@@ -49,6 +49,22 @@ Opcode* Opcode::AddInt(int val) {
 	return this;
 }
 
+Opcode* Opcode::AddUint(uint val) {
+	byte *b = (byte*)&val;
+
+	if (mBigEndian) {
+		for (int i=3; i>=0; i--) {
+			AddByte(b[i]);
+		}
+	} else {
+		for (int i=0; i<4; i++) {
+			AddByte(b[i]);
+		}
+	}
+
+	return this;
+}
+
 
 bool Opcode::IsBigEndian() {
 	union {
