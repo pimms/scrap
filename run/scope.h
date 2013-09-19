@@ -1,6 +1,8 @@
 #pragma once
 
 #include "var.h"
+#include "../common/codes.h"
+
 #include <map>
 #include <stdlib.h>
 using namespace std;

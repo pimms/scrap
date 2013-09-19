@@ -16,14 +16,13 @@ using namespace std;
 
 class Environment {
 public:
-					Environment(void *ops, int oplen);
+					Environment(byte *ops);
 					~Environment();
 
 	int 			Execute();
 
 private:
-	void			*mOpcodes;
-	uint 			mOpLen;
+	byte			*mOpcodes;
 	uint 			mOpPtr;
 
 	/***** Program Stack ****

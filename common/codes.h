@@ -4,6 +4,9 @@
 *
 * This file contains the definitions for the 
 * byte-codes used.
+*
+* Common type-definitions are also included in 
+* this file.
 *****/
 
 
@@ -85,3 +88,11 @@
 #define OP_DATA_CLASS_POS		0xF3	// PARAM
 
 #define OP_DATA_END 			0xFF
+
+
+
+/***** TYPE DEFINITIONS *****
+* Common type definitions.
+*****/
+typedef unsigned		uint;
+typedef unsigned char	byte;
