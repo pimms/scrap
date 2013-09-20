@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	{
 		printf("Calculation program:\n");
 		Environment env(&opsCalc);
-		//env.Execute();
+		env.Execute();
 		printf("\n\n");
 	}
 	{

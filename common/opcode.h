@@ -5,6 +5,8 @@
 * at run-time.
 *****/
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <list>
 #include "codes.h"
 

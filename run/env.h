@@ -117,6 +117,8 @@ private:
 	public:  string mTxt;					\
 	_NAME(string txt=_TXTDEFAULT)			\
 			{  mTxt = txt; }				\
+	virtual ~_NAME() throw() {}				\
+	using std::exception::what; 			\
 	const char* what()						\
 			{ return mTxt.c_str(); }
 
