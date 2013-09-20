@@ -55,8 +55,8 @@
 // Arithmetic operations are performed:
 //		b = pop()
 // 		a = pop()
-// 		c = a (operator) b
-// 		push(c)
+// 		a = a (operator) b
+// 		push(a)
 #define OP_ADD					0x0D
 #define OP_SUB					0x0E
 #define OP_MUL					0x0F
