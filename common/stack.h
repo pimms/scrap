@@ -43,6 +43,7 @@ public:
 		mMaxSize = maxSize;
 		mSize = 0;
 		mBack = 0;
+		mFront = 0;
 	}
 
 	~Stack() {
@@ -68,6 +69,10 @@ public:
 		}
 
 		mBack = node;
+
+		if (mSize == 1) {
+			mFront = mBack;
+		}
 	}
 
 	T Pop() {
@@ -92,9 +97,24 @@ public:
 		return NULL;
 	}
 
+	T Peek(int index) {
+		Node *node = mFront;
+		
+		for (int i=0; i<index && node; i++) {
+			node = node->next;
+		}
+
+		return node->val;
+	}
+
+	int Size() {
+		return mSize;
+	}
+
 private:
 	int 			mMaxSize;
 	int 			mSize;
 
+	Node			*mFront;
 	Node 			*mBack;
 };
