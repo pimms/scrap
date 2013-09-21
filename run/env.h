@@ -119,7 +119,23 @@ private:
 	void 			OpJge();
 	void 			OpJl();
 	void 			OpJle();
-	void			CompareJump(bool(Var::*cmp)(const Var&)const);
+	void			CompareJumpStack(bool(Var::*cmp)(const Var&)const);
+
+	void			OpJeI();
+	void			OpJneI();
+	void			OpJgI();
+	void			OpJgeI();
+	void			OpJlI();
+	void			OpJleI();
+	void			CompareJumpInt(bool(Var::*cmp)(const int&)const);
+
+	void			OpJeF();
+	void			OpJneF();
+	void			OpJgF();
+	void			OpJgeF();
+	void			OpJlF();
+	void			OpJleF();
+	void			CompareJumpFloat(bool(Var::*cmp)(const float&)const);
 
 	void			OpDataBegin();
 	void			OpDataString();

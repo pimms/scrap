@@ -261,8 +261,29 @@ bool Var::operator>(const Var &var) const {
 	return res == GREATER;
 }
 
+bool Var::operator>(const int &val) const {
+	CmpResult res = CompareWithInt(val);
+	return res == GREATER;
+}
+
+bool Var::operator>(const float &val) const {
+	CmpResult res = CompareWithFloat(val);
+	return res == GREATER;
+}
+
+
 bool Var::operator>=(const Var &var) const {
 	CmpResult res = CompareWith(var);
+	return (res == GREATER || res == EQUAL);
+}
+
+bool Var::operator>=(const int &val) const {
+	CmpResult res = CompareWithInt(val);
+	return (res == GREATER || res == EQUAL);
+}
+
+bool Var::operator>=(const float &val) const {
+	CmpResult res = CompareWithFloat(val);
 	return (res == GREATER || res == EQUAL);
 }
 
@@ -272,8 +293,29 @@ bool Var::operator<(const Var &var) const {
 	return res == LESS;
 }
 
+bool Var::operator<(const int &val) const {
+	CmpResult res = CompareWithInt(val);
+	return res == LESS;
+}
+
+bool Var::operator<(const float &val) const {
+	CmpResult res = CompareWithFloat(val);
+	return res == LESS;
+}
+
+
 bool Var::operator<=(const Var &var) const {
 	CmpResult res = CompareWith(var);
+	return (res == LESS || res == EQUAL);
+}
+
+bool Var::operator<=(const int &val) const {
+	CmpResult res = CompareWithInt(val);
+	return (res == LESS || res == EQUAL);
+}
+
+bool Var::operator<=(const float &val) const {
+	CmpResult res = CompareWithFloat(val);
 	return (res == LESS || res == EQUAL);
 }
 
@@ -283,8 +325,29 @@ bool Var::operator==(const Var &var) const {
 	return res == EQUAL;
 }
 
+bool Var::operator==(const int &val) const {
+	CmpResult res = CompareWithInt(val);
+	return res == EQUAL;
+}
+
+bool Var::operator==(const float &val) const {
+	CmpResult res = CompareWithFloat(val);
+	return res == EQUAL;
+}
+
+
 bool Var::operator!=(const Var &var) const {
 	CmpResult res = CompareWith(var);
+	return res != EQUAL;
+}
+
+bool Var::operator!=(const int &val) const {
+	CmpResult res = CompareWithInt(val);
+	return res != EQUAL;
+}
+
+bool Var::operator!=(const float &val) const {
+	CmpResult res = CompareWithFloat(val);
 	return res != EQUAL;
 }
 
@@ -333,51 +396,48 @@ Var::CmpResult Var::CompareWith(const Var &var) const {
 	// Int comparison is only performed when both objects are
 	// of type INT.
 	if (mType == FLOAT || type == FLOAT) {
-		return CompareWithFloat(var);
+		return CompareWithFloat(var.GetFloat());
 	} else if (mType == INT && type == INT) {
-		return CompareWithInt(var);
+		return CompareWithInt(var.GetInt());
 	} else if (mType == STRING || type == STRING) {
-		return CompareWithString(var);
+		return CompareWithString(var.GetString());
 	}
 
 	return Var::CmpResult::UNDEFCMP;
 }
 
-Var::CmpResult Var::CompareWithInt(const Var &iVar) const {
+Var::CmpResult Var::CompareWithInt(const int &val) const {
 	int tVal = GetInt();
-	int oVal = iVar.GetInt();
 
-	if (tVal < oVal) {
+	if (tVal < val) {
 		return LESS;
-	} else if (tVal > oVal) {
+	} else if (tVal > val) {
 		return GREATER;
-	} else if (tVal == oVal) {
+	} else if (tVal == val) {
 		return EQUAL;
 	}
 
 	return UNDEFCMP;
 }
 
-Var::CmpResult Var::CompareWithFloat(const Var &fVar) const {
+Var::CmpResult Var::CompareWithFloat(const float &val) const {
 	float tVal = GetFloat();
-	float oVal = fVar.GetFloat();
 
-	if (abs(tVal-oVal) < 0.0000001f) {
+	if (abs(tVal-val) < 0.0000001f) {
 		return EQUAL;
-	} if (tVal < oVal) {
+	} if (tVal < val) {
 		return LESS;
-	} else if (tVal > oVal) {
+	} else if (tVal > val) {
 		return GREATER;
 	}
 
 	return UNDEFCMP;
 }
 
-Var::CmpResult Var::CompareWithString(const Var &sVar) const {
+Var::CmpResult Var::CompareWithString(const char *val) const {
 	const char *tVal = GetString();
-	const char *oVal = sVar.GetString();
 
-	if (strcmp(tVal, oVal) == 0) {
+	if (strcmp(tVal, val) == 0) {
 		return EQUAL;
 	} 
 

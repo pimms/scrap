@@ -137,7 +137,6 @@ int main(int argc, char *argv[]) {
 		printf("LOOP END %i\n", count.Length());
 		count.AddByte(OP_RET)->AddUint(VAR_LOCAL | 2);
 
-		/*
 		{
 			printf("Calculation program:\n");
 			Environment env(&calc);
@@ -156,7 +155,6 @@ int main(int argc, char *argv[]) {
 			env.Execute();
 			printf("\n\n");
 		}
-		*/
 		{
 			printf("Counting program:\n");
 			Environment env(&count);

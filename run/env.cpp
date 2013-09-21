@@ -88,8 +88,6 @@ void Environment::Operation() {
 
 				case OP_PUSH_SCOPE:	OpPushScope();	break;
 				case OP_POP_SCOPE:	OpPopScope();	break;
-
-				case OP_EXIT: 		/* TODO */		break;
 			}
 		} else if (op <= 0x2F) {
 			switch (op) {
@@ -100,6 +98,20 @@ void Environment::Operation() {
 				case OP_JGE:		OpJge();		break;
 				case OP_JL:			OpJl();			break;
 				case OP_JLE:		OpJle();		break;
+
+				case OP_JE_I:		OpJeI();		break;
+				case OP_JNE_I:		OpJneI();		break;
+				case OP_JG_I:		OpJgI();		break;
+				case OP_JGE_I:		OpJgeI();		break;
+				case OP_JL_I:		OpJlI();		break;
+				case OP_JLE_I:		OpJleI();		break;
+
+				case OP_JE_F:		OpJeF();		break;
+				case OP_JNE_F:		OpJneF();		break;
+				case OP_JG_F:		OpJgF();		break;
+				case OP_JGE_F:		OpJgeF();		break;
+				case OP_JL_F:		OpJlF();		break;
+				case OP_JLE_F:		OpJleF();		break;
 			}
 		} else {
 			// Corrupted binary
@@ -398,35 +410,35 @@ void Environment::OpJmp() {
 
 void Environment::OpJe() {
 	LOGF(("Comparing ==\n"));
-	CompareJump(&Var::operator==);
+	CompareJumpStack(&Var::operator==);
 }
 
 void Environment::OpJne() {
 	LOGF(("Comparing !=\n"));
-	CompareJump(&Var::operator!=);
+	CompareJumpStack(&Var::operator!=);
 }
 
 void Environment::OpJg() {
 	LOGF(("Comparing >\n"));
-	CompareJump(&Var::operator>);
+	CompareJumpStack(&Var::operator>);
 }
 
 void Environment::OpJge() {
 	LOGF(("Comparing >=\n"));
-	CompareJump(&Var::operator>=);
+	CompareJumpStack(&Var::operator>=);
 }
 
 void Environment::OpJl() {
 	LOGF(("Comparing <\n"));
-	CompareJump(&Var::operator<);
+	CompareJumpStack(&Var::operator<);
 }
 
 void Environment::OpJle() {
 	LOGF(("Comparing <=\n"));
-	CompareJump(&Var::operator<=);
+	CompareJumpStack(&Var::operator<=);
 }
 
-void Environment::CompareJump(bool(Var::*cmp)(const Var&)const) {
+void Environment::CompareJumpStack(bool(Var::*cmp)(const Var&)const) {
 	Var *left = NULL;
 	Var *right = NULL;
 
@@ -437,6 +449,84 @@ void Environment::CompareJump(bool(Var::*cmp)(const Var&)const) {
 		OpJmp();
 	} else {
 		// Ignore the op-pointer
+		mOpPtr += 4;
+	}
+}
+
+
+void Environment::OpJeI() {
+	CompareJumpInt(&Var::operator==);
+}
+
+void Environment::OpJneI() {
+	CompareJumpInt(&Var::operator!=);
+}
+
+void Environment::OpJgI() {
+	CompareJumpInt(&Var::operator>);
+}
+
+void Environment::OpJgeI() {
+	CompareJumpInt(&Var::operator>=);
+}
+
+void Environment::OpJlI() {
+	CompareJumpInt(&Var::operator<);
+}
+
+void Environment::OpJleI() {
+	CompareJumpInt(&Var::operator<=);
+}
+
+void Environment::CompareJumpInt(bool(Var::*cmp)(const int&)const) {
+	Var *var = NULL;
+	int literal = 0;
+
+	PopStackVar(var);
+	literal = GetOpcodeInt();
+
+	if ((*var.*cmp)(literal)) {
+		OpJmp();
+	} else {
+		mOpPtr += 4;
+	}
+}
+
+
+void Environment::OpJeF() {
+	CompareJumpInt(&Var::operator==);
+}
+
+void Environment::OpJneF() {
+	CompareJumpInt(&Var::operator!=);
+}
+
+void Environment::OpJgF() {
+	CompareJumpInt(&Var::operator>);
+}
+
+void Environment::OpJgeF() {
+	CompareJumpInt(&Var::operator>=);
+}
+
+void Environment::OpJlF() {
+	CompareJumpInt(&Var::operator<);
+}
+
+void Environment::OpJleF() {
+	CompareJumpInt(&Var::operator<=);
+}
+
+void Environment::CompareJumpFloat(bool(Var::*cmp)(const float&)const) {
+	Var *var = NULL;
+	float literal = 0.f;
+
+	PopStackVar(var);
+	literal = GetOpcodeFloat();
+
+	if ((*var.*cmp)(literal)) {
+		OpJmp();
+	} else {
 		mOpPtr += 4;
 	}
 }

@@ -47,13 +47,28 @@ public:
 	void operator%=(const int &val);
 
 	bool operator>(const Var &var) const;
+	bool operator>(const int &val) const;
+	bool operator>(const float &val) const;
+
 	bool operator>=(const Var &var) const;
+	bool operator>=(const int &val) const;
+	bool operator>=(const float &val) const;
 	
 	bool operator<(const Var &var) const;
+	bool operator<(const int &val) const;
+	bool operator<(const float &val) const;
+
 	bool operator<=(const Var &var) const;
+	bool operator<=(const int &val) const;
+	bool operator<=(const float &val) const;
 
 	bool operator==(const Var &var) const;
+	bool operator==(const int &val) const;
+	bool operator==(const float &val) const;
+
 	bool operator!=(const Var &var) const;
+	bool operator!=(const int &val) const;
+	bool operator!=(const float &val) const;
 
 private:
 	Type 		mType;
@@ -89,7 +104,7 @@ private:
 	};
 
 	CmpResult CompareWith(const Var &var) const;
-	CmpResult CompareWithInt(const Var &iVar) const;
-	CmpResult CompareWithFloat(const Var &fVar) const;
-	CmpResult CompareWithString(const Var &sVar) const;
+	CmpResult CompareWithInt(const int &val) const;
+	CmpResult CompareWithFloat(const float &val) const;
+	CmpResult CompareWithString(const char *val) const;
 };
