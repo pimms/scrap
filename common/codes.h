@@ -63,6 +63,29 @@
 #define OP_DIV 					0x10
 #define OP_MOD					0x11
 
+// Arithmetic literal operations are performed:
+//		a = pop()
+//		a = a (operator) opcode_literal
+//		push(a)
+#define OP_ADD_I				0x12	// PARAM
+#define OP_SUB_I				0x13	// PARAM
+#define OP_MUL_I				0x14	// PARAM
+#define OP_DIV_I				0x15	// PARAM
+#define OP_MOD_I				0x16	// PARAM
+
+#define OP_ADD_F				0x17	// PARAM
+#define OP_SUB_F				0x18	// PARAM
+#define OP_MUL_F				0x19	// PARAM
+#define OP_DIV_F				0x1A	// PARAM
+
+// Nested scopes are scopes within a scope, for
+// instance the body of a loop or an if-statement.
+// Variables allocated after a call to PUSH_SCOPE
+// will be deallocated on the next POP_SCOPE call.
+#define	OP_PUSH_SCOPE			0x1E
+#define OP_POP_SCOPE			0x1F
+
+
 /***** COMPARISON AND JUMPS *****
 * Start: 		0x20
 * Finsih:		0x2F
