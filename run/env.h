@@ -70,8 +70,12 @@ private:
 	Var* 			GetVarById(uint id);
 	void 			PopStackVar(Var *&var);
 
-	uint 			GetOpcodeInt();
+	int				GetOpcodeInt();
+	uint 			GetOpcodeUint();
+	float			GetOpcodeFloat();
 	Var* 			GetOpcodeVar();
+
+	Scope*			GetCurrentScope();
 
 	void 			OpPush();
 	void 			OpPushData();
@@ -90,6 +94,23 @@ private:
 	void 			OpMul();
 	void 			OpDiv();
 	void 			OpMod();
+	void			ArithmeticStack(void(Var::*oper)(const Var&));
+
+	void			OpAddI();
+	void			OpSubI();
+	void			OpMulI();
+	void			OpDivI();
+	void			OpModI();
+	void			ArithmeticInt(void(Var::*oper)(const int&));
+
+	void			OpAddF();
+	void			OpSubF();
+	void			OpMulF();
+	void			OpDivF();
+	void			ArithmeticFloat(void(Var::*oper)(const float&));
+
+	void			OpPushScope();
+	void			OpPopScope();
 
 	void 			OpJmp();
 	void 			OpJe();

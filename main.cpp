@@ -114,7 +114,6 @@ int main(int argc, char *argv[]) {
 		count.AddByte(OP_EXIT)->AddUint(VAR_GLOBAL | 1);
 	
 		// Function entry
-		printf("FUNCTION ENTRY: %i\n", count.Length());
 		count.AddByte(OP_ALLOC)->AddUint(VAR_LOCAL | 1);
 		count.AddByte(OP_POPMOV)->AddUint(VAR_LOCAL | 1);
 		count.AddByte(OP_ALLOC)->AddUint(VAR_LOCAL | 2);
@@ -123,7 +122,6 @@ int main(int argc, char *argv[]) {
 		count.AddByte(OP_MOVI)->AddUint(VAR_LOCAL | 3)->AddInt(1);
 
 		// Loop begin
-		printf("Loop begin: %i\n", count.Length());
 		count.AddByte(OP_PUSH)->AddUint(VAR_LOCAL | 2);
 		count.AddByte(OP_PUSH)->AddUint(VAR_LOCAL | 1);
 		count.AddByte(OP_JGE)->AddUint(115);
@@ -135,7 +133,6 @@ int main(int argc, char *argv[]) {
 		count.AddByte(OP_JMP)->AddUint(83);
 
 		// Loop end
-		printf("Loop end: %i\n", count.Length());
 		count.AddByte(OP_RET)->AddUint(VAR_LOCAL | 2);
 
 		{

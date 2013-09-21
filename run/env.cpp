@@ -26,7 +26,7 @@ int Environment::Execute() {
 	}
 
 	mOpPtr++;
-	int exitId = GetOpcodeInt();
+	int exitId = GetOpcodeUint();
 
 	if (exitId & (VAR_GLOBAL | VAR_LOCAL)) {
 		Var *var = GetVarById(exitId);
@@ -75,6 +75,20 @@ void Environment::Operation() {
 				case OP_DIV: 		OpDiv();		break;
 				case OP_MOD: 		OpMod();		break;
 
+				case OP_ADD_I:		OpAddI();		break;
+				case OP_SUB_I:		OpSubI();		break;
+				case OP_MUL_I:		OpMulI();		break;
+				case OP_DIV_I:		OpDivI();		break;
+				case OP_MOD_I:		OpModI();		break;
+
+				case OP_ADD_F:		OpAddF();		break;
+				case OP_SUB_F:		OpSubF();		break;
+				case OP_MUL_F:		OpMulF();		break;
+				case OP_DIV_F:		OpDivF();		break;
+
+				case OP_PUSH_SCOPE:	OpPushScope();	break;
+				case OP_POP_SCOPE:	OpPopScope();	break;
+
 				case OP_EXIT: 		/* TODO */		break;
 			}
 		} else if (op <= 0x2F) {
@@ -92,6 +106,7 @@ void Environment::Operation() {
 		}
 	}
 }
+
 
 Var* Environment::GetVarById(uint id) {
 	Var *ret = NULL;
@@ -112,23 +127,48 @@ void Environment::PopStackVar(Var *&var) {
 	var = GetVarById(varId);
 }
 
-uint Environment::GetOpcodeInt() {
-	char *bytePtr = &((char*)mOpcodes)[mOpPtr];
+
+int Environment::GetOpcodeInt() {
+	byte *bytePtr = &((byte*)mOpcodes)[mOpPtr];
+
+	mOpPtr += 4;
+
+	return *(int*)bytePtr;
+}
+
+uint Environment::GetOpcodeUint() {
+	byte *bytePtr = &((byte*)mOpcodes)[mOpPtr];
 
 	mOpPtr += 4;
 
 	return *(uint*)bytePtr;
 }
 
+float Environment::GetOpcodeFloat() {
+	byte *bytePtr = &((byte*)mOpcodes)[mOpPtr];
+
+	mOpPtr += 4;
+
+	return *(float*)bytePtr;
+}
+
 Var* Environment::GetOpcodeVar() {
-	uint id = GetOpcodeInt();
+	uint id = GetOpcodeUint();
 	return GetVarById(id);
 }
 
 
+Scope* Environment::GetCurrentScope() {
+	if (!mLScope.Size()) {
+		return &mGScope;
+	} 
+		
+	return mLScope.Peek();
+}
+
 
 void Environment::OpPush() {
-	uint varId = GetOpcodeInt();
+	uint varId = GetOpcodeUint();
 	mPStack.Push(varId);
 
 	LOGF(("Pushing var %x\n", varId));
@@ -143,7 +183,7 @@ void Environment::OpPop() {
 }
 
 void Environment::OpCall() {
-	uint funcId = GetOpcodeInt();
+	uint funcId = GetOpcodeUint();
 	uint funcPos = mFunctions[funcId];
 
 	// Push the next instruction to be executed.
@@ -162,7 +202,7 @@ void Environment::OpRet() {
 
 	// Copy the value of the local var
 	// to the return variable.
-	retId = GetOpcodeInt();
+	retId = GetOpcodeUint();
 	Var *retSrc = NULL;
 	if ((retSrc = GetVarById(retId))) {
 		Var *retDst = GetVarById(VAR_RETURN);
@@ -183,7 +223,7 @@ void Environment::OpRet() {
 }
 
 void Environment::OpAlloc() {
-	uint varId = GetOpcodeInt();
+	uint varId = GetOpcodeUint();
 
 	if (varId & VAR_GLOBAL) {
 		mGScope.Alloc(varId);
@@ -217,25 +257,23 @@ void Environment::OpMov() {
 }
 
 void Environment::OpMovI() {
-	uint destId = 0;
 	Var *dest = NULL;
 	int literal = 0;
 
-	destId = GetOpcodeInt();
-	literal = GetOpcodeInt();
+	dest = GetOpcodeVar();
+	literal = GetOpcodeUint();
 	
-	dest = GetVarById(destId);
 	dest->Set(literal);
 
-	LOGF(("Var %x = %i\n", destId, literal));
+	LOGF(("Var %x = %i\n", dest->GetId(), literal));
 }
 
 void Environment::OpMovF() {
 	Var *dest = NULL;
 	float literal = 0;
 
-	literal = mPStack.Pop();
-	PopStackVar(dest);
+	dest = GetOpcodeVar();
+	literal = GetOpcodeFloat();
 
 	dest->Set(literal);
 
@@ -249,73 +287,107 @@ void Environment::OpMovS() {
 
 
 void Environment::OpAdd() {
-	Var *left = NULL;
-	Var *right = NULL;
-	
-	PopStackVar(right);
-	PopStackVar(left);
-
-	*left += *right;	
-	mPStack.Push(left->GetId());
-
-	LOGF(("Var %x += Var %x = %i\n", left->GetId(), right->GetId(), left->GetInt()));
+	ArithmeticStack(&Var::operator+=);
 }
 
 void Environment::OpSub() {
-	Var *left = NULL;
-	Var *right = NULL;
-	
-	PopStackVar(right);
-	PopStackVar(left);
-
-	*left -= *right;	
-	mPStack.Push(left->GetId());
-
-	LOGF(("Var %x -= Var %x = %i\n", left->GetId(), right->GetId(), left->GetInt()));
+	ArithmeticStack(&Var::operator-=);
 }
 
 void Environment::OpMul() {
-	Var *left = NULL;
-	Var *right = NULL;
-	
-	PopStackVar(right);
-	PopStackVar(left);
-
-	*left *= *right;
-	mPStack.Push(left->GetId());
-
-	LOGF(("Var %x *= Var %x = %i\n", left->GetId(), right->GetId(), left->GetInt()));
+	ArithmeticStack(&Var::operator*=);
 }
 
 void Environment::OpDiv() {
-	Var *left = NULL;
-	Var *right = NULL;
-	
-	PopStackVar(right);
-	PopStackVar(left);
-
-	*left /= *right;	
-	mPStack.Push(left->GetId());
-
-	LOGF(("Var %x /= Var %x = %i\n", left->GetId(), right->GetId(), left->GetInt()));
+	ArithmeticStack(&Var::operator/=);
 }
 
 void Environment::OpMod() {
+	ArithmeticStack(&Var::operator%=);
+}
+
+void Environment::ArithmeticStack(void(Var::*oper)(const Var&)) {
 	Var *left = NULL;
 	Var *right = NULL;
-	
+
 	PopStackVar(right);
 	PopStackVar(left);
 
-	*left %= *right;	
-	mPStack.Push(left->GetId());
+	(*left.*oper)(*right);
+}
 
-	LOGF(("Var %x %%= Var %x\n", left->GetId(), right->GetId()));
+
+void Environment::OpAddI() {
+	ArithmeticInt(&Var::operator+=);
+}
+
+void Environment::OpSubI() {
+	ArithmeticInt(&Var::operator-=);
+}
+
+void Environment::OpMulI() {
+	ArithmeticInt(&Var::operator*=);
+}
+
+void Environment::OpDivI() {
+	ArithmeticInt(&Var::operator/=);
+}
+
+void Environment::OpModI() {
+	ArithmeticInt(&Var::operator%=);
+}
+
+void Environment::ArithmeticInt(void(Var::*oper)(const int&)) {
+	Var *var = NULL;
+	int literal = 0;
+
+	PopStackVar(var);
+	literal = GetOpcodeInt();
+
+	(*var.*oper)(literal);
+}
+
+
+void Environment::OpAddF() {
+	ArithmeticFloat(&Var::operator+=);
+}
+
+void Environment::OpSubF() {
+	ArithmeticFloat(&Var::operator-=);
+}
+
+void Environment::OpMulF() {
+	ArithmeticFloat(&Var::operator*=);
+}
+
+void Environment::OpDivF() {
+	ArithmeticFloat(&Var::operator/=);
+}
+
+void Environment::ArithmeticFloat(void(Var::*oper)(const float&)) {
+	Var *var = NULL;
+	float literal = 0.f;
+
+	PopStackVar(var);
+	literal = GetOpcodeFloat();
+
+	(*var.*oper)(literal);
+}
+
+
+void Environment::OpPushScope() {
+	Scope *scope = GetCurrentScope();
+	scope->PushNestedScope();
+}
+
+void Environment::OpPopScope() {
+	Scope *scope = GetCurrentScope();
+	scope->PopNestedScope();
 }
 
 
 void Environment::OpJmp() {
-	int dest = GetOpcodeInt();
+	int dest = GetOpcodeUint();
 	mOpPtr = dest;
 
 	LOGF(("Jumping to %i\n", dest));
@@ -383,8 +455,8 @@ void Environment::OpDataFunc() {
 	int funcId = 0;
 	int funcPos = 0;
 
-	funcId = GetOpcodeInt();
-	funcPos = GetOpcodeInt();
+	funcId = GetOpcodeUint();
+	funcPos = GetOpcodeUint();
 
 	mFunctions[funcId] = funcPos;
 }
