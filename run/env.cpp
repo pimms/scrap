@@ -314,6 +314,7 @@ void Environment::ArithmeticStack(void(Var::*oper)(const Var&)) {
 	PopStackVar(left);
 
 	(*left.*oper)(*right);
+	mPStack.Push(left->GetId());
 }
 
 
@@ -345,6 +346,7 @@ void Environment::ArithmeticInt(void(Var::*oper)(const int&)) {
 	literal = GetOpcodeInt();
 
 	(*var.*oper)(literal);
+	mPStack.Push(var->GetId());
 }
 
 
@@ -372,6 +374,7 @@ void Environment::ArithmeticFloat(void(Var::*oper)(const float&)) {
 	literal = GetOpcodeFloat();
 
 	(*var.*oper)(literal);
+	mPStack.Push(var->GetId());
 }
 
 

@@ -114,27 +114,30 @@ int main(int argc, char *argv[]) {
 		count.AddByte(OP_EXIT)->AddUint(VAR_GLOBAL | 1);
 	
 		// Function entry
+		printf("FUNC BEGIN: %i\n", count.Length());
 		count.AddByte(OP_ALLOC)->AddUint(VAR_LOCAL | 1);
 		count.AddByte(OP_POPMOV)->AddUint(VAR_LOCAL | 1);
 		count.AddByte(OP_ALLOC)->AddUint(VAR_LOCAL | 2);
-		count.AddByte(OP_MOVI)->AddUint(VAR_LOCAL | 2)->AddInt(1);
-		count.AddByte(OP_ALLOC)->AddUint(VAR_LOCAL | 3);
-		count.AddByte(OP_MOVI)->AddUint(VAR_LOCAL | 3)->AddInt(1);
 
 		// Loop begin
+		printf("LOOP BEGIN: %i\n", count.Length());
 		count.AddByte(OP_PUSH)->AddUint(VAR_LOCAL | 2);
 		count.AddByte(OP_PUSH)->AddUint(VAR_LOCAL | 1);
-		count.AddByte(OP_JGE)->AddUint(115);
+		count.AddByte(OP_JGE)->AddUint(92);
 
+		// Inner loop
+		count.AddByte(OP_PUSH_SCOPE);
 		count.AddByte(OP_PUSH)->AddUint(VAR_LOCAL | 2);
-		count.AddByte(OP_PUSH)->AddUint(VAR_LOCAL | 3);
-		count.AddByte(OP_ADD);
+		count.AddByte(OP_ADD_I)->AddInt(1);
 		count.AddByte(OP_POP);
-		count.AddByte(OP_JMP)->AddUint(83);
+		count.AddByte(OP_POP_SCOPE);
+		count.AddByte(OP_JMP)->AddUint(60);
 
 		// Loop end
+		printf("LOOP END %i\n", count.Length());
 		count.AddByte(OP_RET)->AddUint(VAR_LOCAL | 2);
 
+		/*
 		{
 			printf("Calculation program:\n");
 			Environment env(&calc);
@@ -153,12 +156,14 @@ int main(int argc, char *argv[]) {
 			env.Execute();
 			printf("\n\n");
 		}
+		*/
 		{
 			printf("Counting program:\n");
 			Environment env(&count);
 			env.Execute();
 			printf("\n\n");
 		}
+		
 	}
 	
 #	ifdef _WIN32

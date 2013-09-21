@@ -14,8 +14,7 @@ Scope::~Scope() {
 bool Scope::Alloc(uint id) {
 	Scope *nested = mNested.Peek();
 	if (nested) {
-		nested->Alloc(id);
-		return;
+		return nested->Alloc(id);
 	}
 
 	if (GetVar(id) != NULL) {
