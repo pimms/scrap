@@ -260,6 +260,39 @@ void Var::operator%=(const Var &var) {
 }
 
 
+bool Var::operator>(const Var &var) const {
+	CmpResult res = CompareWith(var);
+	return res == GREATER;
+}
+
+bool Var::operator>=(const Var &var) const {
+	CmpResult res = CompareWith(var);
+	return (res == GREATER || res == EQUAL);
+}
+
+
+bool Var::operator<(const Var &var) const {
+	CmpResult res = CompareWith(var);
+	return res == LESS;
+}
+
+bool Var::operator<=(const Var &var) const {
+	CmpResult res = CompareWith(var);
+	return (res == LESS || res == EQUAL);
+}
+
+
+bool Var::operator==(const Var &var) const {
+	CmpResult res = CompareWith(var);
+	return res == EQUAL;
+}
+
+bool Var::operator!=(const Var &var) const {
+	CmpResult res = CompareWith(var);
+	return res != EQUAL;
+}
+
+
 bool Var::Convert(const char *str) {
 	bool dbl = false;
 
@@ -291,4 +324,66 @@ void Var::Clear() {
 
 	mValInt = 0;
 	mValFloat = 0.0;
+}
+
+
+
+Var::CmpResult Var::CompareWith(const Var &var) const {
+	Var::Type type = var.GetType();
+
+	// If either object is float, the objects are
+	// compared as floats. If neither is float and either
+	// object is string, the objects are compared as string.
+	// Int comparison is only performed when both objects are
+	// of type INT.
+	if (mType == FLOAT || type == FLOAT) {
+		return CompareWithFloat(var);
+	} else if (mType == INT && type == INT) {
+		return CompareWithInt(var);
+	} else if (mType == STRING || type == STRING) {
+		return CompareWithString(var);
+	}
+
+	return Var::CmpResult::UNDEFCMP;
+}
+
+Var::CmpResult Var::CompareWithInt(const Var &iVar) const {
+	int tVal = GetInt();
+	int oVal = iVar.GetInt();
+
+	if (tVal < oVal) {
+		return LESS;
+	} else if (tVal > oVal) {
+		return GREATER;
+	} else if (tVal == oVal) {
+		return EQUAL;
+	}
+
+	return UNDEFCMP;
+}
+
+Var::CmpResult Var::CompareWithFloat(const Var &fVar) const {
+	float tVal = GetFloat();
+	float oVal = fVar.GetFloat();
+
+	if (abs(tVal-oVal) < 0.0000001f) {
+		return EQUAL;
+	} if (tVal < oVal) {
+		return LESS;
+	} else if (tVal > oVal) {
+		return GREATER;
+	}
+
+	return UNDEFCMP;
+}
+
+Var::CmpResult Var::CompareWithString(const Var &sVar) const {
+	const char *tVal = GetString();
+	const char *oVal = sVar.GetString();
+
+	if (strcmp(tVal, oVal) == 0) {
+		return EQUAL;
+	} 
+
+	return NEQUAL;
 }

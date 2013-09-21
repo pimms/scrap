@@ -92,13 +92,13 @@ private:
 	void 			OpMod();
 
 	void 			OpJmp();
-	void 			OpCmp();
 	void 			OpJe();
 	void 			OpJne();
 	void 			OpJg();
 	void 			OpJge();
 	void 			OpJl();
 	void 			OpJle();
+	void			CompareJump(bool(Var::*cmp)(const Var&)const);
 
 	void			OpDataBegin();
 	void			OpDataString();

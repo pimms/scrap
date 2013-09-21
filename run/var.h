@@ -44,6 +44,15 @@ public:
 	Var* operator%(const Var &var) const;
 	void operator%=(const Var &var);
 
+	bool operator>(const Var &var) const;
+	bool operator>=(const Var &var) const;
+	
+	bool operator<(const Var &var) const;
+	bool operator<=(const Var &var) const;
+
+	bool operator==(const Var &var) const;
+	bool operator!=(const Var &var) const;
+
 private:
 	Type 		mType;
 	int 		mValInt;
@@ -54,4 +63,31 @@ private:
 
 	bool 		Convert(const char *str);
 	void 		Clear();
+
+
+	/***** CmpResult *****
+	* When comparing two Vars, a CmpResult
+	* defined the state between the two 
+	* Vars.
+	*
+	* The results define the relationship between
+	* THIS and OTHER, from the perspective of THIS.
+	*
+	* Var x = 3
+	* Var y = 5
+	* x.CompareWith(y) == LESS
+	* y.CompareWith(x) == GREATER
+	*****/
+	enum CmpResult {
+		UNDEFCMP	= 0x01,
+		GREATER		= 0x02,
+		LESS		= 0x04,
+		EQUAL		= 0x08,
+		NEQUAL		= 0x10,
+	};
+
+	CmpResult CompareWith(const Var &var) const;
+	CmpResult CompareWithInt(const Var &iVar) const;
+	CmpResult CompareWithFloat(const Var &fVar) const;
+	CmpResult CompareWithString(const Var &sVar) const;
 };

@@ -78,7 +78,15 @@ void Environment::Operation() {
 				case OP_EXIT: 		/* TODO */		break;
 			}
 		} else if (op <= 0x2F) {
-			// Jump and comparisons
+			switch (op) {
+				case OP_JMP:		OpJmp();		break;
+				case OP_JE:			OpJe();			break;
+				case OP_JNE:		OpJne();		break;
+				case OP_JG:			OpJg();			break;
+				case OP_JGE:		OpJge();		break;
+				case OP_JL:			OpJl();			break;
+				case OP_JLE:		OpJle();		break;
+			}
 		} else {
 			// Corrupted binary
 		}
@@ -307,35 +315,55 @@ void Environment::OpMod() {
 
 
 void Environment::OpJmp() {
+	int dest = GetOpcodeInt();
+	mOpPtr = dest;
 
-}
-
-void Environment::OpCmp() {
-
+	LOGF(("Jumping to %i\n", dest));
 }
 
 void Environment::OpJe() {
-
+	LOGF(("Comparing ==\n"));
+	CompareJump(&Var::operator==);
 }
 
 void Environment::OpJne() {
-
+	LOGF(("Comparing !=\n"));
+	CompareJump(&Var::operator!=);
 }
 
 void Environment::OpJg() {
-
+	LOGF(("Comparing >\n"));
+	CompareJump(&Var::operator>);
 }
 
 void Environment::OpJge() {
-
+	LOGF(("Comparing >=\n"));
+	CompareJump(&Var::operator>=);
 }
 
 void Environment::OpJl() {
-
+	LOGF(("Comparing <\n"));
+	CompareJump(&Var::operator<);
 }
 
 void Environment::OpJle() {
+	LOGF(("Comparing <=\n"));
+	CompareJump(&Var::operator<=);
+}
 
+void Environment::CompareJump(bool(Var::*cmp)(const Var&)const) {
+	Var *left = NULL;
+	Var *right = NULL;
+
+	PopStackVar(right);
+	PopStackVar(left);
+
+	if ((left->*cmp)(*right)) {
+		OpJmp();
+	} else {
+		// Ignore the op-pointer
+		mOpPtr += 4;
+	}
 }
 
 

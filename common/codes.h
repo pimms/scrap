@@ -66,15 +66,22 @@
 /***** COMPARISON AND JUMPS *****
 * Start: 		0x20
 * Finsih:		0x2F
+*
+* Comparisons are performed in the same order
+* as arithmetics. This is a pseudo-comparison
+* between the two last elements on the stack:
+*
+* b = pop()
+* a = pop()
+* if (a >= b) { stuff() }
 *****/
 #define OP_JMP					0x20	// PARAM
-#define OP_CMP 					0x21 
-#define OP_JE					0x22	// PARAM
-#define OP_JNE					0x23	// PARAM
-#define OP_JG					0x24	// PARAM
-#define OP_JGE					0x25	// PARAM
-#define OP_JL					0x26	// PARAM
-#define OP_JLE					0x27	// PARAM
+#define OP_JE					0x21	// PARAM
+#define OP_JNE					0x22	// PARAM
+#define OP_JG					0x23	// PARAM
+#define OP_JGE					0x24	// PARAM
+#define OP_JL					0x25	// PARAM
+#define OP_JLE					0x26	// PARAM
 
 
 /***** DATA DEFINITIONS *****
