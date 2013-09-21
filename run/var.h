@@ -27,22 +27,24 @@ public:
 
 	void operator=(const Var &var);
 
-	void operator++();
-	Var* operator+(const Var &var) const;
 	void operator+=(const Var &var);
+	void operator+=(const int &val);
+	void operator+=(const float &val);
 
-	void operator--();
-	Var* operator-(const Var &var) const;
 	void operator-=(const Var &var);
+	void operator-=(const int &val);
+	void operator-=(const float &val);
 
-	Var* operator*(const Var &var) const;
 	void operator*=(const Var &var);
+	void operator*=(const int &val);
+	void operator*=(const float &val);
 
-	Var* operator/(const Var &var) const;
 	void operator/=(const Var &var);
+	void operator/=(const int &val);
+	void operator/=(const float &val);
 
-	Var* operator%(const Var &var) const;
 	void operator%=(const Var &var);
+	void operator%=(const int &val);
 
 	bool operator>(const Var &var) const;
 	bool operator>=(const Var &var) const;

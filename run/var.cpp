@@ -132,27 +132,6 @@ void Var::operator=(const Var &var) {
 }
 
 
-void Var::operator++() {
-	if (mType == INT) {
-		mValInt++;
-	} else if (mType == FLOAT) {
-		mValFloat += 1.f;
-	}
-}
-
-Var* Var::operator+(const Var &var) const {
-	Var *result = new Var();
-
-	// Left associative type
-	if (mType == INT) {
-		result->Set(mValInt + var.GetInt());
-	} else if (mType == FLOAT) {
-		result->Set(mValFloat + var.GetFloat());
-	}
-
-	return result;
-}
-
 void Var::operator+=(const Var &var) {
 	if (mType == INT) {
 		mValInt += var.GetInt();
@@ -161,27 +140,27 @@ void Var::operator+=(const Var &var) {
 	}
 }
 
-
-void Var::operator--() {
+void Var::operator+=(const int &val) {
 	if (mType == INT) {
-		mValInt--;
+		mValInt += val;
 	} else if (mType == FLOAT) {
-		mValFloat--;
+		mValFloat += val;
+	} else if (mType == UNDEFINED) {
+		Set(val);
 	}
 }
 
-Var* Var::operator-(const Var &var) const {
-	Var *result = new Var();
-
-	// Left associative type
-	if (mType == INT) {
-		result->Set(mValInt - var.GetInt());
-	} else if (mType == FLOAT) {
-		result->Set(mValFloat - var.GetFloat());
+void Var::operator+=(const float &val) {
+	if (mType == FLOAT) {
+		mValFloat += val;
+	} else if (mType == INT) {
+		Set(val + (float)mValInt);
+	} else if (mType == UNDEFINED) {
+		Set(val);
 	}
-
-	return result;
 }
+
+
 
 void Var::operator-=(const Var &var) {
 	if (mType == INT) {
@@ -191,18 +170,26 @@ void Var::operator-=(const Var &var) {
 	}
 }
 
-
-Var* Var::operator*(const Var &var) const {
-	Var *result = new Var();
-
+void Var::operator-=(const int &val) {
 	if (mType == INT) {
-		result->Set(mValInt * var.GetInt());
+		mValInt -= val;
 	} else if (mType == FLOAT) {
-		result->Set(mValFloat * var.GetFloat());
+		mValFloat -= val;
+	} else if (mType == UNDEFINED) {
+		Set(-val);
 	}
-
-	return result;
 }
+
+void Var::operator-=(const float &val) {
+	if (mType == FLOAT) {
+		mValFloat -= val;
+	} else if (mType == INT) {
+		Set((float)mValInt - val);
+	} else if (mType == UNDEFINED) {
+		Set(-val);
+	}
+}
+
 
 void Var::operator*=(const Var &var) {
 	if (mType == INT) {
@@ -212,23 +199,22 @@ void Var::operator*=(const Var &var) {
 	}
 }
 
-
-Var* Var::operator/(const Var &var) const {
-	if (var.GetFloat() == 0.f || !var.GetInt()) {
-		throw "DIVISION BY ZERO";
-		return NULL;
-	}
-
-	Var *result = new Var();
-
+void Var::operator*=(const int &val) {
 	if (mType == INT) {
-		result->Set(mValInt / var.GetInt());
+		mValInt *= val;
 	} else if (mType == FLOAT) {
-		result->Set(mValFloat / var.GetFloat());
-	}
-
-	return result;
+		mValFloat *= (float)val;
+	} 
 }
+
+void Var::operator*=(const float &val) {
+	if (mType == FLOAT) {
+		mValFloat *= val;
+	} else if (mType == INT) {
+		Set((float)mValInt * val);
+	}
+}
+
 
 void Var::operator/=(const Var &var) {
 	if (var.GetFloat() == 0.f || !var.GetInt()) {
@@ -242,21 +228,31 @@ void Var::operator/=(const Var &var) {
 	}
 }
 
-
-Var* Var::operator%(const Var &var) const {
-	if (var.GetFloat() == 0.f || !var.GetInt()) {
-		throw "MODULO BY ZERO";
-		return NULL;
+void Var::operator/=(const int &val) {
+	if (mType == INT) {
+		mValInt /= val;
+	} else if (mType == FLOAT) {
+		mValFloat /= (float)val;
 	}
-
-	Var *result = NULL;
-	result->Set(GetInt() % var.GetInt());
-
-	return result;
 }
+
+void Var::operator/=(const float &val) {
+	if (mType == FLOAT) {
+		mValFloat /= val;
+	} else if (mType == INT) {
+		Set((float)mValInt / val);
+	}
+}
+
 
 void Var::operator%=(const Var &var) {
 	Set(GetInt() % var.GetInt());
+}
+
+void Var::operator%=(const int &val) {
+	if (mType == INT) {
+		mValInt %= val;
+	}
 }
 
 
