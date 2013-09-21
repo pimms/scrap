@@ -12,11 +12,15 @@ Scope::~Scope() {
 
 
 bool Scope::Alloc(uint id) {
-#ifdef _DEBUG
+	Scope *nested = mNested.Peek();
+	if (nested) {
+		nested->Alloc(id);
+		return;
+	}
+
 	if (GetVar(id) != NULL) {
 		return false;
 	}
-#endif
 
 	Var *var = new Var(id);
 	mVars[id] = var;
@@ -25,9 +29,32 @@ bool Scope::Alloc(uint id) {
 }
 
 Var* Scope::GetVar(uint id) {
+	for (int i=mNested.Size()-1; i>=0; i--) {
+		Var *var = mNested.Peek(i)->GetVar(id);
+		if (var) {
+			return var;
+		}
+	}
+
 	if (mVars.count(id) == 0) {
 		return NULL;
 	}
 
 	return mVars[id];
+}
+
+
+
+void Scope::PushNestedScope() {
+	Scope *nested = new Scope();
+	mNested.Push(nested);
+}
+
+void Scope::PopNestedScope() {
+	if (mNested.Size() > 0) {
+		Scope *nested = mNested.Pop();
+		delete nested;
+	} else {
+		throw UnderflowException();
+	}
 }
