@@ -7,6 +7,7 @@
 
 #include "tokens.h"
 #include "../common/opcode.h"
+#include "../common/scope.h"
 
 class Parser {
 public:
@@ -21,7 +22,9 @@ private:
 	string				mFile;
 	bool				mIsFileMain;
 	Tokens				*mTokens;
-
+	
+	CompileScope		mGScope;
+	Stack<CompileScope*>mLScope;
 
 	void 				ParseReserved(Token *token);
 };
