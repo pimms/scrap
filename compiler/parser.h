@@ -12,11 +12,16 @@ class Parser {
 public:
 						Parser(string file, bool mainFile);
 						~Parser();
+
 	bool				ParseFile();
+	bool 				CompileTokens();
 	Opcode*				GetOpcodes();
 
 private:
 	string				mFile;
 	bool				mIsFileMain;
 	Tokens				*mTokens;
+
+
+	void 				ParseReserved(Token *token);
 };

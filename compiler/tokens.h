@@ -42,9 +42,12 @@ class Tokens {
 public:
 	void				BuildTokens(string file);
 
+	bool 				HasMore();
+	Token* 				PopIfExists(Token::Type type);
+	Token* 				PopNext();
 
 private:
-	list<Token>			mTokens;
+	list<Token*>			mTokens;
 
 	/***** GetToken *****
 	* Attempts to fetch a token from the file. 

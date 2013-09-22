@@ -24,6 +24,31 @@ bool Parser::ParseFile() {
 	return true;
 }
 
+bool Parser::CompileTokens() {
+	return false;
+}
+
 Opcode* Parser::GetOpcodes() {
 	return NULL;
+}
+
+
+void Parser::ParseReserved(Token *token) {
+	if (token->mToken == "var") {
+		
+	} if (token->mToken == "for") {
+		
+	} else if (token->mToken == "class") {
+
+	} else if (token->mToken == "if") {
+
+	} else if (token->mToken == "else") {
+
+	} else if (token->mToken == "while") {
+
+	} else if (token->mToken == "func") {
+
+	} else {
+		
+	}
 }

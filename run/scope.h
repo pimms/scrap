@@ -9,17 +9,74 @@
 
 using namespace std;
 
-class Scope {
+
+template<typename T>
+class ScopeT {
 public:
-					~Scope();
+	~ScopeT() {
+		typename map<uint,T>::iterator it;
 
-	bool 			Alloc(uint id);
-	Var* 			GetVar(uint id);
+		for (it = mVars.begin(); it != mVars.end(); it++) {
+			delete it->second;
+		}
+	}
 
-	void			PushNestedScope();
-	void			PopNestedScope();
+	bool ItemExists(uint id) {
+		for (int i=mNested.Size()-1; i>=0; i--) {
+			if (mNested.ItemExists(id)) {
+				return true;
+			}
+		}
 
-private:
-	map<uint,Var*>	mVars;
-	Stack<Scope*>	mNested;
+		if (mVars.count(id) != 0) {
+			return true;
+		}
+
+		return false;
+	}
+
+	void AddItem(uint id, T t) {
+		ScopeT<T> *nested = mNested.Peek();
+		if (nested) {
+			nested->AddItem(id, t);
+			return;
+		}
+
+		mVars[id] = t;
+	}
+
+	T GetVar(uint id) {
+		for (int i=mNested.Size()-1; i>=0; i--) {
+			T t = mNested.Peek(i)->GetVar(id);
+			if (t) {
+				return t;
+			}
+		}
+
+		if (mVars.count(id) == 0) {
+			return NULL;
+		}
+
+		return mVars[id];
+	}
+
+	void PushNestedScope() {
+		ScopeT<T> *nested = new ScopeT<T>();
+		mNested.Push(nested);
+	}
+
+	void PopNestedScope() {
+		if (mNested.Size() > 0) {
+			ScopeT<T> *nested = mNested.Pop();
+			delete nested;
+		} else {
+			throw UnderflowException();
+		}
+	}
+
+protected:
+	map<uint,T>		mVars;
+	Stack<ScopeT<T>*> 	mNested;
 };
+
+typedef ScopeT<Var*> Scope;

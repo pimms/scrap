@@ -5,17 +5,41 @@
 
 void Tokens::BuildTokens(string fileName) {
 	ifstream file;
-	file.open(fileName);
+	file.open(fileName.c_str());
 	if (!file.good()) {
 		throw FileNotFoundException("File not found: " + (string)fileName);		
 	}
 
 	while (GetToken(file)) ;
 	
-	list<Token>::iterator it;
+	list<Token*>::iterator it;
 	for (it = mTokens.begin(); it != mTokens.end(); it++) {
-		printf("[%i]: %s\n", it->mType, it->mToken.c_str());
+		printf("[%i]: %s\n", (*it)->mType, (*it)->mToken.c_str());
 	}
+}
+
+bool Tokens::HasMore() {
+	return mTokens.size() > 0;
+}
+
+Token* Tokens::PopIfExists(Token::Type type) {
+	Token *token = NULL;
+
+	if (mTokens.front()->mType == type) {
+		token = mTokens.front();
+		mTokens.pop_front();
+	}
+
+	return token;
+}
+
+Token* Tokens::PopNext() {
+	Token *token = NULL;
+
+	token = mTokens.front();
+	mTokens.pop_front();
+
+	return token;
 }
 
 
@@ -23,8 +47,6 @@ bool Tokens::GetToken(ifstream &file) {
 	if (!file.good()) return false;
 
 	Token token;
-	char ch;
-
 	SeekNextToken(file);
 	
 	if (GetOperator(file)) {
@@ -52,8 +74,8 @@ bool Tokens::GetOperator(ifstream &file) {
 	}
 
 	if (str.length()) {
-		Token token(str, Token::OPERATOR);
-		mTokens.push_back(token);
+		Token *t = new Token(str, Token::OPERATOR);
+		mTokens.push_back(t);
 		return true;
 	}
 
@@ -69,8 +91,8 @@ bool Tokens::GetBracket(ifstream &file) {
 		case ')':
 			{
 				str = ch;
-				Token token(str, Token::PARANTHESES);
-				mTokens.push_back(token);
+				Token *t = new Token(str, Token::PARANTHESES);
+				mTokens.push_back(t);
 				file.get();
 				return true;
 			}
@@ -79,8 +101,8 @@ bool Tokens::GetBracket(ifstream &file) {
 		case '}':
 			{
 				str = ch;
-				Token token(str, Token::BRACKET);
-				mTokens.push_back(token);
+				Token *t = new Token(str, Token::BRACKET);
+				mTokens.push_back(t);
 				file.get();
 				return true;
 			}
@@ -88,8 +110,8 @@ bool Tokens::GetBracket(ifstream &file) {
 		case ';':
 			{
 				str = ch;
-				Token token(str, Token::SEMICOLON);
-				mTokens.push_back(token);
+				Token *t = new Token(str, Token::SEMICOLON);
+				mTokens.push_back(t);
 				file.get();
 				return true;
 			}
@@ -106,15 +128,15 @@ bool Tokens::GetWord(ifstream &file) {
 	}
 
 	if (str.length()) {
-		Token token(str);
+		Token *t = new Token(str);
 
 		if (ReservedWord(str)) {
-			token.mType = Token::RESERVED;
+			t->mType = Token::RESERVED;
 		} else {
-			token.mType = Token::CUSTOM;
+			t->mType = Token::CUSTOM;
 		}
 
-		mTokens.push_back(token);
+		mTokens.push_back(t);
 		return true;
 	}
 
@@ -172,7 +194,6 @@ bool Tokens::ReservedWord(string str) {
 		str == "if"		||
 		str == "else"	||
 		str == "while"	||
-		str == "do"		||
 		str == "func"	||
 		str == "var") {
 		return true;
@@ -210,8 +231,6 @@ bool Tokens::NextCharBlocking(ifstream &file) {
 }
 
 void Tokens::SeekNextToken(ifstream &file) {
-	bool comment = false;
-
 	char ch = file.peek();
 	while (ch == '#') {
 		SkipLine(file);

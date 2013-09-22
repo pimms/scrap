@@ -23,6 +23,10 @@ int main(int argc, char *argv[]) {
 		
 		if (parser.ParseFile()) {
 			printf("VALID SCRAP\n");
+			if (parser.CompileTokens()) {
+				Environment env(parser.GetOpcodes());
+				env.Execute();
+			}
 		}
 	}
 	
