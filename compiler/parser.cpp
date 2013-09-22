@@ -1,5 +1,8 @@
 #include "parser.h"
 
+uint Parser::sFuncId = 0;
+
+
 Parser::Parser(string file, bool mainFile) {
 	mFile = file;
 	mIsFileMain = mainFile;
