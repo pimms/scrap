@@ -11,7 +11,7 @@ Environment::Environment(Opcode *opcode) {
 	mDataDef = false;
 
 	// Allocate the global return value 
-	mGScope.Alloc(VAR_RETURN);
+	mGScope.AddItem(VAR_RETURN, new Var(VAR_RETURN));
 }
 
 Environment::~Environment() {
@@ -240,9 +240,15 @@ void Environment::OpAlloc() {
 	uint varId = GetOpcodeUint();
 
 	if (varId & VAR_GLOBAL) {
-		mGScope.Alloc(varId);
+		if (!mGScope.ItemExists(varId)) {
+			mGScope.AddItem(varId, new Var(varId));
+		}
 	} else {
-		mLScope.Peek()->Alloc(varId);
+		if (mLScope.Size()) {
+			if (!mLScope.Peek()->ItemExists(varId)) {
+				mLScope.Peek()->AddItem(varId, new Var(varId));
+			}
+		}
 	}
 
 	LOGF(("Allocating %x\n", varId));

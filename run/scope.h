@@ -23,7 +23,7 @@ public:
 
 	bool ItemExists(uint id) {
 		for (int i=mNested.Size()-1; i>=0; i--) {
-			if (mNested.ItemExists(id)) {
+			if (mNested.Peek(i)->ItemExists(id)) {
 				return true;
 			}
 		}
