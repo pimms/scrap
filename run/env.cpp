@@ -1,4 +1,6 @@
 #include "env.h"
+#include "../common/scrapexcept.h"
+
 #include <stdlib.h>
 #include <cstring>
 #include <stdio.h>
