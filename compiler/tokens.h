@@ -9,29 +9,36 @@
 #include <list>
 using namespace std;
 
-class Tokens {
-private:
-	struct Token {
-		enum Type {
-			UNDEFINED,
-			OPERATOR,
-			CUSTOM,
-			RESERVED,
-			BRACKET,
-			SEMICOLON,
-			PARANTHESES,
-		};
 
-		Token() { mType = UNDEFINED; }
-		Token(string token, Type t = UNDEFINED) {
-			mToken = token;
-			mType = t;
-		}
-
-		string			mToken;
-		Type			mType;
+/***** Struct Token *****
+* Holds the type and text-value of a single
+* scrap token. 
+*****/
+struct Token {
+	enum Type {
+		UNDEFINED,
+		OPERATOR,
+		CUSTOM,
+		RESERVED,
+		BRACKET,
+		SEMICOLON,
+		PARANTHESES,
 	};
 
+	Token() { mType = UNDEFINED; }
+	Token(string token, Type t = UNDEFINED) {
+		mToken = token;
+		mType = t;
+	}
+
+	string			mToken;
+	Type			mType;
+};
+
+/***** Clsas Tokens *****
+* Manages all Tokens in a file. 
+*****/
+class Tokens {
 public:
 	void				BuildTokens(string file);
 

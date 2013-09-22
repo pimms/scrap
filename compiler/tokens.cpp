@@ -22,7 +22,7 @@ void Tokens::BuildTokens(string fileName) {
 bool Tokens::GetToken(ifstream &file) {
 	if (!file.good()) return false;
 
-	Tokens::Token token;
+	Token token;
 	char ch;
 
 	SeekNextToken(file);
@@ -46,7 +46,7 @@ bool Tokens::GetOperator(ifstream &file) {
 	string str;
 	char lastChar = 0;
 
-	while (PeekOperator(file, lastChar)) {
+	while (PeekOperator(file, lastChar) && str.length() <= 1) {
 		lastChar = file.get();
 		str += lastChar;
 	}
