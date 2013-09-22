@@ -36,7 +36,7 @@ Opcode* Parser::GetOpcodes() {
 void Parser::ParseReserved(Token *token) {
 	if (token->mToken == "var") {
 		
-	} if (token->mToken == "for") {
+	} else if (token->mToken == "for") {
 		
 	} else if (token->mToken == "class") {
 
