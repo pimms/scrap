@@ -1,7 +1,7 @@
 #pragma once
 
 #include "var.h"
-#include "scope.h"
+#include "../common/scope.h"
 #include "../common/stack.h"
 #include "../common/codes.h"
 #include "../common/opcode.h"
