@@ -15,6 +15,32 @@ Var* Var::CreateVar(const char *val) {
 	return var;
 }
 
+Var::Type Var::GetType(string str) {
+	bool flt = false;
+
+	for (int i=0; i<str.length(); i++) {
+		if (str[i] >= '0' && str[i] <= '9') {
+			// ..all is well
+		} else if (str[i] == '.') {
+			if (flt) {
+				return Type::STRING;
+			} 
+
+			flt = true;
+		} else if (i && str[i] == '-') {
+			return Type::STRING;
+		}  else {
+			return Type::STRING;
+		}
+	}
+
+	if (flt) {
+		return Type::FLOAT;
+	} else {
+		return Type::INT;
+	}
+}
+
 
 
 Var::Var(int id) {
@@ -60,7 +86,12 @@ void Var::Set(float val) {
 void Var::Set(const char *val) {
 	Clear();
 
-	if (Convert(val)) {
+	Var::Type t = GetType(val);
+	if (t == INT) {
+		Set(atoi(val));
+		return;
+	} else if (t == FLOAT) {
+		Set((float)atof(val));
 		return;
 	}
 
@@ -351,28 +382,6 @@ bool Var::operator!=(const float &val) const {
 	return res != EQUAL;
 }
 
-
-bool Var::Convert(const char *str) {
-	bool dbl = false;
-
-	for (int i=0; i<strlen(str); i++) {
-		if (str[i] < '0' && str[i] > '9') {
-			// ..all is well
-		} else if (str[i] == '.' && !dbl) {
-			dbl = true;
-		} else if (!i && str[i] != '-') {
-			return false;
-		}
-	}
-
-	if (dbl) {
-		Set((float)strtod(str, NULL));
-	} else {
-		Set(atoi(str));
-	}
-
-	return true;
-}
 
 void Var::Clear() {
 	mType = UNDEFINED;

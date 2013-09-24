@@ -1,30 +1,9 @@
-# Expected output:
-# !=, =, -=, !, ++, =, -, +
-!==-=!++=-+ # This should be ignored completely
-# so should this
-	# and this
-		this
-	# poop
-	is
-			valid
-SCRAP
+func LOLWAT(var xyz) {
+	if (xyz == 3.14) {
+		print("%xyz is pi, yo");
+	} else {
+		print("%xyz is nay pi");
+	}
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-yoyoyoyo
-
-
-yoyo 4
-+
+LOLWAT(3.141.5);

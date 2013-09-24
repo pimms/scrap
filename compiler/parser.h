@@ -19,12 +19,13 @@ public:
 	Opcode*				GetOpcodes();
 
 private:
-	/***** sFuncId *****
+	/***** Static ID counters *****
 	* The function-ID iterator is static to
 	* ensure unique function IDs for all compiled
 	* files.
 	*****/
  	static uint			sFuncId;
+	static uint			sGVarId;
 
 	string				mFile;
 	bool				mIsFileMain;

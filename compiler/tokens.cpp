@@ -1,7 +1,34 @@
 #include "tokens.h"
 #include "../common/scrapexcept.h"
+#include "../run/var.h"
 
 #include <fstream>
+
+
+
+string Token::GetStringValue(Token::Type type) {
+	switch (type) {
+	case UNDEFINED:		return "UNDEFINED";
+	case OPERATOR:		return "OPERATOR";
+	case PARANTH_BEG:	return "PARANTH_BEG";
+	case PARANTH_END:	return "PARANTH_END";
+	case RESERVED:		return "RESERVED";
+	case BRACKET_BEG:	return "BRACKET_BEG";
+	case BRACKET_END:	return "BRACKET_END";
+	case SEMICOLON:		return "SEMICOLON";
+	case DOT:			return "DOT";
+	case VARFUNC:		return "VARFUNC";
+	case VALUE:			return "VALUE";
+	case VAL_STRING:	return "VAL_STRING";
+	case VAL_INT:		return "VAL_INT";
+	case VAL_FLOAT:		return "VAL_FLOAT";
+	case INVALID:		return "INVALID";
+	}
+
+	return "???";
+}
+
+
 
 void Tokens::BuildTokens(string fileName) {
 	ifstream file;
@@ -14,7 +41,8 @@ void Tokens::BuildTokens(string fileName) {
 	
 	list<Token*>::iterator it;
 	for (it = mTokens.begin(); it != mTokens.end(); it++) {
-		printf("[%i]: %s\n", (*it)->mType, (*it)->mToken.c_str());
+		printf("[%16s]: %s\n", Token::GetStringValue((*it)->mType).c_str(), 
+								(*it)->mToken.c_str());
 	}
 }
 
@@ -48,12 +76,12 @@ bool Tokens::GetToken(ifstream &file) {
 
 	Token token;
 	SeekNextToken(file);
-	
-	if (GetOperator(file)) {
+
+	if (GetSpecialChar(file)) {
 		return true;
 	}
 
-	if (GetBracket(file)) {
+	if (GetOperator(file)) {
 		return true;
 	}
 
@@ -82,49 +110,73 @@ bool Tokens::GetOperator(ifstream &file) {
 	return false;
 }
 
-bool Tokens::GetBracket(ifstream &file) {
+bool Tokens::GetSpecialChar(ifstream &file) {
 	char ch = file.peek();
 	string str;
+	str = ch;
+
+	Token *t = new Token(str);
 
 	switch (ch) {
 		case '(':
+			t->mType = Token::PARANTH_BEG;
+			break;
+
 		case ')':
-			{
-				str = ch;
-				Token *t = new Token(str, Token::PARANTHESES);
-				mTokens.push_back(t);
-				file.get();
-				return true;
-			}
+			t->mType = Token::PARANTH_END;
+			break;
 
 		case '{':
+			t->mType = Token::BRACKET_BEG;
+			break;
+
 		case '}':
-			{
-				str = ch;
-				Token *t = new Token(str, Token::BRACKET);
-				mTokens.push_back(t);
-				file.get();
-				return true;
-			}
+			t->mType = Token::BRACKET_END;
+			break;
 
 		case ';':
-			{
-				str = ch;
-				Token *t = new Token(str, Token::SEMICOLON);
-				mTokens.push_back(t);
-				file.get();
-				return true;
-			}
+			t->mType = Token::SEMICOLON;
+			break;
+
+		case '.':
+			t->mType = Token::DOT;
+			break;
+
+		default:
+			delete t;
+			t = NULL;
+			return false;
 	}
 
-	return false;
+	mTokens.push_back(t);
+	file.get();
+	return true;
 }
 
 bool Tokens::GetWord(ifstream &file) {
 	string str;
 
-	while (!NextCharBlocking(file) && !file.eof()) {
+	// String literal
+	if (file.peek() == '\"') {
+		// Get the first "
+		str = file.get();
+		char ch = file.peek();
+		
+		while (ch != '\"' && !file.eof()) {
+			str += file.get();
+			ch = file.peek();
+		}
+		
+		// Get the last "
 		str += file.get();
+	} else {
+		// The word can be a VARFUNC, INT or FLOAT.
+		bool numerical = (file.peek() >= '0' && file.peek() <= '9');
+
+		while (!NextCharBlocking(file, numerical) && !file.eof()) {
+			char ch = file.get();
+			str += ch;
+		}
 	}
 
 	if (str.length()) {
@@ -132,8 +184,21 @@ bool Tokens::GetWord(ifstream &file) {
 
 		if (ReservedWord(str)) {
 			t->mType = Token::RESERVED;
+		} else if (str[0] == '\"') {
+			t->mType = Token::VAL_STRING;
 		} else {
-			t->mType = Token::CUSTOM;
+			Var::Type vType = Var::GetType(str);
+			if (vType == Var::Type::INT) {
+				t->mType = Token::VAL_INT;
+			} else if (vType == Var::Type::FLOAT) {
+				t->mType = Token::VAL_FLOAT;
+			} else {
+				if (ValidName(str)) {
+					t->mType = Token::VARFUNC;
+				} else {
+					t->mType = Token::INVALID;
+				}
+			}
 		}
 
 		mTokens.push_back(t);
@@ -150,8 +215,10 @@ bool Tokens::PeekOperator(ifstream &file, char context) {
 	switch (ch) {
 	case '+':
 	case '-':
+	case '&':
+	case '|':
 		{
-			// ++ and -- are valid
+			// ++, --, && and || are valid
 			// operators.
 			if (context == ch || !context) {
 				return true;
@@ -161,23 +228,24 @@ bool Tokens::PeekOperator(ifstream &file, char context) {
 
 	case '*':
 	case '/':
+	case '<':
+	case '>':
 		{
-			// * and / cannot have a preceeding
-			// operator.
-			if (context == 0) {
-				return true;
-			}
-			return false;
+			return context == 0;
 		}
 
 	case '=':
 		{
-			// = can follow all other operators.
+			// = can follow nearly all operators
+			if (context == '&' || context == '|') {
+				return false;
+			}
 			return true;
 		}
 
 	case '!':
 		{
+			// ! must be first in any dual-operand
 			if (context == 0) {
 				return true;
 			}
@@ -187,6 +255,7 @@ bool Tokens::PeekOperator(ifstream &file, char context) {
 
 	return false;
 }
+
 
 bool Tokens::ReservedWord(string str) {
 	if (str == "class"	||
@@ -195,15 +264,39 @@ bool Tokens::ReservedWord(string str) {
 		str == "else"	||
 		str == "while"	||
 		str == "func"	||
-		str == "var") {
+		str == "var"	||
+		str == "include"){
 		return true;
 	}
 
 	return false;
 }
 
+bool Tokens::ValidName(string name) {
+	if (!name.length()) { 
+		return false;
+	}
 
-bool Tokens::NextCharBlocking(ifstream &file) {
+	if (name[0] >= '0' && name[0] <= '9') {
+		return false;
+	}
+
+	for (int i=0; i<name.length(); i++) {
+		char c = name[i];
+
+		if ((c < 'a' || c > 'z') &&
+			(c < 'A' || c > 'Z') &&
+			(c < '0' || c > '9') &&
+			(c != '_')) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool Tokens::NextCharBlocking(ifstream &file, bool numericalContext) {
 	char ch = file.peek();
 
 	switch (ch) {
@@ -224,7 +317,14 @@ bool Tokens::NextCharBlocking(ifstream &file) {
 		case '/':
 		case '=':
 		case '!':
+
+		case '<':
+		case '>':
+		case '\"':
 			return true;
+
+		case '.':
+			return !numericalContext;
 	}
 
 	return false;
