@@ -1,5 +1,8 @@
 #include "parser.h"
 
+uint Parser::sFuncId = 0;
+
+
 Parser::Parser(string file, bool mainFile) {
 	mFile = file;
 	mIsFileMain = mainFile;
@@ -36,7 +39,7 @@ Opcode* Parser::GetOpcodes() {
 void Parser::ParseReserved(Token *token) {
 	if (token->mToken == "var") {
 		
-	} if (token->mToken == "for") {
+	} else if (token->mToken == "for") {
 		
 	} else if (token->mToken == "class") {
 

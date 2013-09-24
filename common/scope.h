@@ -6,6 +6,7 @@
 
 #include <map>
 #include <stdlib.h>
+#include <string>
 
 using namespace std;
 
@@ -18,6 +19,10 @@ public:
 
 		for (it = mVars.begin(); it != mVars.end(); it++) {
 			delete it->second;
+		}
+
+		while (mNested.Size()) {
+			delete mNested.Pop();
 		}
 	}
 
@@ -66,17 +71,20 @@ public:
 	}
 
 	void PopNestedScope() {
-		if (mNested.Size() > 0) {
-			ScopeT<T> *nested = mNested.Pop();
-			delete nested;
-		} else {
-			throw UnderflowException();
-		}
+		delete mNested.Pop();
 	}
 
 protected:
-	map<uint,T>		mVars;
+	map<uint,T>			mVars;
 	Stack<ScopeT<T>*> 	mNested;
 };
 
+
+// The default scope, used at runtime. IDs
+// are mapped directly to the Var-objects.
 typedef ScopeT<Var*> Scope;
+
+// The scope used for scope-checking during
+// compilation. IDs are mapped to variable
+// names rather than actual variables.
+typedef ScopeT<string*> CompileScope;

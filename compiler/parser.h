@@ -7,6 +7,7 @@
 
 #include "tokens.h"
 #include "../common/opcode.h"
+#include "../common/scope.h"
 
 class Parser {
 public:
@@ -18,10 +19,19 @@ public:
 	Opcode*				GetOpcodes();
 
 private:
+	/***** sFuncId *****
+	* The function-ID iterator is static to
+	* ensure unique function IDs for all compiled
+	* files.
+	*****/
+ 	static uint			sFuncId;
+
 	string				mFile;
 	bool				mIsFileMain;
 	Tokens				*mTokens;
-
+	
+	CompileScope		mGScope;
+	Stack<CompileScope*>mLScope;
 
 	void 				ParseReserved(Token *token);
 };
