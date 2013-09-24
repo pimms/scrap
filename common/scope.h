@@ -1,6 +1,6 @@
 #pragma once
 
-#include "var.h"
+#include "../run/var.h"
 #include "../common/codes.h"
 #include "../common/stack.h"
 

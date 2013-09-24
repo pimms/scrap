@@ -1,6 +1,7 @@
 #include "parser.h"
 
 uint Parser::sFuncId = 0;
+uint Parser::sGVarId = 0;
 
 
 Parser::Parser(string file, bool mainFile) {

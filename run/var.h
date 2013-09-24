@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+
+using namespace std;
+
 class Var {
 public:
 	enum Type {
@@ -11,6 +15,8 @@ public:
 	};
 
 	static Var* CreateVar(const char *val);
+	static Type	GetType(string str);
+
 
 				Var(int id = 0);
 				~Var();

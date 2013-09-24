@@ -16,17 +16,28 @@ using namespace std;
 *****/
 struct Token {
 	enum Type {
-		UNDEFINED,
-		OPERATOR,
-		CUSTOM,
-		RESERVED,
-		BRACKET,
-		SEMICOLON,
-		PARANTHESES,
+		UNDEFINED	= 0x00000100,
+		OPERATOR	= 0x00000200,
+		PARANTH_BEG	= 0x00000400,
+		PARANTH_END	= 0x00000800,
+		RESERVED	= 0x00001000,
+		BRACKET_BEG	= 0x00002000,
+		BRACKET_END = 0x00004000,
+		SEMICOLON	= 0x00008000,
+		DOT			= 0x00010000,
+		VARFUNC		= 0x00020000,
+		VALUE		= 0x00040000,
+		VAL_STRING	= 0x00080000,
+		VAL_INT		= 0x00100000,
+		VAL_FLOAT	= 0x00200000,
+
+		INVALID		= 0x80000000,
 	};
 
-	Token() { mType = UNDEFINED; }
-	Token(string token, Type t = UNDEFINED) {
+	static string GetStringValue(Token::Type type);
+
+	Token() { mType = INVALID; }
+	Token(string token, Type t = INVALID) {
 		mToken = token;
 		mType = t;
 	}
@@ -47,14 +58,14 @@ public:
 	Token* 				PopNext();
 
 private:
-	list<Token*>			mTokens;
+	list<Token*>		mTokens;
 
 	/***** GetToken *****
 	* Attempts to fetch a token from the file. 
 	*****/
 	bool				GetToken(ifstream &file);
 	bool				GetOperator(ifstream &file);
-	bool				GetBracket(ifstream &file);
+	bool				GetSpecialChar(ifstream &file);
 	bool				GetWord(ifstream &file);
 
 	/***** PeekOperator *****
@@ -63,14 +74,22 @@ private:
 	*****/
 	bool				PeekOperator(ifstream &file, char context=0);
 
+	/***** Naming Methods *****
+	* Check for whether a word is reserved or
+	* a valid scrap variable/function name.
+	*****/
 	bool				ReservedWord(string word);
+	bool				ValidName(string name);
 
 	/***** NextCharBlocking *****
 	* If the next character in the stream is "(", ")", "+", " " or 
 	* similar, it does not count toward the current token, but is
 	* included in the next token. 
+	*
+	* In respect of floats, the otherwise blocking char '.' does not 
+	* block strings containing only numbers and ONE '.'.
 	*****/
-	bool				NextCharBlocking(ifstream &file);
+	bool				NextCharBlocking(ifstream &file, bool numericalContext);
 
 	/***** SeekNextToken *****
 	* The contents of the file is ignored until the first valid
