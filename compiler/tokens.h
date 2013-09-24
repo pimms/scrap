@@ -25,11 +25,12 @@ struct Token {
 		BRACKET_END = 0x00004000,
 		SEMICOLON	= 0x00008000,
 		DOT			= 0x00010000,
-		VARFUNC		= 0x00020000,
+		COMMA		= 0x00020000,
 		VALUE		= 0x00040000,
 		VAL_STRING	= 0x00080000,
 		VAL_INT		= 0x00100000,
 		VAL_FLOAT	= 0x00200000,
+		VARFUNC		= 0x00400000,
 
 		INVALID		= 0x80000000,
 	};
@@ -54,8 +55,13 @@ public:
 	void				BuildTokens(string file);
 
 	bool 				HasMore();
+
+	// Popped tokens must be deleted by the popper.
 	Token* 				PopIfExists(Token::Type type);
+	Token*				PopExpected(Token::Type type);
 	Token* 				PopNext();
+
+	const Token*		PeekNext();
 
 private:
 	list<Token*>		mTokens;

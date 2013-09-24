@@ -22,10 +22,18 @@ int main(int argc, char *argv[]) {
 		Parser parser(file, true);
 		
 		if (parser.ParseFile()) {
-			printf("VALID SCRAP\n");
-			if (parser.CompileTokens()) {
-				Environment env(parser.GetOpcodes());
-				env.Execute();
+
+			try {
+				if (parser.CompileTokens()) {
+					try {
+						Environment env(parser.GetOpcodes());
+						env.Execute();
+					} catch (exception &e) {
+						printf("Runtime error:\n%s\n", e.what());
+					}
+				}
+			} catch (exception &e) {
+				printf("Compilation failed.\n%s\n", e.what());
 			}
 		}
 	}

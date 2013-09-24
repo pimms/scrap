@@ -9,14 +9,12 @@ using namespace std;
 * prevent clutter.
 *****/
 #define EX_BEGIN(_NAME, _TXTDEFAULT)		\
-	class _NAME : public exception {		\
+	class _NAME : public runtime_error {	\
 	public:  string mTxt;					\
 	_NAME(string txt=_TXTDEFAULT)			\
-			{  mTxt = txt; }				\
+			:runtime_error(txt){}			\
 	virtual ~_NAME() throw() {}				\
 	using std::exception::what; 			\
-	const char* what()						\
-			{ return mTxt.c_str(); }
 
 
 #define EX_END	\
@@ -38,3 +36,5 @@ EX_END
 EX_BEGIN(InvalidTokenException, "Invalid token")
 EX_END
 
+EX_BEGIN(SyntaxErrorException, "Syntax error")
+EX_END

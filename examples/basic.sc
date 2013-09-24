@@ -1,9 +1,8 @@
-func LOLWAT(var xyz) {
-	if (xyz == 3.14) {
-		print("%xyz is pi, yo");
-	} else {
-		print("%xyz is nay pi");
-	}
-}
+var param = 15;
 
-LOLWAT(3.141.5);
+var x = 2 + 5 - f((param+4)*3);
+var x = 2 * 2;
+
+func f(var p) {
+	return p + 1;
+}

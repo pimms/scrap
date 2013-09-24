@@ -17,6 +17,7 @@ string Token::GetStringValue(Token::Type type) {
 	case BRACKET_END:	return "BRACKET_END";
 	case SEMICOLON:		return "SEMICOLON";
 	case DOT:			return "DOT";
+	case COMMA:			return "COMMA";
 	case VARFUNC:		return "VARFUNC";
 	case VALUE:			return "VALUE";
 	case VAL_STRING:	return "VAL_STRING";
@@ -38,17 +39,12 @@ void Tokens::BuildTokens(string fileName) {
 	}
 
 	while (GetToken(file)) ;
-	
-	list<Token*>::iterator it;
-	for (it = mTokens.begin(); it != mTokens.end(); it++) {
-		printf("[%16s]: %s\n", Token::GetStringValue((*it)->mType).c_str(), 
-								(*it)->mToken.c_str());
-	}
 }
 
 bool Tokens::HasMore() {
 	return mTokens.size() > 0;
 }
+
 
 Token* Tokens::PopIfExists(Token::Type type) {
 	Token *token = NULL;
@@ -61,6 +57,20 @@ Token* Tokens::PopIfExists(Token::Type type) {
 	return token;
 }
 
+Token* Tokens::PopExpected(Token::Type type) {
+	Token *token = PopIfExists(type);
+
+	if (token) return token;
+
+	token = PopNext();
+	throw InvalidTokenException(
+							"Expected '" 
+							+ Token::GetStringValue(type) 
+							+ "', got: '" 
+							+ (token ?Token::GetStringValue(token->mType):"NULL") 
+							+ "'.");
+}
+
 Token* Tokens::PopNext() {
 	Token *token = NULL;
 
@@ -68,6 +78,11 @@ Token* Tokens::PopNext() {
 	mTokens.pop_front();
 
 	return token;
+}
+
+
+const Token* Tokens::PeekNext() {
+	return mTokens.front();
 }
 
 
@@ -140,6 +155,10 @@ bool Tokens::GetSpecialChar(ifstream &file) {
 
 		case '.':
 			t->mType = Token::DOT;
+			break;
+
+		case ',':
+			t->mType = Token::COMMA;
 			break;
 
 		default:
@@ -321,6 +340,7 @@ bool Tokens::NextCharBlocking(ifstream &file, bool numericalContext) {
 		case '<':
 		case '>':
 		case '\"':
+		case ',':
 			return true;
 
 		case '.':

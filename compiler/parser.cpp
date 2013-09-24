@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "expr.h"
 
 uint Parser::sFuncId = 0;
 uint Parser::sGVarId = 0;
@@ -29,6 +30,20 @@ bool Parser::ParseFile() {
 }
 
 bool Parser::CompileTokens() {
+	printf("\nExpressions:\n");
+	while (mTokens->HasMore()) {
+		while (mTokens->HasMore()) {
+			if (mTokens->PeekNext()->mToken == "=") {
+				mTokens->PopNext();
+				break;
+			}
+			mTokens->PopNext();
+		}
+
+		Expression expr;
+		expr.ParseExpression(mTokens);
+	}
+
 	return false;
 }
 
