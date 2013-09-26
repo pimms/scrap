@@ -6,6 +6,7 @@
 *****/
 
 #include "tokens.h"
+#include "statement.h"
 #include "../common/opcode.h"
 #include "../common/scope.h"
 
@@ -17,6 +18,20 @@ public:
 	bool				ParseFile();
 	bool 				CompileTokens();
 	Opcode*				GetOpcodes();
+
+	/***** Push / Pop scope*****
+	* Modifies the current context of variable-scope.
+	* This ensures that any requested variables in
+	* fact does exist. 
+	*****/
+	void				PushScope();
+	void				PopScope();
+
+	void				PushNestedScope();
+	void				PopNestedScope();
+
+	uint				RegisterVariable(string name);
+	uint				GetVariableId(string name);
 
 private:
 	/***** Static ID counters *****
@@ -30,9 +45,15 @@ private:
 	string				mFile;
 	bool				mIsFileMain;
 	Tokens				*mTokens;
+
+	Opcode				*mOpcode;
 	
 	CompileScope		mGScope;
 	Stack<CompileScope*>mLScope;
 
-	void 				ParseReserved(Token *token);
+	list<Statement*>	mStatements;
+
+	bool				BuildStatements();
+	bool				BuildIntermediates();
+	bool				BuildBytecode();
 };

@@ -38,3 +38,12 @@ EX_END
 
 EX_BEGIN(SyntaxErrorException, "Syntax error")
 EX_END
+
+EX_BEGIN(NotImplementedException, "Feature not implemented")
+EX_END
+
+EX_BEGIN(StackOverflowException, "Stack overflow")
+EX_END
+
+EX_BEGIN(StackUnderflowException, "Stack underflow")
+EX_END

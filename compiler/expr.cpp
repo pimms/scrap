@@ -14,21 +14,31 @@ Expression::~Expression() {
 	}
 }
 
-
-void Expression::ParseExpression(Tokens *tokens) {
-	BuildPostfix(tokens);
+string Expression::DbgGetString() {
+	string ret;
 
 	list<ExprTerm*>::iterator it;
 	for (it = mPostfix.begin(); it != mPostfix.end(); it++) {
 		if ((*it)->mToken != NULL) {
-			printf("%s ", (*it)->mToken->mToken.c_str());
+			ret += (*it)->mToken->mToken + " ";
 		} else {
-			printf("func ");
+			ret += (*it)->mFunc->DbgGetString();
 		}
 	}
-	printf("\n");
+	
+	return ret;
 }
 
+
+void Expression::ParseStatement(Tokens *tokens) {
+	mPostfix.clear();
+
+	BuildPostfix(tokens);
+
+	if (!mPostfix.size()) {
+		throw InvalidTokenException("Expected expression");
+	}
+}
 
 void Expression::BuildPostfix(Tokens *tokens) {
 	Stack<Token*> stack;
@@ -48,7 +58,7 @@ void Expression::BuildPostfix(Tokens *tokens) {
 			// Function call
 			if (tokens->PeekNext()->mType == Token::PARANTH_BEG) {
 				FunctionCall *func = new FunctionCall(token);
-				func->ParseExpression(tokens);
+				func->ParseStatement(tokens);
 				mPostfix.push_back(new ExprTerm(func));
 			} else {
 				mPostfix.push_back(new ExprTerm(token));
@@ -97,7 +107,6 @@ void Expression::BuildPostfix(Tokens *tokens) {
 	}
 }
 
-
 int Expression::OperatorPrecedence(Token *token) {
 	if (token->mType != Token::OPERATOR) {
 		return -1;
@@ -120,4 +129,25 @@ int Expression::OperatorPrecedence(Token *token) {
 	}
 
 	return 0;
+}
+
+
+void Expression::ProvideIntermediates(Opcode *opcode, Parser *parser) {
+	AllocateVariables(opcode, parser);
+	HandleFunctionCalls(opcode, parser);
+}
+
+
+void Expression::AllocateVariables(Opcode *opcode, Parser* parser) {
+	list<ExprTerm*>::iterator it;
+	for (it = mPostfix.begin(); it != mPostfix.end(); it++) {
+		Token *token = (*it)->mToken;
+		if (token && token->mType == Token::VARFUNC) {
+
+		}
+	}
+}
+
+void Expression::HandleFunctionCalls(Opcode *opcode, Parser *parser) {
+
 }
