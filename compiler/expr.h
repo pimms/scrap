@@ -14,8 +14,10 @@ class Expression : public Fragment {
 public:
 					Expression(bool isFunctionParam = false);
 					~Expression();
+	string			DbgGetString();
 
-	void			ParseExpression(Tokens *tokens);
+	void			ParseStatement(Tokens *tokens);
+	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 private:
 	struct ExprTerm {
@@ -38,4 +40,8 @@ private:
 
 	void			BuildPostfix(Tokens *tokens);
 	int				OperatorPrecedence(Token *token);
+
+	void			AllocateVariables(Opcode *opcode, Parser *parser);
+	void			HandleFunctionCalls(Opcode *opcode, Parser *parser);
+
 };

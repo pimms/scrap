@@ -1,13 +1,13 @@
 #pragma once
 
-/***** Class Function *****
+/***** Class FunctionCall *****
 * Defines a function fragment. The eventual parameters
 * of the function are parsed as expressions.
 * FunctionCalls are ALWAYS 'owned' by an Expression.
 *****/
 #include <stdlib.h>
 #include "tokens.h"
-#include "expr.h"
+#include "fragment.h"
 
 
 class Expression;
@@ -15,7 +15,10 @@ class Expression;
 class FunctionCall : public Fragment {
 public:
 					FunctionCall(Token *funcToken);
-	void			ParseExpression(Tokens *tokens);
+	void			ParseStatement(Tokens *tokens);
+	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
+
+	string			DbgGetString();
 
 protected:
 	Token::Type		mDelim;

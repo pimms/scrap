@@ -15,9 +15,7 @@ Environment::Environment(Opcode *opcode) {
 }
 
 Environment::~Environment() {
-	if (mOpcodes) {
-		delete[] mOpcodes;
-	}
+
 }
 
 int Environment::Execute() {

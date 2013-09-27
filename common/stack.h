@@ -1,28 +1,9 @@
 #pragma once
 
-#include <exception>
 #include <stdlib.h>
+#include "scrapexcept.h"
 
 using namespace std;
-
-class OverflowException : public exception {
-public:
-	using exception::what;
-
-	const char* what() {
-		return "Stack overflow!\n";
-	}
-};
-
-class UnderflowException : public exception {
-public:
-	using exception::what;
-
-	const char* what() {
-		return "Stack underflow!\n";
-	}
-};
-
 
 template<typename T>
 class Stack {

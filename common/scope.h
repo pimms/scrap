@@ -14,6 +14,10 @@ using namespace std;
 template<typename T>
 class ScopeT {
 public:
+	ScopeT() {
+		mVarCount = 1;
+	}
+
 	~ScopeT() {
 		typename map<uint,T>::iterator it;
 
@@ -24,6 +28,24 @@ public:
 		while (mNested.Size()) {
 			delete mNested.Pop();
 		}
+	}
+
+	uint GetItemId(T val) {
+		for (int i=mNested.Size()-1; i>=0; i--) {
+			uint id = mNested.Peek(i)->GetItemId(val);
+			if (id != 0) {
+				return id;
+			}
+		}
+
+		typename map<uint,T>::iterator it;
+		for (it = mVars.begin(); it != mVars.end(); it++) {
+			if (*(it->second) == *val) {
+				return it->first;
+			}
+		}
+
+		return 0;
 	}
 
 	bool ItemExists(uint id) {
@@ -41,6 +63,8 @@ public:
 	}
 
 	void AddItem(uint id, T t) {
+		mVarCount++;
+
 		ScopeT<T> *nested = mNested.Peek();
 		if (nested) {
 			nested->AddItem(id, t);
@@ -48,6 +72,10 @@ public:
 		}
 
 		mVars[id] = t;
+	}
+
+	int GetVarCount() {
+		return mVarCount;
 	}
 
 	T GetVar(uint id) {
@@ -65,6 +93,11 @@ public:
 		return mVars[id];
 	}
 
+
+	int NestCount() {
+		return mNested.Size();
+	}
+
 	void PushNestedScope() {
 		ScopeT<T> *nested = new ScopeT<T>();
 		mNested.Push(nested);
@@ -77,6 +110,7 @@ public:
 protected:
 	map<uint,T>			mVars;
 	Stack<ScopeT<T>*> 	mNested;
+	int					mVarCount;
 };
 
 

@@ -10,10 +10,12 @@ Parser::Parser(string file, bool mainFile) {
 	mIsFileMain = mainFile;
 
 	mTokens = new Tokens();
+	mOpcode = new Opcode();
 }
 
 Parser::~Parser() {
 	delete mTokens;
+	delete mOpcode;
 }
 
 
@@ -30,21 +32,34 @@ bool Parser::ParseFile() {
 }
 
 bool Parser::CompileTokens() {
-	printf("\nExpressions:\n");
-	while (mTokens->HasMore()) {
-		while (mTokens->HasMore()) {
-			if (mTokens->PeekNext()->mToken == "=") {
-				mTokens->PopNext();
-				break;
-			}
-			mTokens->PopNext();
+	try {
+		if (!BuildStatements()) {
+			return false;
 		}
-
-		Expression expr;
-		expr.ParseExpression(mTokens);
+	} catch (exception e) {
+		printf("Failed to build statements from tokens:\n");
+		printf("%s\n", e.what());
 	}
 
-	return false;
+	try {
+		if (!BuildIntermediates()) {
+			return false;
+		}
+	} catch (exception e) {
+		printf("Failed to build intermediates:\n");
+		printf("%s\n", e.what());
+	}
+
+	try {
+		if (!BuildBytecode()) {
+			return false;
+		}
+	} catch (exception e) {
+		printf("Failed to build bytecode:\n");
+		printf("%s\n", e.what());
+	}
+
+	return true;
 }
 
 Opcode* Parser::GetOpcodes() {
@@ -52,22 +67,95 @@ Opcode* Parser::GetOpcodes() {
 }
 
 
-void Parser::ParseReserved(Token *token) {
-	if (token->mToken == "var") {
-		
-	} else if (token->mToken == "for") {
-		
-	} else if (token->mToken == "class") {
+void Parser::PushScope() {
+	mLScope.Push(new CompileScope);
+}
 
-	} else if (token->mToken == "if") {
+void Parser::PopScope() {
+	delete mLScope.Pop();
+}
 
-	} else if (token->mToken == "else") {
 
-	} else if (token->mToken == "while") {
-
-	} else if (token->mToken == "func") {
-
+void Parser::PushNestedScope() {
+	if (mLScope.Size()) {
+		mLScope.Peek()->PushNestedScope();
 	} else {
-		
+		mGScope.PushNestedScope();
 	}
+}
+
+void Parser::PopNestedScope() {
+	if (mLScope.Size()) {
+		mLScope.Peek()->PopNestedScope();
+	} else {
+		mGScope.PopNestedScope();
+	}
+}
+
+
+uint Parser::RegisterVariable(string name) {
+	CompileScope *scope = NULL;
+	uint id = 0;
+
+	if (mLScope.Size()) {
+		scope = mLScope.Peek();
+		id = VAR_LOCAL | (mLScope.Peek()->GetVarCount());
+	} else {
+		scope = &mGScope;
+		id = VAR_GLOBAL | (++sGVarId);
+	}
+
+	string *n = new string;
+	*n = name;
+
+	scope->AddItem(id, n);
+}
+
+uint Parser::GetVariableId(string name) {
+	if (!name.length()) {
+		throw runtime_error("Are you out of your fkn mind?");
+	}
+
+	uint id = 0;
+
+	if (mLScope.Size()) {
+		id = mLScope.Peek()->GetItemId(&name);
+		if (id) { 
+			return id;
+		}
+	}
+
+	id = mGScope.GetItemId(&name);
+	
+	if (id == 0) {
+		throw VarNotDefined("Variable is not defined in the current scope: " + name);
+	}
+
+	return id;
+}
+
+
+bool Parser::BuildStatements() {
+	while (mTokens->HasMore()) {
+		Statement *statement = Statement::ParseStatement(mTokens);
+		if (statement) {
+			mStatements.push_back(statement);
+		}
+	}
+
+	return true;
+}
+
+bool Parser::BuildIntermediates() {
+	list<Statement*>::iterator it;
+	for (it = mStatements.begin(); it != mStatements.end(); it++) {
+		(*it)->ProvideIntermediates(mOpcode, this);
+	}
+
+	return true;
+}
+
+bool Parser::BuildBytecode() {
+
+	return false;
 }
