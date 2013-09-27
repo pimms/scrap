@@ -1,6 +1,7 @@
 #pragma once
 
 #include <exception>
+#include <stdexcept>
 #include <string>
 using namespace std;
 
@@ -10,12 +11,9 @@ using namespace std;
 *****/
 #define EX_BEGIN(_NAME, _TXTDEFAULT)		\
 	class _NAME : public runtime_error {	\
-	public:  string mTxt;					\
+	public: 								\
 	_NAME(string txt=_TXTDEFAULT)			\
 			:runtime_error(txt){}			\
-	virtual ~_NAME() throw() {}				\
-	using std::exception::what; 			\
-
 
 #define EX_END	\
 	};

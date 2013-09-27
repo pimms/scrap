@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <sstream>
+#include <math.h>
 
 
 
@@ -23,21 +24,21 @@ Var::Type Var::GetType(string str) {
 			// ..all is well
 		} else if (str[i] == '.') {
 			if (flt) {
-				return Type::STRING;
+				return STRING;
 			} 
 
 			flt = true;
 		} else if (i && str[i] == '-') {
-			return Type::STRING;
+			return STRING;
 		}  else {
-			return Type::STRING;
+			return STRING;
 		}
 	}
 
 	if (flt) {
-		return Type::FLOAT;
+		return FLOAT;
 	} else {
-		return Type::INT;
+		return INT;
 	}
 }
 
@@ -412,7 +413,7 @@ Var::CmpResult Var::CompareWith(const Var &var) const {
 		return CompareWithString(var.GetString());
 	}
 
-	return Var::CmpResult::UNDEFCMP;
+	return UNDEFCMP;
 }
 
 Var::CmpResult Var::CompareWithInt(const int &val) const {
@@ -432,7 +433,7 @@ Var::CmpResult Var::CompareWithInt(const int &val) const {
 Var::CmpResult Var::CompareWithFloat(const float &val) const {
 	float tVal = GetFloat();
 
-	if (abs(tVal-val) < 0.0000001f) {
+	if ((float)fabs((float)tVal-val) < 0.0000001f) {
 		return EQUAL;
 	} if (tVal < val) {
 		return LESS;
