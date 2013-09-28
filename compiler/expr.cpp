@@ -135,19 +135,124 @@ int Expression::OperatorPrecedence(Token *token) {
 void Expression::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 	AllocateVariables(opcode, parser);
 	HandleFunctionCalls(opcode, parser);
+	BuildBytecodePostfix(opcode, parser);
 }
 
 
 void Expression::AllocateVariables(Opcode *opcode, Parser* parser) {
-	list<ExprTerm*>::iterator it;
-	for (it = mPostfix.begin(); it != mPostfix.end(); it++) {
+	// Register all required variables under anonymous names
+	for (list<ExprTerm*>::iterator it=mPostfix.begin(); 
+			it!=mPostfix.end(); it++) {
 		Token *token = (*it)->mToken;
-		if (token && token->mType == Token::VARFUNC) {
+		if (token && token->mType != Token::OPERATOR) {
+			mExprVars[*it] = RegisterVariable(parser, "");
+		}
+	}
 
+	// Intermediate allocation objects
+	for (map<ExprTerm*,uint>::iterator it=mExprVars.begin(); 
+			it!=mExprVars.end(); it++) {
+		if (!it->first->mToken) continue;
+
+		Token *token = it->first->mToken;
+
+		opcode->AddInterop(new ByteOperation(OP_ALLOC));
+		opcode->AddInterop(new DwordOperation(&it->second));
+
+		if (token->mType == Token::VARFUNC) {
+			// Copy the original variable into our new one
+			opcode->AddInterop(new ByteOperation(OP_MOV));
+
+			uint src = GetVariableId(parser, token->mToken);
+			uint dst = it->second;
+
+			opcode->AddInterop(new DwordOperation(&dst));
+			opcode->AddInterop(new DwordOperation(&src));
+		} else {
+			// The value to be copied is a numerical value.
+			byte operation = 0;
+			void *dword = malloc(4);
+
+			if (it->first->mToken->mType == Token::VAL_INT) {
+				operation = OP_MOVI;
+				*(int*)dword = atoi(token->mToken.c_str());
+			} else if (token->mType == Token::VAL_FLOAT) {
+				operation = OP_MOVF;
+				*(float*)dword = atof(token->mToken.c_str());
+			} else {
+				throw InvalidTokenException("Expression token is of invalid type");
+			}
+
+			opcode->AddInterop(new ByteOperation(operation));
+			opcode->AddInterop(new DwordOperation(dword));
+
+			free(dword);
 		}
 	}
 }
 
 void Expression::HandleFunctionCalls(Opcode *opcode, Parser *parser) {
+	for (list<ExprTerm*>::iterator it=mPostfix.begin();
+			it!=mPostfix.end(); it++) {
+		FunctionCall *fcall = (*it)->mFunc;
+		if (fcall) {
+			fcall->ProvideIntermediates(opcode, parser);
 
+			// The return value of the function will be
+			// stored in VAR_RETURN upon return. Allocate
+			// a new variable and pop the value into it.
+			uint id = RegisterVariable(parser, "");
+
+			opcode->AddInterop(new ByteOperation(OP_ALLOC));
+			opcode->AddInterop(new DwordOperation(&id));
+			opcode->AddInterop(new ByteOperation(OP_POPMOV));
+			opcode->AddInterop(new DwordOperation(&id));
+
+			mExprVars[*it] = id;
+		}
+	}
+}
+
+void Expression::BuildBytecodePostfix(Opcode *opcode, Parser *parser) {
+	for (list<ExprTerm*>::iterator it = mPostfix.begin();
+			it != mPostfix.end(); it++) {
+		ExprTerm *term = *it;
+
+		if (mExprVars.count(term) != 0) {
+			opcode->AddInterop(new ByteOperation(OP_PUSH));
+			opcode->AddInterop(new DwordOperation(&mExprVars[term]));
+		} else {
+			AddOperator(opcode, term->mToken);
+		}
+	}
+}
+
+
+void Expression::AddOperator(Opcode *opcode, Token *token) {
+	if (!token) {
+		throw NullPointerException("Token cannot be nil");
+	}
+
+	if (token->mType != Token::OPERATOR) {
+		throw InvalidTokenException("Expected an operator, got: " + token->mToken);
+	}
+
+	byte oper = 0;
+	string s = token->mToken;
+
+	if (s == "+") {
+		oper = OP_ADD;
+	} else if (s == "-") {
+		oper = OP_SUB;
+	} else if (s == "*") {
+		oper = OP_MUL;
+	} else if (s == "/") {
+		oper = OP_DIV;
+	} else if (s == "%") {
+		oper = OP_MOD;
+	} else {
+		throw NotImplementedException("Operator not implemented: " + s);
+	}
+
+	opcode->AddInterop(new ByteOperation(oper));
 }

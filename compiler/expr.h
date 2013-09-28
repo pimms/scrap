@@ -3,7 +3,7 @@
 /***** Class Expression *****
 * Binary tree-representation of expresions.
 * All inputs are infix expressions, and are 
-* stored as postfix binary parse-trees.
+* stored in postfix format.
 *****/
 #include "fragment.h"
 #include "func.h"
@@ -38,10 +38,14 @@ private:
 	list<ExprTerm*>	mPostfix;
 	bool			mIsParam;
 
+	map<ExprTerm*,uint> mExprVars;
+
 	void			BuildPostfix(Tokens *tokens);
 	int				OperatorPrecedence(Token *token);
 
 	void			AllocateVariables(Opcode *opcode, Parser *parser);
 	void			HandleFunctionCalls(Opcode *opcode, Parser *parser);
+	void			BuildBytecodePostfix(Opcode *opcode, Parser *parser);
 
+	void			AddOperator(Opcode *opcode, Token *token);
 };

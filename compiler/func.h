@@ -24,5 +24,8 @@ protected:
 	Token::Type		mDelim;
 
 	Token			*mFuncToken;
+
 	list<Expression*>	mParams;
+
+	void			HandleParameters(Opcode *opcode, Parser *parser);
 };

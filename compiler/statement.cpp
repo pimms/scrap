@@ -55,5 +55,5 @@ void AssignStatement::ParseStatement(Tokens *tokens) {
 }
 
 void AssignStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
-
+	
 }

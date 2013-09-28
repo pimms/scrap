@@ -14,6 +14,12 @@ using namespace std;
 	public: 								\
 	_NAME(string txt=_TXTDEFAULT)			\
 			:runtime_error(txt){}			\
+	const char *what() {					\
+		string str = #_NAME;				\
+		str += ": ";						\
+		str += runtime_error::what();		\
+		return str.c_str();					\
+	}
 
 #define EX_END	\
 	};
@@ -44,4 +50,7 @@ EX_BEGIN(StackOverflowException, "Stack overflow")
 EX_END
 
 EX_BEGIN(StackUnderflowException, "Stack underflow")
+EX_END
+
+EX_BEGIN(NullPointerException, "Null-pointer exception")
 EX_END

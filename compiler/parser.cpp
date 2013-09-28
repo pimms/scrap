@@ -135,6 +135,15 @@ uint Parser::GetVariableId(string name) {
 }
 
 
+uint Parser::GetFunctionId(string name) {
+	if (!mFuncIds.count(name)) {
+		throw FuncNotDefined("Function is undefined: " + name);
+	}
+
+	return mFuncIds[name];
+}
+
+
 bool Parser::BuildStatements() {
 	while (mTokens->HasMore()) {
 		Statement *statement = Statement::ParseStatement(mTokens);

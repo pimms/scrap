@@ -46,5 +46,18 @@ string FunctionCall::DbgGetString() {
 
 
 void FunctionCall::ProvideIntermediates(Opcode *opcode, Parser *parser) {
+	HandleParameters(opcode, parser);
 
+	uint funcId = parser->GetFunctionId(mFuncToken->mToken);
+
+	opcode->AddInterop(new ByteOperation(OP_CALL));
+	opcode->AddInterop(new DwordOperation(&funcId));
+}
+
+
+void FunctionCall::HandleParameters(Opcode *opcode, Parser *parser) {
+	list<Expression*>::reverse_iterator it;
+	for (it=mParams.rbegin(); it!=mParams.rend(); it++) {
+		(*it)->ProvideIntermediates(opcode, parser);
+	}
 }

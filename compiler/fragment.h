@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "tokens.h"
 #include "parser.h"
+#include "interop.h"
 #include "../common/opcode.h"
 
 

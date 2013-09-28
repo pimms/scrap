@@ -33,6 +33,8 @@ public:
 	uint				RegisterVariable(string name);
 	uint				GetVariableId(string name);
 
+	uint				GetFunctionId(string name);
+
 private:
 	/***** Static ID counters *****
 	* The function-ID iterator is static to
@@ -52,6 +54,8 @@ private:
 	Stack<CompileScope*>mLScope;
 
 	list<Statement*>	mStatements;
+
+	map<string,uint>	mFuncIds;
 
 	bool				BuildStatements();
 	bool				BuildIntermediates();
