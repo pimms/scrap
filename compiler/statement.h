@@ -1,11 +1,12 @@
 #pragma once
 
 #include <stdlib.h>
-#include "tokens.h"
-#include "expr.h"
-#include "../common/opcode.h"
+#include "../common/codes.h"
+#include "fragment.h"
 
 class Expression;
+class Tokens;
+struct Token;
 
 /***** Class Statement *****
 * Abstract superclass for all statements.
@@ -15,7 +16,7 @@ protected:
 						Statement();
 			
 public:
-	static Statement*	ParseStatement(Tokens *tokens);
+	static Statement*	CreateStatement(Tokens *tokens);
 };
 
 
@@ -35,9 +36,16 @@ public:
 
 
 /***** Class AssignStatement *****
-* A statement which assigns a new value to
+* A statement which may assign a new value to
 * a variable. The variable may be allocated
 * by the same statement.
+*
+* There are four cases falling into AssignStatement:
+*	Allocation and assigninment:		var x = 1;
+*	Allocation without assignment:		var x;
+*	Reassignment:						x = 3;
+*	Expression without assignment:		f(32);
+* Do note that all assigning operators are supported (+=, -=, =, etc)
 *****/
 class AssignStatement : public Statement {
 public:
@@ -49,4 +57,6 @@ private:
 	Token			*mAssignee;
 	Token			*mOperator;
 	Expression		*mExpression;
+
+	void			HandleOperator(Opcode *opcode, uint varId);
 };

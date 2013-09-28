@@ -65,8 +65,8 @@ public:
 	void AddItem(uint id, T t) {
 		mVarCount++;
 
-		ScopeT<T> *nested = mNested.Peek();
-		if (nested) {
+		if (mNested.Size()) {
+			ScopeT<T> *nested = mNested.Peek();
 			nested->AddItem(id, t);
 			return;
 		}
@@ -74,7 +74,7 @@ public:
 		mVars[id] = t;
 	}
 
-	int GetVarCount() {
+	uint GetVarCount() {
 		return mVarCount;
 	}
 
@@ -110,7 +110,7 @@ public:
 protected:
 	map<uint,T>			mVars;
 	Stack<ScopeT<T>*> 	mNested;
-	int					mVarCount;
+	uint				mVarCount;
 };
 
 

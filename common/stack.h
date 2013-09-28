@@ -75,7 +75,7 @@ public:
 			return mBack->val;
 		}
 
-		return NULL;
+		throw StackUnderflowException("Naked stack-peek is illegal");
 	}
 
 	T Peek(int index) {

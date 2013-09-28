@@ -6,7 +6,11 @@
 #include <stdio.h>
 
 Environment::Environment(Opcode *opcode) {
-	mOpcodes = opcode->GetRaw();
+	const vector<byte> opVec = opcode->GetBytecode();
+
+	mOpcodes = new byte[opVec.size()];
+	copy(opVec.begin(), opVec.end(), mOpcodes);
+
 	mOpPtr = 0;
 	mDataDef = false;
 
@@ -15,7 +19,7 @@ Environment::Environment(Opcode *opcode) {
 }
 
 Environment::~Environment() {
-
+	delete[] mOpcodes;
 }
 
 int Environment::Execute() {
@@ -279,7 +283,7 @@ void Environment::OpMovI() {
 	int literal = 0;
 
 	dest = GetOpcodeVar();
-	literal = GetOpcodeUint();
+	literal = GetOpcodeInt();
 	
 	dest->Set(literal);
 

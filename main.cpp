@@ -11,6 +11,7 @@
 #include "run/env.h"
 #include "common/opcode.h"
 #include "compiler/parser.h"
+#include "common/optostr.h"
 
 int main(int argc, char *argv[]) {
 	if (argc == 1) {
@@ -26,11 +27,16 @@ int main(int argc, char *argv[]) {
 			try {
 				if (parser.CompileTokens()) {
 					try {
-						Environment env(parser.GetOpcodes());
-						env.Execute();
+						OpcodeText tostr;
+						tostr.Parse(parser.GetOpcodes());
+						
+						//Environment env(parser.GetOpcodes());
+						//env.Execute();
 					} catch (exception &e) {
 						printf("Runtime error:\n%s\n", e.what());
 					}
+				} else {
+					printf("Compilation failed.\n");
 				}
 			} catch (exception &e) {
 				printf("Compilation failed.\n%s\n", e.what());

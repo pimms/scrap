@@ -25,13 +25,17 @@ class Opcode {
 public:
 						Opcode();
 
-	byte*				GetRaw();
+	bool				IsBigEndian();
+
+	const vector<byte>	GetBytecode();
 	int					Length();
 
 
-	InteropIter*		AddInterop(IntermediateOperation *interop);
-	void				PushTail(InteropIter *it);
+	InteropIter			AddInterop(IntermediateOperation *interop);
+	void				PushTail(InteropIter it);
 	void				PopTail();
+
+	bool				BuildBytecodeFromIntermediates();
 
 
 	/***** Add *****
@@ -49,10 +53,8 @@ public:
 
 private:
 	list<IntermediateOperation*> mInterops;
-	Stack<InteropIter*>	mInsertTails;
+	Stack<InteropIter>	mInsertTails;
 
 	vector<byte>		mBytes;
 	bool				mBigEndian;
-
-	bool				IsBigEndian();
 };

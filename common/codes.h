@@ -10,13 +10,6 @@
 *****/
 
 
-// Bitwise AND-helpers
-#define HIGH_WORD 		0xFFFF0000
-#define LOW_WORD  		0x0000FFFF
-
-#define HIGH_NIBBLE 	0xF0
-#define LOW_NIBBLE  	0x0F
-
 /***** VARIABLE CONSTANTS ****
 * Variables are stored in a lookup-table in the
 * Environment class. 
@@ -40,16 +33,16 @@
 *****/
 #define OP_PUSH 				0x01  	// PARAM
 #define OP_PUSH_DATA			0x02	// PARAM
-#define OP_POP 					0x03	// PARAM
-#define OP_CALL 				0x04	// PARAM
-#define OP_RET 					0x05	// PARAM
-#define OP_ALLOC 				0x06 	// PARAM
-#define OP_POPMOV 				0x07	// PARAM (*)
-#define OP_EXIT 				0x08	// PARAM
-#define OP_MOV 					0x09	// PARAM 2  (var id)
-#define OP_MOVI					0x0A	// PARAM 2  (int literal)
-#define OP_MOVF 				0x0B	// PARAM 2  (float literal)
-#define OP_MOVS					0x0C	// PARAM 2  (string data)
+#define OP_CALL 				0x03	// PARAM
+#define OP_RET 					0x04	// PARAM
+#define OP_ALLOC 				0x05 	// PARAM
+#define OP_POPMOV 				0x06	// PARAM (*)
+#define OP_EXIT 				0x07	// PARAM
+#define OP_MOV 					0x08	// PARAM 2  (var id)
+#define OP_MOVI					0x09	// PARAM 2  (int literal)
+#define OP_MOVF 				0x0A	// PARAM 2  (float literal)
+#define OP_MOVS					0x0B	// PARAM 2  (string-data id)
+#define OP_POP 					0x0C	
 
 
 // Arithmetic operations are performed:

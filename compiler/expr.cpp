@@ -1,7 +1,8 @@
 #include "expr.h"
 #include "../common/stack.h"
 #include "../common/scrapexcept.h"
-
+#include "interop.h"
+#include "func.h"
 
 Expression::Expression(bool isFunctionParam) {
 	mIsParam = isFunctionParam;
@@ -156,17 +157,15 @@ void Expression::AllocateVariables(Opcode *opcode, Parser* parser) {
 
 		Token *token = it->first->mToken;
 
-		opcode->AddInterop(new ByteOperation(OP_ALLOC));
-		opcode->AddInterop(new DwordOperation(&it->second));
+		AllocateVariable(opcode, it->second);
 
 		if (token->mType == Token::VARFUNC) {
 			// Copy the original variable into our new one
 			opcode->AddInterop(new ByteOperation(OP_MOV));
 
 			uint src = GetVariableId(parser, token->mToken);
-			uint dst = it->second;
 
-			opcode->AddInterop(new DwordOperation(&dst));
+			opcode->AddInterop(new DwordOperation(&it->second));
 			opcode->AddInterop(new DwordOperation(&src));
 		} else {
 			// The value to be copied is a numerical value.
@@ -184,6 +183,7 @@ void Expression::AllocateVariables(Opcode *opcode, Parser* parser) {
 			}
 
 			opcode->AddInterop(new ByteOperation(operation));
+			opcode->AddInterop(new DwordOperation(&it->second));
 			opcode->AddInterop(new DwordOperation(dword));
 
 			free(dword);
@@ -203,8 +203,7 @@ void Expression::HandleFunctionCalls(Opcode *opcode, Parser *parser) {
 			// a new variable and pop the value into it.
 			uint id = RegisterVariable(parser, "");
 
-			opcode->AddInterop(new ByteOperation(OP_ALLOC));
-			opcode->AddInterop(new DwordOperation(&id));
+			AllocateVariable(opcode, id);
 			opcode->AddInterop(new ByteOperation(OP_POPMOV));
 			opcode->AddInterop(new DwordOperation(&id));
 

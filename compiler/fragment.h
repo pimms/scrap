@@ -4,11 +4,14 @@
 * 
 *****/
 #include <stdlib.h>
-#include "tokens.h"
-#include "parser.h"
-#include "interop.h"
-#include "../common/opcode.h"
+#include <string>
 
+#include "../common/codes.h"
+using namespace std;
+
+class Opcode;
+class Parser;
+class Tokens;
 
 class Fragment {
 public:
@@ -20,4 +23,6 @@ public:
 protected:
 	uint			RegisterVariable(Parser *parser, string name);
 	uint			GetVariableId(Parser *parser, string name);
+
+	void			AllocateVariable(Opcode *opcode, uint varId);
 };

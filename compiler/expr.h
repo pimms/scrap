@@ -8,6 +8,9 @@
 #include "fragment.h"
 #include "func.h"
 
+#include <map>
+using namespace std;
+
 class FunctionCall;
 
 class Expression : public Fragment {

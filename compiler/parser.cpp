@@ -63,7 +63,7 @@ bool Parser::CompileTokens() {
 }
 
 Opcode* Parser::GetOpcodes() {
-	return NULL;
+	return mOpcode;
 }
 
 
@@ -109,6 +109,7 @@ uint Parser::RegisterVariable(string name) {
 	*n = name;
 
 	scope->AddItem(id, n);
+	return id;
 }
 
 uint Parser::GetVariableId(string name) {
@@ -146,7 +147,7 @@ uint Parser::GetFunctionId(string name) {
 
 bool Parser::BuildStatements() {
 	while (mTokens->HasMore()) {
-		Statement *statement = Statement::ParseStatement(mTokens);
+		Statement *statement = Statement::CreateStatement(mTokens);
 		if (statement) {
 			mStatements.push_back(statement);
 		}
@@ -165,6 +166,5 @@ bool Parser::BuildIntermediates() {
 }
 
 bool Parser::BuildBytecode() {
-
-	return false;
+	return mOpcode->BuildBytecodeFromIntermediates();
 }

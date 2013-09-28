@@ -10,6 +10,8 @@
 #include "../common/opcode.h"
 #include "../common/scope.h"
 
+class Statement;
+
 class Parser {
 public:
 						Parser(string file, bool mainFile);

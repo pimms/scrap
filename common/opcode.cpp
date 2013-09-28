@@ -1,14 +1,26 @@
 #include "opcode.h"
 #include "scrapexcept.h"
+#include "../compiler/interop.h"
 
 Opcode::Opcode() {
 	mBigEndian = IsBigEndian();
 	
-	mInsertTails.Push(&mInterops.end());
+	mInsertTails.Push(mInterops.end());
 }
 
-byte* Opcode::GetRaw() {
-	return &mBytes[0];
+
+bool Opcode::IsBigEndian() {
+	union {
+        uint i;
+        char c[4];
+    } bint = {0x01020304};
+
+    return bint.c[0] == 1;
+}
+
+
+const vector<byte> Opcode::GetBytecode() {
+	return mBytes;
 }
 
 int Opcode::Length() {
@@ -16,12 +28,12 @@ int Opcode::Length() {
 }
 
 
-InteropIter* Opcode::AddInterop(IntermediateOperation *interop) {
-	InteropIter *tail = mInsertTails.Peek();
-	return &mInterops.insert(*tail, interop);
+InteropIter Opcode::AddInterop(IntermediateOperation *interop) {
+	InteropIter tail = mInsertTails.Peek();
+	return mInterops.insert(tail, interop);
 }
 
-void Opcode::PushTail(InteropIter *it) {
+void Opcode::PushTail(InteropIter it) {
 	mInsertTails.Push(it);
 }
 
@@ -34,13 +46,25 @@ void Opcode::PopTail() {
 }
 
 
+bool Opcode::BuildBytecodeFromIntermediates() {
+	list<IntermediateOperation*>::iterator it;
+
+	for (it = mInterops.begin(); it != mInterops.end(); it++) {
+		(*it)->ProvideBytecode(this);
+	}
+
+	return true;
+}
+
+
 Opcode* Opcode::AddByte(byte val) {
 	mBytes.push_back(val);
 	return this;
 }
 
 Opcode* Opcode::AddDword(void *dword) {
-	byte *b = (byte*)&dword;
+	byte *b = (byte*)dword;
+	uint xx = *(uint*)dword;
 
 	if (mBigEndian) {
 		for (int i=3; i>=0; i--) {
@@ -84,14 +108,4 @@ void Opcode::ReplaceUint(int index, uint val) {
 			ReplaceByte(index + i, b[i]);
 		}
 	}
-}
-
-
-bool Opcode::IsBigEndian() {
-	union {
-        uint i;
-        char c[4];
-    } bint = {0x01020304};
-
-    return bint.c[0] == 1;
 }

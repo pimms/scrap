@@ -1,7 +1,10 @@
 #include "func.h"
+#include "interop.h"
+#include "expr.h"
+#include "parser.h"
+
 #include "../common/stack.h"
 #include "../common/scrapexcept.h"
-
 
 FunctionCall::FunctionCall(Token *funcToken) {
 	mFuncToken = funcToken;
