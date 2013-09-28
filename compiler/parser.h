@@ -11,6 +11,7 @@
 #include "../common/scope.h"
 
 class Statement;
+class FunctionDefinition;
 
 class Parser {
 public:
@@ -21,7 +22,7 @@ public:
 	bool 				CompileTokens();
 	Opcode*				GetOpcodes();
 
-	/***** Push / Pop scope*****
+	/***** Push / Pop scope *****
 	* Modifies the current context of variable-scope.
 	* This ensures that any requested variables in
 	* fact does exist. 
@@ -29,12 +30,19 @@ public:
 	void				PushScope();
 	void				PopScope();
 
+	/***** IsInLocalScope *****
+	* Is the Parser currently handing Tokens, Fragments 
+	* or Intermediates in a local (function) scope?
+	*****/
+	bool				IsInLocalScope();
+
 	void				PushNestedScope();
 	void				PopNestedScope();
 
 	uint				RegisterVariable(string name);
 	uint				GetVariableId(string name);
 
+	uint				RegisterFunction(string name);
 	uint				GetFunctionId(string name);
 
 private:
@@ -55,11 +63,21 @@ private:
 	CompileScope		mGScope;
 	Stack<CompileScope*>mLScope;
 
-	list<Statement*>	mStatements;
+	list<Fragment*>		mFragments;
 
 	map<string,uint>	mFuncIds;
 
-	bool				BuildStatements();
+	bool				BuildFragments();
 	bool				BuildIntermediates();
 	bool				BuildBytecode();
+
+	/***** Data-definition header functions *****
+	* Adds position-inquirers to listen for the byte-position
+	* of functions. 
+	* TODO: string data
+	*****/
+	void				AddDataBegin();
+	void				AddFunctionData(FunctionDefinition *funcDef);
+	void				AddDataEnd();
+	
 };

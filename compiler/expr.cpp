@@ -31,17 +31,17 @@ string Expression::DbgGetString() {
 }
 
 
-void Expression::ParseStatement(Tokens *tokens) {
+void Expression::ParseStatement(Tokens *tokens, Parser *parser) {
 	mPostfix.clear();
 
-	BuildPostfix(tokens);
+	BuildPostfix(tokens, parser);
 
 	if (!mPostfix.size()) {
 		throw InvalidTokenException("Expected expression");
 	}
 }
 
-void Expression::BuildPostfix(Tokens *tokens) {
+void Expression::BuildPostfix(Tokens *tokens, Parser *parser) {
 	Stack<Token*> stack;
 
 	// Keeps the loop going when parsing a function-parameter expr
@@ -59,7 +59,7 @@ void Expression::BuildPostfix(Tokens *tokens) {
 			// Function call
 			if (tokens->PeekNext()->mType == Token::PARANTH_BEG) {
 				FunctionCall *func = new FunctionCall(token);
-				func->ParseStatement(tokens);
+				func->ParseStatement(tokens, parser);
 				mPostfix.push_back(new ExprTerm(func));
 			} else {
 				mPostfix.push_back(new ExprTerm(token));
@@ -177,7 +177,7 @@ void Expression::AllocateVariables(Opcode *opcode, Parser* parser) {
 				*(int*)dword = atoi(token->mToken.c_str());
 			} else if (token->mType == Token::VAL_FLOAT) {
 				operation = OP_MOVF;
-				*(float*)dword = atof(token->mToken.c_str());
+				*(float*)dword = (float)atof(token->mToken.c_str());
 			} else {
 				throw InvalidTokenException("Expression token is of invalid type");
 			}

@@ -19,7 +19,7 @@ public:
 					~Expression();
 	string			DbgGetString();
 
-	void			ParseStatement(Tokens *tokens);
+	void			ParseStatement(Tokens *tokens, Parser *parser);
 	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 private:
@@ -43,7 +43,7 @@ private:
 
 	map<ExprTerm*,uint> mExprVars;
 
-	void			BuildPostfix(Tokens *tokens);
+	void			BuildPostfix(Tokens *tokens, Parser *parser);
 	int				OperatorPrecedence(Token *token);
 
 	void			AllocateVariables(Opcode *opcode, Parser *parser);

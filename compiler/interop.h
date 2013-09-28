@@ -58,6 +58,8 @@ protected:
 *****/
 class PositionInquirer : public DwordOperation {
 public:
+					PositionInquirer() 
+						: DwordOperation(NULL) {}
 	virtual void	ProvideBytecode(Opcode *opcode);
 	void			InsertPosition(Opcode *opcode, uint finalValue);
 

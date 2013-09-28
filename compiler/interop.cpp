@@ -14,7 +14,10 @@ void ByteOperation::ProvideBytecode(Opcode *opcode) {
 /***** DwordOperation *****/
 DwordOperation::DwordOperation(void *dword) {
 	mDword = malloc(4);
-	memcpy(mDword, dword, 4);
+
+	if (dword != NULL) {
+		memcpy(mDword, dword, 4);
+	}
 }
 
 DwordOperation::~DwordOperation() {

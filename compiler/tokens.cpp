@@ -5,7 +5,6 @@
 #include <fstream>
 
 
-
 string Token::GetStringValue(Token::Type type) {
 	switch (type) {
 	case UNDEFINED:		return "UNDEFINED";
@@ -31,6 +30,11 @@ string Token::GetStringValue(Token::Type type) {
 
 
 
+
+Tokens::Tokens() {
+	mCursor = mTokens.begin();
+}
+
 void Tokens::BuildTokens(string fileName) {
 	ifstream file;
 	file.open(fileName.c_str());
@@ -39,19 +43,22 @@ void Tokens::BuildTokens(string fileName) {
 	}
 
 	while (GetToken(file)) ;
+
+	mCursor = mTokens.begin();
 }
 
 bool Tokens::HasMore() {
-	return mTokens.size() > 0;
+	return mTokens.size() > 0 
+		&& mCursor != mTokens.end();
 }
 
 
 Token* Tokens::PopIfExists(Token::Type type) {
 	Token *token = NULL;
 
-	if (mTokens.front()->mType == type) {
-		token = mTokens.front();
-		mTokens.pop_front();
+	if ((*mCursor)->mType == type) {
+		token = *mCursor;
+		mCursor = mTokens.erase(mCursor);
 	}
 
 	return token;
@@ -60,9 +67,13 @@ Token* Tokens::PopIfExists(Token::Type type) {
 Token* Tokens::PopExpected(Token::Type type) {
 	Token *token = PopIfExists(type);
 
-	if (token) return token;
+	if (token) { 
+		return token;
+	}
 
+	// All hell is loose - RELEASE THE KRAKEN!
 	token = PopNext();
+
 	throw InvalidTokenException(
 							"Expected '" 
 							+ Token::GetStringValue(type) 
@@ -72,18 +83,26 @@ Token* Tokens::PopExpected(Token::Type type) {
 }
 
 Token* Tokens::PopNext() {
-	Token *token = NULL;
-
-	token = mTokens.front();
-	mTokens.pop_front();
+	Token *token = *mCursor;
+	mCursor = mTokens.erase(mCursor);
 
 	return token;
 }
 
 
-const Token* Tokens::PeekNext() {
-	return mTokens.front();
+Token* Tokens::PeekNext() {
+	return *mCursor;
 }
+
+
+TokenIter Tokens::GetFrontIter() {
+	return mTokens.begin(); 
+}
+
+void Tokens::SetCursor(TokenIter iter) {
+	mCursor = iter;
+}
+
 
 
 bool Tokens::GetToken(ifstream &file) {
@@ -284,6 +303,7 @@ bool Tokens::ReservedWord(string str) {
 		str == "while"	||
 		str == "func"	||
 		str == "var"	||
+		str == "return" ||
 		str == "include"){
 		return true;
 	}

@@ -16,7 +16,7 @@ protected:
 						Statement();
 			
 public:
-	static Statement*	CreateStatement(Tokens *tokens);
+	static Statement*	CreateStatement(Tokens *tokens, Parser *parser);
 };
 
 
@@ -49,7 +49,7 @@ public:
 *****/
 class AssignStatement : public Statement {
 public:
-	void			ParseStatement(Tokens *tokens);
+	void			ParseStatement(Tokens *tokens, Parser *parser);
 	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 private:
@@ -59,4 +59,17 @@ private:
 	Expression		*mExpression;
 
 	void			HandleOperator(Opcode *opcode, uint varId);
+};
+
+
+/***** Class ReturnStatement *****
+* Handles returns from functions.
+*****/
+class ReturnStatement : public Statement {
+public:
+	void			ParseStatement(Tokens *tokens, Parser *parser);
+	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
+
+private:
+	Expression		*mExpression;
 };

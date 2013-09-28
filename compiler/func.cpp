@@ -10,7 +10,7 @@ FunctionCall::FunctionCall(Token *funcToken) {
 	mFuncToken = funcToken;
 }
 
-void FunctionCall::ParseStatement(Tokens *tokens) {
+void FunctionCall::ParseStatement(Tokens *tokens, Parser *parser) {
 	delete tokens->PopExpected(Token::PARANTH_BEG);
 
 	if (tokens->PeekNext()->mType == Token::PARANTH_END) {
@@ -18,7 +18,7 @@ void FunctionCall::ParseStatement(Tokens *tokens) {
 	} else {
 		while (tokens->PeekNext()->mType != Token::PARANTH_END) {
 			Expression *expr = new Expression(true);
-			expr->ParseStatement(tokens);
+			expr->ParseStatement(tokens, parser);
 			mParams.push_back(expr);
 
 			if (Token *t = tokens->PopIfExists(Token::COMMA)) {

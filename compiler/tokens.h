@@ -47,11 +47,15 @@ struct Token {
 	Type			mType;
 };
 
+typedef list<Token*>::iterator TokenIter;
+
 /***** Clsas Tokens *****
 * Manages all Tokens in a file. 
 *****/
 class Tokens {
 public:
+						Tokens();
+
 	void				BuildTokens(string file);
 
 	bool 				HasMore();
@@ -61,10 +65,23 @@ public:
 	Token*				PopExpected(Token::Type type);
 	Token* 				PopNext();
 
-	const Token*		PeekNext();
+	Token*				PeekNext();
+
+
+	/***** Iterative Methods *****
+	* SetCursor allows for modifications of what the Pop-methods
+	* returns. The following will ensure that the first Token is NEVER
+	* touched:
+	*		TokenIter it = GetFrontIter();	it++;
+	*		SetCursor(it);
+	*		PopNext();  // <- returns the second Token
+	*****/
+	TokenIter			GetFrontIter();
+	void				SetCursor(TokenIter front);
 
 private:
 	list<Token*>		mTokens;
+	TokenIter			mCursor;
 
 	/***** GetToken *****
 	* Attempts to fetch a token from the file. 
