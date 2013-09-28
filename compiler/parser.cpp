@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "expr.h"
 #include "funcdef.h"
+#include "interop.h"
 
 uint Parser::sFuncId = 0;
 uint Parser::sGVarId = 0;
@@ -149,6 +150,7 @@ uint Parser::RegisterFunction(string name) {
 	}
 
 	mFuncIds[name] = ++sFuncId;
+	return sFuncId;
 }
 
 uint Parser::GetFunctionId(string name) {
@@ -161,6 +163,8 @@ uint Parser::GetFunctionId(string name) {
 
 
 bool Parser::BuildFragments() {
+	AddDataBegin();
+
 	int stackDepth = 0;
 	bool inFunction = false;
 
@@ -174,6 +178,8 @@ bool Parser::BuildFragments() {
 			FunctionDefinition *fdef = new FunctionDefinition();
 			fdef->ParseStatement(mTokens, this);
 			mFragments.push_back(fdef);
+
+			AddFunctionData(fdef);
 
 			delete mTokens->PopExpected(Token::BRACKET_BEG);
 
@@ -190,8 +196,7 @@ bool Parser::BuildFragments() {
 			PushNestedScope();
 			delete mTokens->PopNext();
 		} else if (next->mType == Token::BRACKET_END) {
-			stackDepth--;
-			if (!stackDepth) {
+			if (--stackDepth == 0) {
 				if (inFunction) {
 					PopScope();
 					inFunction = false;
@@ -207,6 +212,8 @@ bool Parser::BuildFragments() {
 			delete mTokens->PopNext();
 		}
 	}
+
+	AddDataEnd();
 
 	return true;
 }
@@ -225,8 +232,25 @@ bool Parser::BuildBytecode() {
 }
 
 
-// TODO:
-// Consider putting this in a class.
-void Parser::BuildFunctionIntermediates() {
+void Parser::AddDataBegin() {
+	if (mOpcode->Length() != 0) {
+		throw InternalErrorException();
+	}
+	
+	mOpcode->AddInterop(new ByteOperation(OP_DATA_BEGIN));
+}	
 
+void Parser::AddFunctionData(FunctionDefinition *funcDef) {
+	uint funcId = funcDef->GetId();
+
+	mOpcode->AddInterop(new ByteOperation(OP_DATA_FUNC));
+	mOpcode->AddInterop(new DwordOperation(&funcId));
+
+	PositionInquirer *posInq = new PositionInquirer();
+	funcDef->GetPositionReference()->AddInquirer(posInq);
+	mOpcode->AddInterop(posInq);
+}
+
+void Parser::AddDataEnd() {
+	mOpcode->AddInterop(new ByteOperation(OP_DATA_END));
 }

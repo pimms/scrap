@@ -17,14 +17,18 @@ class FunctionDefinition : public Fragment {
 public:
 	static bool			IsFunctionDefinition(Tokens *tokens);
 
+						FunctionDefinition();
 	PositionReference*	GetPositionReference();
 
 	void				ParseStatement(Tokens *tokens, Parser *parser);
 	void				ProvideIntermediates(Opcode *opcode, Parser *parser);
 
+	uint				GetId();
+
 protected:
 	list<Token*>		mParams;
 	PositionReference	*mPosRef;
+	uint				mFuncId;
 };
 
 

@@ -11,6 +11,7 @@
 #include "../common/scope.h"
 
 class Statement;
+class FunctionDefinition;
 
 class Parser {
 public:
@@ -64,6 +65,13 @@ private:
 	bool				BuildIntermediates();
 	bool				BuildBytecode();
 
-	void				BuildFunctionIntermediates();
+	/***** Data-definition header functions *****
+	* Adds position-inquirers to listen for the byte-position
+	* of functions. 
+	* TODO: string data
+	*****/
+	void				AddDataBegin();
+	void				AddFunctionData(FunctionDefinition *funcDef);
+	void				AddDataEnd();
 	
 };

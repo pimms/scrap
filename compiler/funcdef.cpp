@@ -14,6 +14,10 @@ bool FunctionDefinition::IsFunctionDefinition(Tokens *tokens) {
 
 
 
+FunctionDefinition::FunctionDefinition() {
+	mFuncId = 0;
+}
+
 PositionReference* FunctionDefinition::GetPositionReference() {
 	return mPosRef;
 }
@@ -29,7 +33,7 @@ void FunctionDefinition::ParseStatement(Tokens *tokens, Parser *parser) {
 
 	// Register the function
 	Token *funcName = tokens->PopExpected(Token::VARFUNC);
-	parser->RegisterFunction(funcName->mToken);
+	mFuncId = parser->RegisterFunction(funcName->mToken);
 	delete funcName;
 
 	// Delete the opening parantheses
@@ -71,6 +75,10 @@ void FunctionDefinition::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 	}
 }
 
+uint FunctionDefinition::GetId() {
+	return mFuncId;
+}
+
 
 /***** FunctionTail *****/
 void FunctionTail::ParseStatement(Tokens *tokens, Parser *parser) {
@@ -78,6 +86,7 @@ void FunctionTail::ParseStatement(Tokens *tokens, Parser *parser) {
 }
 
 void FunctionTail::ProvideIntermediates(Opcode *opcode, Parser *parser) {
+	parser->PopScope();
 	uint zero = 0;
 
 	opcode->AddInterop(new ByteOperation(OP_RET));

@@ -24,6 +24,8 @@ using namespace std;
 #define EX_END	\
 	};
 
+EX_BEGIN(InternalErrorException, "Internal error - you're doing great!")
+EX_END
 
 EX_BEGIN(InvalidOpException, "Invalid operation")
 EX_END
