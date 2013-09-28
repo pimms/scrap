@@ -11,7 +11,7 @@ Statement::Statement() {
 
 }
 
-Statement* Statement::CreateStatement(Tokens *tokens) {
+Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 	Statement *stmt = NULL;
 
 	const Token *token = tokens->PeekNext();
@@ -27,9 +27,7 @@ Statement* Statement::CreateStatement(Tokens *tokens) {
 	}
 
 	if (stmt) {
-		stmt->ParseStatement(tokens);
-	} else {
-		throw NotImplementedException("Feature not implemented");
+		stmt->ParseStatement(tokens, parser);
 	}
 
 	return stmt;
@@ -38,7 +36,7 @@ Statement* Statement::CreateStatement(Tokens *tokens) {
 
 
 /***** AssignStatement *****/
-void AssignStatement::ParseStatement(Tokens *tokens) {
+void AssignStatement::ParseStatement(Tokens *tokens, Parser *parser) {
 	mAlloc = false;
 	mOperator = NULL;
 	mExpression = NULL;
@@ -56,7 +54,7 @@ void AssignStatement::ParseStatement(Tokens *tokens) {
 	mOperator = tokens->PopIfExists(Token::OPERATOR);
 	if (mOperator) {
 		mExpression = new Expression;
-		mExpression->ParseStatement(tokens);
+		mExpression->ParseStatement(tokens, parser);
 	}
 }
 

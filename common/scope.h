@@ -25,7 +25,7 @@ public:
 			delete it->second;
 		}
 
-		while (mNested.Size()) {
+		while (mNested.Size() > 0) {
 			delete mNested.Pop();
 		}
 	}

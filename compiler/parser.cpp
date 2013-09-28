@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "expr.h"
+#include "funcdef.h"
 
 uint Parser::sFuncId = 0;
 uint Parser::sGVarId = 0;
@@ -33,12 +34,13 @@ bool Parser::ParseFile() {
 
 bool Parser::CompileTokens() {
 	try {
-		if (!BuildStatements()) {
+		if (!BuildFragments()) {
 			return false;
 		}
 	} catch (exception e) {
-		printf("Failed to build statements from tokens:\n");
+		printf("Failed to build fragments from tokens:\n");
 		printf("%s\n", e.what());
+		return false;
 	}
 
 	try {
@@ -48,6 +50,7 @@ bool Parser::CompileTokens() {
 	} catch (exception e) {
 		printf("Failed to build intermediates:\n");
 		printf("%s\n", e.what());
+		return false;
 	}
 
 	try {
@@ -57,6 +60,7 @@ bool Parser::CompileTokens() {
 	} catch (exception e) {
 		printf("Failed to build bytecode:\n");
 		printf("%s\n", e.what());
+		return false;
 	}
 
 	return true;
@@ -94,6 +98,8 @@ void Parser::PopNestedScope() {
 
 
 uint Parser::RegisterVariable(string name) {
+	// TODO:
+	// Ensure that the variable isn't already defined
 	CompileScope *scope = NULL;
 	uint id = 0;
 
@@ -129,27 +135,73 @@ uint Parser::GetVariableId(string name) {
 	id = mGScope.GetItemId(&name);
 	
 	if (id == 0) {
-		throw VarNotDefined("Variable is not defined in the current scope: " + name);
+		throw VarNotDefinedException("Variable is not defined in the current scope: " + name);
 	}
 
 	return id;
 }
 
 
+
+uint Parser::RegisterFunction(string name) {
+	if (mFuncIds.count(name)) {
+		throw FuncAlreadyDefinedException("Function " + name + " is already defined");
+	}
+
+	mFuncIds[name] = ++sFuncId;
+}
+
 uint Parser::GetFunctionId(string name) {
 	if (!mFuncIds.count(name)) {
-		throw FuncNotDefined("Function is undefined: " + name);
+		throw FuncNotDefinedException("Function is undefined: " + name);
 	}
 
 	return mFuncIds[name];
 }
 
 
-bool Parser::BuildStatements() {
+bool Parser::BuildFragments() {
+	int stackDepth = 0;
+	bool inFunction = false;
+
 	while (mTokens->HasMore()) {
-		Statement *statement = Statement::CreateStatement(mTokens);
+		Token *next = mTokens->PeekNext();
+
+		Statement *statement = Statement::CreateStatement(mTokens, this);
 		if (statement) {
-			mStatements.push_back(statement);
+			mFragments.push_back(statement);
+		} else if (FunctionDefinition::IsFunctionDefinition(mTokens)) {
+			FunctionDefinition *fdef = new FunctionDefinition();
+			fdef->ParseStatement(mTokens, this);
+			mFragments.push_back(fdef);
+
+			delete mTokens->PopExpected(Token::BRACKET_BEG);
+
+			if (inFunction) {
+				throw SyntaxErrorException("Funexception");
+			}
+
+			stackDepth++;
+			inFunction = true;
+			PushScope();
+
+		} else if (next->mType == Token::BRACKET_BEG) {
+			stackDepth++;
+			PushNestedScope();
+			delete mTokens->PopNext();
+		} else if (next->mType == Token::BRACKET_END) {
+			stackDepth--;
+			if (!stackDepth) {
+				if (inFunction) {
+					PopScope();
+					inFunction = false;
+				} else {
+					throw InvalidTokenException("Unexpected }");
+				}
+			} else {
+				PopNestedScope();
+			}
+			delete mTokens->PopNext();
 		}
 	}
 
@@ -157,8 +209,8 @@ bool Parser::BuildStatements() {
 }
 
 bool Parser::BuildIntermediates() {
-	list<Statement*>::iterator it;
-	for (it = mStatements.begin(); it != mStatements.end(); it++) {
+	list<Fragment*>::iterator it;
+	for (it = mFragments.begin(); it != mFragments.end(); it++) {
 		(*it)->ProvideIntermediates(mOpcode, this);
 	}
 
@@ -167,4 +219,11 @@ bool Parser::BuildIntermediates() {
 
 bool Parser::BuildBytecode() {
 	return mOpcode->BuildBytecodeFromIntermediates();
+}
+
+
+// TODO:
+// Consider putting this in a class.
+void Parser::BuildFunctionIntermediates() {
+
 }

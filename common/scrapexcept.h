@@ -28,10 +28,16 @@ using namespace std;
 EX_BEGIN(InvalidOpException, "Invalid operation")
 EX_END
 
-EX_BEGIN(VarNotDefined, "Variable not defined")
+EX_BEGIN(VarNotDefinedException, "Variable not defined")
 EX_END
 
-EX_BEGIN(FuncNotDefined, "Function is not defined")
+EX_BEGIN(VarAlreadyDefinedException, "Variable is already defined");
+EX_END
+
+EX_BEGIN(FuncNotDefinedException, "Function is not defined")
+EX_END
+
+EX_BEGIN(FuncAlreadyDefinedException, "Function is already defined!");
 EX_END
 
 EX_BEGIN(FileNotFoundException, "File does not exist")

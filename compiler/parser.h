@@ -21,7 +21,7 @@ public:
 	bool 				CompileTokens();
 	Opcode*				GetOpcodes();
 
-	/***** Push / Pop scope*****
+	/***** Push / Pop scope *****
 	* Modifies the current context of variable-scope.
 	* This ensures that any requested variables in
 	* fact does exist. 
@@ -35,6 +35,7 @@ public:
 	uint				RegisterVariable(string name);
 	uint				GetVariableId(string name);
 
+	uint				RegisterFunction(string name);
 	uint				GetFunctionId(string name);
 
 private:
@@ -55,11 +56,14 @@ private:
 	CompileScope		mGScope;
 	Stack<CompileScope*>mLScope;
 
-	list<Statement*>	mStatements;
+	list<Fragment*>		mFragments;
 
 	map<string,uint>	mFuncIds;
 
-	bool				BuildStatements();
+	bool				BuildFragments();
 	bool				BuildIntermediates();
 	bool				BuildBytecode();
+
+	void				BuildFunctionIntermediates();
+	
 };

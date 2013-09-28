@@ -14,7 +14,7 @@ class Expression;
 class FunctionCall : public Fragment {
 public:
 					FunctionCall(Token *funcToken);
-	void			ParseStatement(Tokens *tokens);
+	void			ParseStatement(Tokens *tokens, Parser *parser);
 	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 	string			DbgGetString();
