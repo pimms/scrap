@@ -27,3 +27,13 @@ protected:
 	PositionReference	*mPosRef;
 };
 
+
+/***** Class FunctionTail *****
+* Inserted by the Parser object after an entire function has
+* been fragmented. Inserts the final intermediates required
+* for a function to behave properly, most notably the OP_RET.
+*****/
+class FunctionTail : public Fragment {
+	void				ParseStatement(Tokens *tokens, Parser *parser);
+	void				ProvideIntermediates(Opcode *opcode, Parser *parser);
+};

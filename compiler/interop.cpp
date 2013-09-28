@@ -48,16 +48,3 @@ void PositionReference::ProvideBytecode(Opcode *opcode) {
 void PositionReference::AddInquirer(PositionInquirer *inquirer) {
 	mInquirers.push_back(inquirer);
 }
-
-
-/***** FunctionTail *****/
-void FunctionTail::ProvideBytecode(Opcode *opcode) {
-	ByteOperation::ProvideBytecode(opcode);
-
-	// TODO: 
-	// Proper return values
-	uint zero = 0;
-	opcode->AddDword(&zero);
-
-	opcode->PopTail();
-}

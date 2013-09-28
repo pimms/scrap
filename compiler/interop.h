@@ -79,15 +79,3 @@ public:
 protected:
 	vector<PositionInquirer*> mInquirers;
 };
-
-
-/***** Class FunctionTail *****
-* Inserted as tail from a FunctionDefinition (Fragment subclass),
-* and pops itself (and inserts a OP_RET) upon bytecode provision.
-*****/
-class FunctionTail : public ByteOperation {
-public:
-					FunctionTail() 
-						: ByteOperation(OP_RET){}
-	virtual void	ProvideBytecode(Opcode *opcode);
-};

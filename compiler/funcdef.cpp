@@ -69,8 +69,17 @@ void FunctionDefinition::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 		opcode->AddInterop(new ByteOperation(OP_POPMOV));
 		opcode->AddInterop(new DwordOperation(&varId));
 	}
-	
-	// Push the tail
-	InteropIter tail = opcode->AddInterop(new FunctionTail);
-	opcode->PushTail(tail);
+}
+
+
+/***** FunctionTail *****/
+void FunctionTail::ParseStatement(Tokens *tokens, Parser *parser) {
+	// Nothing to parse, nothing to see.
+}
+
+void FunctionTail::ProvideIntermediates(Opcode *opcode, Parser *parser) {
+	uint zero = 0;
+
+	opcode->AddInterop(new ByteOperation(OP_RET));
+	opcode->AddInterop(new DwordOperation(&zero));
 }

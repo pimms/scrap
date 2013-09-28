@@ -195,6 +195,9 @@ bool Parser::BuildFragments() {
 				if (inFunction) {
 					PopScope();
 					inFunction = false;
+
+					FunctionTail *ftail = new FunctionTail();
+					mFragments.push_back(ftail);
 				} else {
 					throw InvalidTokenException("Unexpected }");
 				}
