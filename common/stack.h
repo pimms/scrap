@@ -38,7 +38,7 @@ public:
 
 	void Push(T val) {
 		if (++mSize >= mMaxSize) {
-			throw OverflowException();
+			throw StackOverflowException();
 		}
 
 		Node *node = new Node();
@@ -58,7 +58,7 @@ public:
 
 	T Pop() {
 		if (--mSize < 0) {
-			throw UnderflowException();
+			throw StackUnderflowException();
 		}
 
 		Node *node = mBack;
