@@ -60,3 +60,16 @@ private:
 
 	void			HandleOperator(Opcode *opcode, uint varId);
 };
+
+
+/***** Class ReturnStatement *****
+* Handles returns from functions.
+*****/
+class ReturnStatement : public Statement {
+public:
+	void			ParseStatement(Tokens *tokens, Parser *parser);
+	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
+
+private:
+	Expression		*mExpression;
+};

@@ -303,6 +303,7 @@ bool Tokens::ReservedWord(string str) {
 		str == "while"	||
 		str == "func"	||
 		str == "var"	||
+		str == "return" ||
 		str == "include"){
 		return true;
 	}

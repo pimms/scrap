@@ -30,6 +30,12 @@ public:
 	void				PushScope();
 	void				PopScope();
 
+	/***** IsInLocalScope *****
+	* Is the Parser currently handing Tokens, Fragments 
+	* or Intermediates in a local (function) scope?
+	*****/
+	bool				IsInLocalScope();
+
 	void				PushNestedScope();
 	void				PopNestedScope();
 

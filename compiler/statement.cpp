@@ -2,6 +2,7 @@
 #include "interop.h"
 #include "expr.h"
 #include "tokens.h"
+#include "parser.h"
 
 #include "../common/stack.h"
 #include "../common/scrapexcept.h"
@@ -21,6 +22,8 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 
 		if (s == "var") {
 			stmt = new AssignStatement();
+		} else if (s == "return") {
+			stmt = new ReturnStatement();
 		}
 	} else if (token->mType == Token::VARFUNC) {
 		stmt = new AssignStatement();
@@ -109,4 +112,42 @@ void AssignStatement::HandleOperator(Opcode *opcode, uint varId) {
 
 	opcode->AddInterop(new ByteOperation(operation));
 	opcode->AddInterop(new ByteOperation(OP_POP));
+}
+
+
+/***** ReturnStatement *****/
+void ReturnStatement::ParseStatement(Tokens *tokens, Parser *parser) {
+	delete tokens->PopExpected(Token::RESERVED);
+
+	if (tokens->PeekNext()->mType == Token::SEMICOLON) {
+		mExpression = NULL;
+		delete tokens->PopNext();
+	} else {
+		mExpression = new Expression;
+		mExpression->ParseStatement(tokens, parser);
+	}
+}
+
+void ReturnStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
+	if (!parser->IsInLocalScope()) {
+		throw InvalidTokenException("Unexpected return");
+	}
+
+
+	if (mExpression) {
+		uint varId = parser->RegisterVariable("");
+		AllocateVariable(opcode, varId);
+
+		mExpression->ProvideIntermediates(opcode, parser);
+
+		opcode->AddInterop(new ByteOperation(OP_POPMOV));
+		opcode->AddInterop(new DwordOperation(&varId));
+		
+		opcode->AddInterop(new ByteOperation(OP_RET));
+		opcode->AddInterop(new DwordOperation(&varId));
+	} else {
+		uint zero = 0;
+		opcode->AddInterop(new ByteOperation(OP_RET));
+		opcode->AddInterop(new DwordOperation(&zero));
+	}
 }

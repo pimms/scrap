@@ -80,6 +80,10 @@ void Parser::PopScope() {
 	delete mLScope.Pop();
 }
 
+bool Parser::IsInLocalScope() {
+	return mLScope.Size() > 0;
+}
+
 
 void Parser::PushNestedScope() {
 	if (mLScope.Size()) {

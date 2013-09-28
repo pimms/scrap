@@ -1,4 +1,5 @@
-func f(var a) { a += 1; }
-func g(var a) { a += 2; }
+var x = f();
 
-var x = 1337;
+func f() {
+	return 15;
+}
