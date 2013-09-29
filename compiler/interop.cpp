@@ -1,5 +1,5 @@
 #include "interop.h"
-
+#include <cstring>
 
 /***** ByteOperation *****/
 ByteOperation::ByteOperation(byte val) {
