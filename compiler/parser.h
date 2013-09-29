@@ -12,6 +12,9 @@
 
 class Statement;
 class FunctionDefinition;
+class PositionInquirer;
+
+typedef list<Fragment*>::iterator FragmentIter;
 
 class Parser {
 public:
@@ -71,13 +74,27 @@ private:
 	bool				BuildIntermediates();
 	bool				BuildBytecode();
 
-	/***** Data-definition header functions *****
+	void				AddFragment(Fragment *fragment);
+	void				PushFragmentTail(FragmentIter tail);
+	void				PopFragmentTail();
+
+	/***** Data header functions *****
 	* Adds position-inquirers to listen for the byte-position
 	* of functions. 
 	* TODO: string data
 	*****/
-	void				AddDataBegin();
+	void				AddHeader();
 	void				AddFunctionData(FunctionDefinition *funcDef);
-	void				AddDataEnd();
-	
+
+	/***** Fragment Tail-iterators *****
+	* Bytecode must be placed in the order:
+	* [data header][jmp to global code][function definitions][global code]
+	*
+	* These iterators ensure that Fragments are placed in the correct
+	* order.
+	*****/
+	Stack<FragmentIter> mFragmentTailStack;
+	FragmentIter		mIterFuncdefEnd;
+	InteropIter			mHeaderEnd;
+	PositionInquirer	*mHeaderJump;
 };

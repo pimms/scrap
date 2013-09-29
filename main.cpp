@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
 						OpcodeText tostr;
 						tostr.Parse(parser.GetOpcodes());
 						
-						//Environment env(parser.GetOpcodes());
-						//env.Execute();
+						Environment env(parser.GetOpcodes());
+						env.Execute();
 					} catch (exception &e) {
 						printf("Runtime error:\n%s\n", e.what());
 					}
