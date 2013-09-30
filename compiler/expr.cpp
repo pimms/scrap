@@ -4,8 +4,9 @@
 #include "interop.h"
 #include "func.h"
 
-Expression::Expression(bool isFunctionParam) {
+Expression::Expression(bool isFunctionParam, bool canBeNull) {
 	mIsParam = isFunctionParam;
+	mCanBeNull = canBeNull;
 }
 
 Expression::~Expression() {
@@ -36,7 +37,7 @@ void Expression::ParseStatement(Tokens *tokens, Parser *parser) {
 
 	BuildPostfix(tokens, parser);
 
-	if (!mPostfix.size()) {
+	if (!mCanBeNull && !mPostfix.size()) {
 		throw InvalidTokenException("Expected expression");
 	}
 }

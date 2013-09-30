@@ -122,4 +122,6 @@ private:
 	*****/
 	void				SeekNextToken(ifstream &file);
 	void				SkipLine(ifstream &file);
+	
+	bool 				EndReached(ifstream &file);
 };

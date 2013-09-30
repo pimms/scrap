@@ -45,16 +45,24 @@ void AssignStatement::ParseStatement(Tokens *tokens, Parser *parser) {
 	mExpression = NULL;
 	mAssignee = NULL;
 
-	// Check for alloocatoin
+	// Check for allocation
 	if (tokens->PeekNext()->mToken == "var") {
 		mAlloc = true;
 		delete tokens->PopExpected(Token::RESERVED);
+		
+		mAssignee = tokens->PopExpected(Token::VARFUNC);
+	} else {
+		TokenIter it = tokens->GetCursor();
+		if ((*it++)->mType == Token::VARFUNC &&
+			(*it)->mType == Token::OPERATOR) {
+			mAssignee = tokens->PopExpected(Token::VARFUNC);
+			mOperator = tokens->PopExpected(Token::OPERATOR);
+		}
 	}
-
-	// Check for assignment
-	TokenIter iter = tokens->GetCursor();
-
-	// Check for raw expression (probably a function call)
+	
+	// Parse the expression
+	mExpression = new Expression();
+	mExpression->ParseStatement(tokens, parser);
 }
 
 void AssignStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
@@ -67,22 +75,19 @@ void AssignStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 		varId = GetVariableId(parser, mAssignee->mToken);
 	}
 
-	if (varId != 0) {
-		opcode->AddInterop(new ByteOperation(OP_PUSH));
-		opcode->AddInterop(new DwordOperation(&varId));
-
-		mExpression->ProvideIntermediates(opcode, parser);
-
+	mExpression->ProvideIntermediates(opcode, parser);
+	
+	if (varId && mOperator) {
 		HandleOperator(opcode, varId);
-	} else {
-		mExpression->ProvideIntermediates(opcode, parser);
-		opcode->AddInterop(new ByteOperation(OP_POP));
 	}
 }
 
 void AssignStatement::HandleOperator(Opcode *opcode, uint varId) {
 	string s = mOperator->mToken;
 	byte operation = 0;
+	
+	opcode->AddInterop(new ByteOperation(OP_PUSH));
+	opcode->AddInterop(new DwordOperation(&varId));
 
 	if (s == "+=") {
 		operation = OP_ADD;

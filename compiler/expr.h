@@ -15,7 +15,13 @@ class FunctionCall;
 
 class Expression : public Fragment {
 public:
-					Expression(bool isFunctionParam = false);
+	/***** Expression *****
+	* @param isFunctionParam
+	* 		 Is the expression a function parameter?
+	* @param canBeNull
+	* 		 Can the expression be empty? I.e., ";;;;;;".
+	*****/
+					Expression(bool isFunctionParam=false, bool canBeNull=true);
 					~Expression();
 	string			DbgGetString();
 
@@ -40,6 +46,7 @@ private:
 
 	list<ExprTerm*>	mPostfix;
 	bool			mIsParam;
+	bool 			mCanBeNull;
 
 	map<ExprTerm*,uint> mExprVars;
 
