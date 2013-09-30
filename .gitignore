@@ -21,3 +21,4 @@ vs11/
 
 # Xcode project folder
 xcode/
+.DS_Store
