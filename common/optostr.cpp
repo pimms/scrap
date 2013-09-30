@@ -119,6 +119,8 @@ int OpcodeText::ParamCount(byte code) {
 	case OP_DATA_STRING:
 		return -1;
 	}
+	
+	return 0;
 }
 
 string OpcodeText::GetLiteral(byte code) {

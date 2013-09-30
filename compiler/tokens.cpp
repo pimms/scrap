@@ -226,9 +226,9 @@ bool Tokens::GetWord(ifstream &file) {
 			t->mType = Token::VAL_STRING;
 		} else {
 			Var::Type vType = Var::GetType(str);
-			if (vType == Var::Type::INT) {
+			if (vType == Var::INT) {
 				t->mType = Token::VAL_INT;
-			} else if (vType == Var::Type::FLOAT) {
+			} else if (vType == Var::FLOAT) {
 				t->mType = Token::VAL_FLOAT;
 			} else {
 				if (ValidName(str)) {
