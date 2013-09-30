@@ -81,8 +81,12 @@ uint FunctionDefinition::GetId() {
 
 
 /***** FunctionTail *****/
+FunctionTail::FunctionTail() {
+	mPosRef = new PositionReference();
+}
+
 void FunctionTail::ParseStatement(Tokens *tokens, Parser *parser) {
-	// Nothing to parse, nothing to see.
+	// Nothing to do
 }
 
 void FunctionTail::ProvideIntermediates(Opcode *opcode, Parser *parser) {
@@ -91,4 +95,9 @@ void FunctionTail::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 
 	opcode->AddInterop(new ByteOperation(OP_RET));
 	opcode->AddInterop(new DwordOperation(&zero));
+	opcode->AddInterop(mPosRef);
+}
+
+PositionReference* FunctionTail::GetPositionReference() {
+	return mPosRef;
 }

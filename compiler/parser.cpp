@@ -167,7 +167,9 @@ uint Parser::GetFunctionId(string name) {
 
 
 bool Parser::BuildFragments() {
-	AddDataBegin();
+	PushFragmentTail(mFragments.end());
+	AddHeader();
+	mIterFuncdefEnd = mFragments.insert(mFragments.end(), NULL);
 
 	int stackDepth = 0;
 	bool inFunction = false;
@@ -177,12 +179,14 @@ bool Parser::BuildFragments() {
 
 		Statement *statement = Statement::CreateStatement(mTokens, this);
 		if (statement) {
-			mFragments.push_back(statement);
+			AddFragment(statement);
 		} else if (FunctionDefinition::IsFunctionDefinition(mTokens)) {
 			FunctionDefinition *fdef = new FunctionDefinition();
 			fdef->ParseStatement(mTokens, this);
-			mFragments.push_back(fdef);
 
+
+			PushFragmentTail(mIterFuncdefEnd);
+			AddFragment(fdef);
 			AddFunctionData(fdef);
 
 			delete mTokens->PopExpected(Token::BRACKET_BEG);
@@ -205,8 +209,11 @@ bool Parser::BuildFragments() {
 					PopScope();
 					inFunction = false;
 
-					FunctionTail *ftail = new FunctionTail();
-					mFragments.push_back(ftail);
+					FunctionTail *tail = new FunctionTail();
+					AddFragment(tail);
+					PopFragmentTail();
+
+					tail->GetPositionReference()->AddInquirer(mHeaderJump);
 				} else {
 					throw InvalidTokenException("Unexpected }");
 				}
@@ -214,10 +221,10 @@ bool Parser::BuildFragments() {
 				PopNestedScope();
 			}
 			delete mTokens->PopNext();
+		} else {
+			throw InvalidTokenException("Unexpected '" + next->mToken + "'!");
 		}
 	}
-
-	AddDataEnd();
 
 	return true;
 }
@@ -225,8 +232,14 @@ bool Parser::BuildFragments() {
 bool Parser::BuildIntermediates() {
 	list<Fragment*>::iterator it;
 	for (it = mFragments.begin(); it != mFragments.end(); it++) {
+		if (!*it) continue;
 		(*it)->ProvideIntermediates(mOpcode, this);
 	}
+
+	// Add a final exit-statement
+	uint zero = 0;
+	mOpcode->AddInterop(new ByteOperation(OP_EXIT));
+	mOpcode->AddInterop(new DwordOperation(&zero));
 
 	return true;
 }
@@ -236,15 +249,36 @@ bool Parser::BuildBytecode() {
 }
 
 
-void Parser::AddDataBegin() {
+void Parser::AddFragment(Fragment *fragment) {
+	mFragments.insert(mFragmentTailStack.Peek(), fragment);
+}
+
+void Parser::PushFragmentTail(FragmentIter iter) {
+	mFragmentTailStack.Push(iter);
+}
+
+void Parser::PopFragmentTail() {
+	mFragmentTailStack.Pop();
+}
+
+
+void Parser::AddHeader() {
 	if (mOpcode->Length() != 0) {
 		throw InternalErrorException();
 	}
 	
 	mOpcode->AddInterop(new ByteOperation(OP_DATA_BEGIN));
+	mHeaderEnd = mOpcode->AddInterop(new ByteOperation(OP_DATA_END));
+
+	// Add the header-jump
+	mHeaderJump = new PositionInquirer();
+	mOpcode->AddInterop(new ByteOperation(OP_JMP));
+	mOpcode->AddInterop(mHeaderJump);
 }	
 
 void Parser::AddFunctionData(FunctionDefinition *funcDef) {
+	mOpcode->PushTail(mHeaderEnd);
+
 	uint funcId = funcDef->GetId();
 
 	mOpcode->AddInterop(new ByteOperation(OP_DATA_FUNC));
@@ -253,8 +287,6 @@ void Parser::AddFunctionData(FunctionDefinition *funcDef) {
 	PositionInquirer *posInq = new PositionInquirer();
 	funcDef->GetPositionReference()->AddInquirer(posInq);
 	mOpcode->AddInterop(posInq);
-}
 
-void Parser::AddDataEnd() {
-	mOpcode->AddInterop(new ByteOperation(OP_DATA_END));
+	mOpcode->PopTail();
 }

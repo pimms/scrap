@@ -36,8 +36,17 @@ protected:
 * Inserted by the Parser object after an entire function has
 * been fragmented. Inserts the final intermediates required
 * for a function to behave properly, most notably the OP_RET.
+*
+* All FunctionTails have a PositionReference intermediate to
+* inform the header-jump of the final function-body.
 *****/
 class FunctionTail : public Fragment {
+public:
+						FunctionTail();
 	void				ParseStatement(Tokens *tokens, Parser *parser);
 	void				ProvideIntermediates(Opcode *opcode, Parser *parser);
+	PositionReference*	GetPositionReference();
+
+private:
+	PositionReference	*mPosRef;
 };
