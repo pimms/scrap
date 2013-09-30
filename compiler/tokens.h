@@ -77,6 +77,7 @@ public:
 	*		PopNext();  // <- returns the second Token
 	*****/
 	TokenIter			GetFrontIter();
+	TokenIter			GetCursor();
 	void				SetCursor(TokenIter front);
 
 private:

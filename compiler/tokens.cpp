@@ -99,6 +99,10 @@ TokenIter Tokens::GetFrontIter() {
 	return mTokens.begin(); 
 }
 
+TokenIter Tokens::GetCursor() {
+	return mCursor;
+}
+
 void Tokens::SetCursor(TokenIter iter) {
 	mCursor = iter;
 }

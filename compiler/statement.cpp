@@ -45,20 +45,16 @@ void AssignStatement::ParseStatement(Tokens *tokens, Parser *parser) {
 	mExpression = NULL;
 	mAssignee = NULL;
 
-	if (tokens->PeekNext()->mType == Token::RESERVED) {
+	// Check for alloocatoin
+	if (tokens->PeekNext()->mToken == "var") {
 		mAlloc = true;
-		delete tokens->PopNext();
+		delete tokens->PopExpected(Token::RESERVED);
 	}
 
-	mAssignee = tokens->PopExpected(Token::VARFUNC);
+	// Check for assignment
+	TokenIter iter = tokens->GetCursor();
 
-	// TODO:
-	// Allow "standalone" expressions
-	mOperator = tokens->PopIfExists(Token::OPERATOR);
-	if (mOperator) {
-		mExpression = new Expression;
-		mExpression->ParseStatement(tokens, parser);
-	}
+	// Check for raw expression (probably a function call)
 }
 
 void AssignStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
