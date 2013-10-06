@@ -4,6 +4,7 @@
 #include "interop.h"
 
 uint Parser::sFuncId = 0;
+uint Parser::sStdFuncId = 0;
 uint Parser::sGVarId = 0;
 
 
@@ -159,6 +160,22 @@ uint Parser::RegisterFunction(FunctionSignature funcSign) {
 	}
 
 	funcSign.SetId(++sFuncId);
+	mFuncSigns.push_back(funcSign);
+
+	return sFuncId;
+}
+
+uint Parser::RegisterStdFunction(FunctionSignature funcSign) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcSign.GetName()) {
+			throw FuncAlreadyDefinedException("Function " 
+											+ funcSign.GetName() 
+											+ " is already defined");
+		}
+	}
+
+	funcSign.SetId(++sStdFuncId | FUNC_STD);
 	mFuncSigns.push_back(funcSign);
 
 	return sFuncId;

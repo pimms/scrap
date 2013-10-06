@@ -47,6 +47,7 @@ public:
 	uint				GetVariableId(string name);
 
 	uint				RegisterFunction(FunctionSignature funcSign);
+	uint				RegisterStdFunction(FunctionSignature funcSign);
 	uint				GetFunctionId(string name);
 	FunctionSignature	GetFunctionSignature(string functionName);
 	FunctionSignature	GetFunctionSignature(uint functionId);
@@ -58,6 +59,7 @@ private:
 	* files.
 	*****/
  	static uint			sFuncId;
+	static uint			sStdFuncId;
 	static uint			sGVarId;
 
 	string				mFile;

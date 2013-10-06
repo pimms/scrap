@@ -13,6 +13,12 @@
 #include "compiler/parser.h"
 #include "common/optostr.h"
 
+
+void f(int a, int b, int c) {
+	printf("%i %i %i\n", a, b, c);
+}
+
+
 int main(int argc, char *argv[]) {
 	if (argc == 1) {
 		printf("No file specified.\n");
