@@ -13,6 +13,7 @@
 class Statement;
 class FunctionDefinition;
 class PositionInquirer;
+class FunctionSignature;
 
 typedef list<Fragment*>::iterator FragmentIter;
 
@@ -45,8 +46,10 @@ public:
 	uint				RegisterVariable(string name);
 	uint				GetVariableId(string name);
 
-	uint				RegisterFunction(string name);
+	uint				RegisterFunction(FunctionSignature funcSign);
 	uint				GetFunctionId(string name);
+	FunctionSignature	GetFunctionSignature(string functionName);
+	FunctionSignature	GetFunctionSignature(uint functionId);
 
 private:
 	/***** Static ID counters *****
@@ -68,7 +71,7 @@ private:
 
 	list<Fragment*>		mFragments;
 
-	map<string,uint>	mFuncIds;
+	list<FunctionSignature> mFuncSigns;
 
 	bool				BuildFragments();
 	bool				BuildIntermediates();

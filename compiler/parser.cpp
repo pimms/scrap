@@ -148,21 +148,58 @@ uint Parser::GetVariableId(string name) {
 
 
 
-uint Parser::RegisterFunction(string name) {
-	if (mFuncIds.count(name)) {
-		throw FuncAlreadyDefinedException("Function " + name + " is already defined");
+uint Parser::RegisterFunction(FunctionSignature funcSign) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcSign.GetName()) {
+			throw FuncAlreadyDefinedException("Function " 
+											+ funcSign.GetName() 
+											+ " is already defined");
+		}
 	}
 
-	mFuncIds[name] = ++sFuncId;
+	funcSign.SetId(++sFuncId);
+	mFuncSigns.push_back(funcSign);
+
 	return sFuncId;
 }
 
 uint Parser::GetFunctionId(string name) {
-	if (!mFuncIds.count(name)) {
-		throw FuncNotDefinedException("Function is undefined: " + name);
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == name) {
+			return it->GetId();
+		}
 	}
 
-	return mFuncIds[name];
+	throw FuncNotDefinedException("Function is undefined: " + name);
+	return 0;
+}
+
+FunctionSignature Parser::GetFunctionSignature(string funcName) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcName) {
+			return *it;
+		}
+	}
+
+	throw  FuncNotDefinedException("Function " + funcName + " not defined");
+}
+
+FunctionSignature Parser::GetFunctionSignature(uint funcId) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetId() == funcId) {
+			return *it;
+		}
+	}
+
+	string errorMsg;
+	errorMsg += "Function with ID '";
+	errorMsg += funcId;
+	errorMsg += "' not defined";
+	throw  FuncNotDefinedException(errorMsg);
 }
 
 

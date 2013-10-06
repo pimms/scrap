@@ -6,6 +6,7 @@
 #include "../common/stack.h"
 #include "../common/scrapexcept.h"
 
+#include <sstream>
 
 /***** FunctionCall *****/
 FunctionCall::FunctionCall(Token *funcToken) {
@@ -29,6 +30,16 @@ void FunctionCall::ParseStatement(Tokens *tokens, Parser *parser) {
 		}
 
 		delete tokens->PopExpected(Token::PARANTH_END);
+	}
+
+	// Check that the function signature matches
+	FunctionSignature funcSign = parser->GetFunctionSignature(mFuncToken->mToken);
+	if (funcSign.GetParamCount() != mParams.size()) {
+		stringstream ss;
+		ss << "Function " <<funcSign.GetName() <<": "
+		   <<"Expected " <<funcSign.GetParamCount() <<" parameters, "
+		   <<"received " <<mParams.size();
+		throw InvalidArgumentException(ss.str());
 	}
 }
 
@@ -90,15 +101,13 @@ void FunctionDefinition::ParseStatement(Tokens *tokens, Parser *parser) {
 	}
 	delete token;
 
-	// Register the function
+	// Get the function name
 	Token *funcName = tokens->PopExpected(Token::VARFUNC);
-	mFuncId = parser->RegisterFunction(funcName->mToken);
-	delete funcName;
 
 	// Delete the opening parantheses
 	delete tokens->PopExpected(Token::PARANTH_BEG);
 
-	// Snag those pesky parameters
+	// Get all the parameters
 	while (tokens->PeekNext()->mToken == "var") {
 		delete tokens->PopExpected(Token::RESERVED);
 
@@ -111,6 +120,11 @@ void FunctionDefinition::ParseStatement(Tokens *tokens, Parser *parser) {
 		}
 	}
 
+	// Register the function
+	FunctionSignature sig(funcName->mToken, mParams.size());
+	mFuncId = parser->RegisterFunction(sig);
+
+	delete funcName;
 	delete tokens->PopExpected(Token::PARANTH_END);
 
 	if (tokens->PeekNext()->mType != Token::BRACKET_BEG) {
