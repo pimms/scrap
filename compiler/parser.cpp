@@ -2,6 +2,7 @@
 #include "expr.h"
 #include "func.h"
 #include "interop.h"
+#include "../common/stdfunc.h"
 
 uint Parser::sFuncId = 0;
 uint Parser::sStdFuncId = 0;
@@ -35,6 +36,8 @@ bool Parser::ParseFile() {
 }
 
 bool Parser::CompileTokens() {
+	ScrapStd::RegisterFunctions(this);
+
 	try {
 		if (!BuildFragments()) {
 			return false;
@@ -178,7 +181,7 @@ uint Parser::RegisterStdFunction(FunctionSignature funcSign) {
 	funcSign.SetId(++sStdFuncId | FUNC_STD);
 	mFuncSigns.push_back(funcSign);
 
-	return sFuncId;
+	return funcSign.GetId();
 }
 
 uint Parser::GetFunctionId(string name) {

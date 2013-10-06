@@ -15,7 +15,9 @@
 *****/
 namespace ScrapStd {
 	void		RegisterFunctions(Parser *parser);
-	Var*		CallStdFunc(uint id, Var *var, ...);
+
+	int			GetParamCount(uint funcId);
+	Var*		CallStdFunc(uint id, int argCount, Var **var);
 
 
 	Var*		TestFunc(Var *var1, Var *var2);

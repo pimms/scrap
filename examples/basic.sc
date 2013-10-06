@@ -1,8 +1,7 @@
-func f(var ff) {
-	var x = ff + 5;
-	return x;
+func printSquare(var root) {
+	print(root * root);
 }
 
-
-
-var YY = f(13) + 20;
+printSquare(3);
+printSquare(10);
+printSquare(9);

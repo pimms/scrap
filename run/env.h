@@ -11,7 +11,8 @@
 #include <exception>
 using namespace std;
 
-#ifdef _DEBUG
+//#define __LOGF_ENABLED
+#if defined(_DEBUG) && defined(__LOGF_ENABLED)
 #	define LOGF(A) printf("[%i]: ",mOpPtr); printf A
 #else
 # 	define LOGF(A) false
@@ -81,6 +82,7 @@ private:
 	void 			OpPushData();
 	void 			OpPop();
 	void 			OpCall();
+	void			OpCallStd(uint funcId);
 	void 			OpRet();
 	void 			OpAlloc();
 	void 			OpPopMov();
