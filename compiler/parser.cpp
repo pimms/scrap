@@ -1,6 +1,6 @@
 #include "parser.h"
 #include "expr.h"
-#include "funcdef.h"
+#include "func.h"
 #include "interop.h"
 
 uint Parser::sFuncId = 0;
