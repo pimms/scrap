@@ -1,8 +1,8 @@
-var x;
-
-func f() {
-
+func f(var ff) {
+	var x = ff + 5;
+	return x;
 }
 
-var y;
-f();
+
+
+var YY = f(13) + 20;

@@ -274,9 +274,18 @@ void Parser::AddHeader() {
 	mHeaderJump = new PositionInquirer();
 	mOpcode->AddInterop(new ByteOperation(OP_JMP));
 	mOpcode->AddInterop(mHeaderJump);
+
+	// If no functions are defined, mHeaderJump will be 0, causing
+	// an infinite loop. If no functions are defined, jump to the next
+	// position
+	PositionReference *posRef = new PositionReference();
+	posRef->AddInquirer(mHeaderJump);
+	mOpcode->AddInterop(posRef);
 }	
 
 void Parser::AddFunctionData(FunctionDefinition *funcDef) {
+	/* Insert the function ID and position into the header.
+	 */
 	mOpcode->PushTail(mHeaderEnd);
 
 	uint funcId = funcDef->GetId();
@@ -284,6 +293,7 @@ void Parser::AddFunctionData(FunctionDefinition *funcDef) {
 	mOpcode->AddInterop(new ByteOperation(OP_DATA_FUNC));
 	mOpcode->AddInterop(new DwordOperation(&funcId));
 
+	// Request the final position for later
 	PositionInquirer *posInq = new PositionInquirer();
 	funcDef->GetPositionReference()->AddInquirer(posInq);
 	mOpcode->AddInterop(posInq);

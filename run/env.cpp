@@ -129,8 +129,10 @@ Var* Environment::GetVarById(uint id) {
 
 	if (id & VAR_GLOBAL) {
 		ret = mGScope.GetVar(id);
-	} else {
-		ret = mLScope.Peek()->GetVar(id);
+	} else if (id & VAR_LOCAL) {
+		if (mLScope.Size()) {
+			ret = mLScope.Peek()->GetVar(id);
+		}
 	}
 
 	return ret;
@@ -263,17 +265,20 @@ void Environment::OpPopMov() {
 	PopStackVar(source);
 
 	dest = GetOpcodeVar();
-	*dest = *source;
 
-	LOGF(("Popping Var %x into Var %x\n", source->GetId(), dest->GetId()));
+	if (source != NULL) {
+		*dest = *source;
+	} else {
+		dest->Undefine();
+	}
 }
 
 void Environment::OpMov() {
 	Var *source = NULL;
 	Var *dest = NULL;
 
-	PopStackVar(source);
-	PopStackVar(dest);
+	dest = GetOpcodeVar();
+	source = GetOpcodeVar();
 
 	*dest = *source;
 }

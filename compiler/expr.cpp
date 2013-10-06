@@ -137,7 +137,10 @@ int Expression::OperatorPrecedence(Token *token) {
 void Expression::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 	AllocateVariables(opcode, parser);
 	HandleFunctionCalls(opcode, parser);
-	BuildBytecodePostfix(opcode, parser);
+
+	if (mExprVars.size()) {
+		BuildBytecodePostfix(opcode, parser);
+	}
 }
 
 
@@ -199,16 +202,18 @@ void Expression::HandleFunctionCalls(Opcode *opcode, Parser *parser) {
 		if (fcall) {
 			fcall->ProvideIntermediates(opcode, parser);
 
-			// The return value of the function will be
-			// stored in VAR_RETURN upon return. Allocate
-			// a new variable and pop the value into it.
-			uint id = RegisterVariable(parser, "");
+			if (mPostfix.size() > 1) {
+				// The return value of the function will be
+				// stored in VAR_RETURN upon return. Allocate
+				// a new variable and pop the value into it.
+				uint id = RegisterVariable(parser, "");
 
-			AllocateVariable(opcode, id);
-			opcode->AddInterop(new ByteOperation(OP_POPMOV));
-			opcode->AddInterop(new DwordOperation(&id));
+				AllocateVariable(opcode, id);
+				opcode->AddInterop(new ByteOperation(OP_POPMOV));
+				opcode->AddInterop(new DwordOperation(&id));
 
-			mExprVars[*it] = id;
+				mExprVars[*it] = id;
+			}
 		}
 	}
 }
