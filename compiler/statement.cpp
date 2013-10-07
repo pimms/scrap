@@ -24,6 +24,8 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 			stmt = new AssignStatement();
 		} else if (s == "return") {
 			stmt = new ReturnStatement();
+		} else if (s == "if") {
+			stmt = new IfStatement();
 		}
 	} else if (token->mType == Token::VARFUNC) {
 		stmt = new AssignStatement();
@@ -36,6 +38,19 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 	return stmt;
 }
 
+
+
+/***** IfStatement *****/
+void IfStatement::ParseStatement(Tokens *tokens, Parser *parser) {
+	delete tokens->PopExpected(Token::RESERVED);
+	delete tokens->PopExpected(Token::PARANTH_BEG);
+
+	throw NotImplementedException("If statements are not implemented");
+}
+
+void IfStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
+	throw NotImplementedException("If statements are not implemented");
+}
 
 
 /***** AssignStatement *****/
