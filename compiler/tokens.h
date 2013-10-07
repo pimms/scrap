@@ -16,23 +16,26 @@ using namespace std;
 *****/
 struct Token {
 	enum Type {
-		UNDEFINED	= 0x00000100,
-		OPERATOR	= 0x00000200,
-		PARANTH_BEG	= 0x00000400,
-		PARANTH_END	= 0x00000800,
-		RESERVED	= 0x00001000,
-		BRACKET_BEG	= 0x00002000,
-		BRACKET_END = 0x00004000,
-		SEMICOLON	= 0x00008000,
-		DOT			= 0x00010000,
-		COMMA		= 0x00020000,
-		VALUE		= 0x00040000,
-		VAL_STRING	= 0x00080000,
-		VAL_INT		= 0x00100000,
-		VAL_FLOAT	= 0x00200000,
-		VARFUNC		= 0x00400000,
+		UNDEFINED		= 0x00000100,
+		OPERATOR		= 0x00000200,
+		OPERATOR_ARIT 	= 0x00000201,
+		OPERATOR_COMP 	= 0x00000202,
+		OPERATOR_ASSIGN = 0x00000204,
+		PARANTH_BEG		= 0x00000400,
+		PARANTH_END		= 0x00000800,
+		RESERVED		= 0x00001000,
+		BRACKET_BEG		= 0x00002000,
+		BRACKET_END 	= 0x00004000,
+		SEMICOLON		= 0x00008000,
+		DOT				= 0x00010000,
+		COMMA			= 0x00020000,
+		VALUE			= 0x00040000,
+		VAL_STRING		= 0x00080000,
+		VAL_INT			= 0x00100000,
+		VAL_FLOAT		= 0x00200000,
+		VARFUNC			= 0x00400000,
 
-		INVALID		= 0x80000000,
+		INVALID			= 0x80000000,
 	};
 
 	static string GetStringValue(Token::Type type);
@@ -96,6 +99,7 @@ private:
 	* in the context of the passed operator?
 	*****/
 	bool				PeekOperator(ifstream &file, char context=0);
+	void 				DetermineOperator(Token* token);
 
 	/***** Naming Methods *****
 	* Check for whether a word is reserved or

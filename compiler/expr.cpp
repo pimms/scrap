@@ -64,7 +64,7 @@ void Expression::BuildPostfix(Tokens *tokens, Parser *parser) {
 			} else {
 				mPostfix.push_back(new ExprTerm(token));
 			}
-		} else if (next->mType == Token::OPERATOR) {
+		} else if (next->mType & Token::OPERATOR) {
 			Token *token = tokens->PopNext();
 
 			while (stack.Size() && stack.Peek()->mType != Token::PARANTH_BEG) {
@@ -109,7 +109,7 @@ void Expression::BuildPostfix(Tokens *tokens, Parser *parser) {
 }
 
 int Expression::OperatorPrecedence(Token *token) {
-	if (token->mType != Token::OPERATOR) {
+	if ((token->mType & Token::OPERATOR) == 0) {
 		return -1;
 	}
 
@@ -145,7 +145,7 @@ void Expression::AllocateVariables(Opcode *opcode, Parser* parser) {
 	for (list<ExprTerm*>::iterator it=mPostfix.begin(); 
 			it!=mPostfix.end(); it++) {
 		Token *token = (*it)->mToken;
-		if (token && token->mType != Token::OPERATOR) {
+		if (token && (token->mType & Token::OPERATOR) == 0) {
 			mExprVars[*it] = RegisterVariable(parser, "");
 		}
 	}
@@ -232,7 +232,7 @@ void Expression::AddOperator(Opcode *opcode, Token *token) {
 		throw NullPointerException("Token cannot be nil");
 	}
 
-	if (token->mType != Token::OPERATOR) {
+	if ((token->mType & Token::OPERATOR) == 0) {
 		throw InvalidTokenException("Expected an operator, got: " + token->mToken);
 	}
 
