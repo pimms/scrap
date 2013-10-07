@@ -24,6 +24,8 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 			stmt = new AssignStatement();
 		} else if (s == "return") {
 			stmt = new ReturnStatement();
+		} else if (s == "if") {
+			stmt = new IfStatement();
 		}
 	} else if (token->mType == Token::VARFUNC) {
 		stmt = new AssignStatement();
@@ -38,6 +40,19 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 
 
 
+/***** IfStatement *****/
+void IfStatement::ParseStatement(Tokens *tokens, Parser *parser) {
+	delete tokens->PopExpected(Token::RESERVED);
+	delete tokens->PopExpected(Token::PARANTH_BEG);
+
+	throw NotImplementedException("If statements are not implemented");
+}
+
+void IfStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
+	throw NotImplementedException("If statements are not implemented");
+}
+
+
 /***** AssignStatement *****/
 void AssignStatement::ParseStatement(Tokens *tokens, Parser *parser) {
 	mAlloc = false;
@@ -45,20 +60,25 @@ void AssignStatement::ParseStatement(Tokens *tokens, Parser *parser) {
 	mExpression = NULL;
 	mAssignee = NULL;
 
-	if (tokens->PeekNext()->mType == Token::RESERVED) {
+	// Check for allocation
+	if (tokens->PeekNext()->mToken == "var") {
 		mAlloc = true;
-		delete tokens->PopNext();
+		delete tokens->PopExpected(Token::RESERVED);
+		
+		mAssignee = tokens->PopExpected(Token::VARFUNC);
+		mOperator = tokens->PopIfExists(Token::OPERATOR);
+	} else {
+		TokenIter it = tokens->GetCursor();
+		if ((*it++)->mType == Token::VARFUNC &&
+			(*it)->mType == Token::OPERATOR) {
+			mAssignee = tokens->PopExpected(Token::VARFUNC);
+			mOperator = tokens->PopExpected(Token::OPERATOR);
+		}
 	}
-
-	mAssignee = tokens->PopExpected(Token::VARFUNC);
-
-	// TODO:
-	// Allow "standalone" expressions
-	mOperator = tokens->PopIfExists(Token::OPERATOR);
-	if (mOperator) {
-		mExpression = new Expression;
-		mExpression->ParseStatement(tokens, parser);
-	}
+	
+	// Parse the expression
+	mExpression = new Expression();
+	mExpression->ParseStatement(tokens, parser);
 }
 
 void AssignStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
@@ -71,16 +91,10 @@ void AssignStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 		varId = GetVariableId(parser, mAssignee->mToken);
 	}
 
-	if (varId != 0) {
-		opcode->AddInterop(new ByteOperation(OP_PUSH));
-		opcode->AddInterop(new DwordOperation(&varId));
-
-		mExpression->ProvideIntermediates(opcode, parser);
-
+	mExpression->ProvideIntermediates(opcode, parser);
+	
+	if (varId && mOperator) {
 		HandleOperator(opcode, varId);
-	} else {
-		mExpression->ProvideIntermediates(opcode, parser);
-		opcode->AddInterop(new ByteOperation(OP_POP));
 	}
 }
 
@@ -99,19 +113,25 @@ void AssignStatement::HandleOperator(Opcode *opcode, uint varId) {
 	} else if (s == "%=") {
 		operation = OP_MOD;
 	} else if (s == "=") {
-		// The assignee-variable and the expression result
-		// is on the stack, but we only need to pop the expresion
-		// into the assignee.
+		// Pop the expression from the stack into the assignee-variable
 		opcode->AddInterop(new ByteOperation(OP_POPMOV));
 		opcode->AddInterop(new DwordOperation(&varId));
-		opcode->AddInterop(new ByteOperation(OP_POP));
 		return;
 	} else {
 		throw NotImplementedException("Operator not implemented: " + s);
 	}
 
+
+	// Push the assignee-variable
+	opcode->AddInterop(new ByteOperation(OP_PUSH));
+	opcode->AddInterop(new DwordOperation(&varId));
+	
+	// Perform the arithmetic
 	opcode->AddInterop(new ByteOperation(operation));
-	opcode->AddInterop(new ByteOperation(OP_POP));
+
+	// Pop the result into the assignee
+	opcode->AddInterop(new ByteOperation(OP_POPMOV));
+	opcode->AddInterop(new DwordOperation(&varId));
 }
 
 

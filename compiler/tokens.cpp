@@ -42,7 +42,7 @@ void Tokens::BuildTokens(string fileName) {
 		throw FileNotFoundException("File not found: " + (string)fileName);		
 	}
 
-	while (GetToken(file)) ;
+	while (GetToken(file) && !EndReached(file)) 	;
 
 	mCursor = mTokens.begin();
 }
@@ -96,6 +96,10 @@ Token* Tokens::PeekNext() {
 
 TokenIter Tokens::GetFrontIter() {
 	return mTokens.begin(); 
+}
+
+TokenIter Tokens::GetCursor() {
+	return mCursor;
 }
 
 void Tokens::SetCursor(TokenIter iter) {
@@ -433,4 +437,10 @@ void Tokens::SeekNextToken(ifstream &file) {
 void Tokens::SkipLine(ifstream &file) {
 	string waste;
 	std::getline(file, waste);
+}
+
+
+bool Tokens::EndReached(ifstream &file) {
+	int next = file.peek();
+	return next == char_traits<char>::eof();
 }

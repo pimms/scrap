@@ -12,6 +12,10 @@
 
 class Statement;
 class FunctionDefinition;
+class PositionInquirer;
+class FunctionSignature;
+
+typedef list<Fragment*>::iterator FragmentIter;
 
 class Parser {
 public:
@@ -42,8 +46,11 @@ public:
 	uint				RegisterVariable(string name);
 	uint				GetVariableId(string name);
 
-	uint				RegisterFunction(string name);
+	uint				RegisterFunction(FunctionSignature funcSign);
+	uint				RegisterStdFunction(FunctionSignature funcSign);
 	uint				GetFunctionId(string name);
+	FunctionSignature	GetFunctionSignature(string functionName);
+	FunctionSignature	GetFunctionSignature(uint functionId);
 
 private:
 	/***** Static ID counters *****
@@ -52,6 +59,7 @@ private:
 	* files.
 	*****/
  	static uint			sFuncId;
+	static uint			sStdFuncId;
 	static uint			sGVarId;
 
 	string				mFile;
@@ -65,19 +73,33 @@ private:
 
 	list<Fragment*>		mFragments;
 
-	map<string,uint>	mFuncIds;
+	list<FunctionSignature> mFuncSigns;
 
 	bool				BuildFragments();
 	bool				BuildIntermediates();
 	bool				BuildBytecode();
 
-	/***** Data-definition header functions *****
+	void				AddFragment(Fragment *fragment);
+	void				PushFragmentTail(FragmentIter tail);
+	void				PopFragmentTail();
+
+	/***** Data header functions *****
 	* Adds position-inquirers to listen for the byte-position
 	* of functions. 
 	* TODO: string data
 	*****/
-	void				AddDataBegin();
+	void				AddHeader();
 	void				AddFunctionData(FunctionDefinition *funcDef);
-	void				AddDataEnd();
-	
+
+	/***** Fragment Tail-iterators *****
+	* Bytecode must be placed in the order:
+	* [data header][jmp to global code][function definitions][global code]
+	*
+	* These iterators ensure that Fragments are placed in the correct
+	* order.
+	*****/
+	Stack<FragmentIter> mFragmentTailStack;
+	FragmentIter		mIterFuncdefEnd;
+	InteropIter			mHeaderEnd;
+	PositionInquirer	*mHeaderJump;
 };

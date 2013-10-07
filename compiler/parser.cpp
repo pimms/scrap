@@ -1,9 +1,11 @@
 #include "parser.h"
 #include "expr.h"
-#include "funcdef.h"
+#include "func.h"
 #include "interop.h"
+#include "../common/stdfunc.h"
 
 uint Parser::sFuncId = 0;
+uint Parser::sStdFuncId = 0;
 uint Parser::sGVarId = 0;
 
 
@@ -34,6 +36,8 @@ bool Parser::ParseFile() {
 }
 
 bool Parser::CompileTokens() {
+	ScrapStd::RegisterFunctions(this);
+
 	try {
 		if (!BuildFragments()) {
 			return false;
@@ -148,26 +152,81 @@ uint Parser::GetVariableId(string name) {
 
 
 
-uint Parser::RegisterFunction(string name) {
-	if (mFuncIds.count(name)) {
-		throw FuncAlreadyDefinedException("Function " + name + " is already defined");
+uint Parser::RegisterFunction(FunctionSignature funcSign) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcSign.GetName()) {
+			throw FuncAlreadyDefinedException("Function " 
+											+ funcSign.GetName() 
+											+ " is already defined");
+		}
 	}
 
-	mFuncIds[name] = ++sFuncId;
+	funcSign.SetId(++sFuncId);
+	mFuncSigns.push_back(funcSign);
+
 	return sFuncId;
 }
 
-uint Parser::GetFunctionId(string name) {
-	if (!mFuncIds.count(name)) {
-		throw FuncNotDefinedException("Function is undefined: " + name);
+uint Parser::RegisterStdFunction(FunctionSignature funcSign) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcSign.GetName()) {
+			throw FuncAlreadyDefinedException("Function " 
+											+ funcSign.GetName() 
+											+ " is already defined");
+		}
 	}
 
-	return mFuncIds[name];
+	funcSign.SetId(++sStdFuncId | FUNC_STD);
+	mFuncSigns.push_back(funcSign);
+
+	return funcSign.GetId();
+}
+
+uint Parser::GetFunctionId(string name) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == name) {
+			return it->GetId();
+		}
+	}
+
+	throw FuncNotDefinedException("Function is undefined: " + name);
+	return 0;
+}
+
+FunctionSignature Parser::GetFunctionSignature(string funcName) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcName) {
+			return *it;
+		}
+	}
+
+	throw  FuncNotDefinedException("Function " + funcName + " not defined");
+}
+
+FunctionSignature Parser::GetFunctionSignature(uint funcId) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetId() == funcId) {
+			return *it;
+		}
+	}
+
+	string errorMsg;
+	errorMsg += "Function with ID '";
+	errorMsg += funcId;
+	errorMsg += "' not defined";
+	throw  FuncNotDefinedException(errorMsg);
 }
 
 
 bool Parser::BuildFragments() {
-	AddDataBegin();
+	PushFragmentTail(mFragments.end());
+	AddHeader();
+	mIterFuncdefEnd = mFragments.insert(mFragments.end(), NULL);
 
 	int stackDepth = 0;
 	bool inFunction = false;
@@ -177,12 +236,14 @@ bool Parser::BuildFragments() {
 
 		Statement *statement = Statement::CreateStatement(mTokens, this);
 		if (statement) {
-			mFragments.push_back(statement);
+			AddFragment(statement);
 		} else if (FunctionDefinition::IsFunctionDefinition(mTokens)) {
 			FunctionDefinition *fdef = new FunctionDefinition();
 			fdef->ParseStatement(mTokens, this);
-			mFragments.push_back(fdef);
 
+
+			PushFragmentTail(mIterFuncdefEnd);
+			AddFragment(fdef);
 			AddFunctionData(fdef);
 
 			delete mTokens->PopExpected(Token::BRACKET_BEG);
@@ -205,8 +266,11 @@ bool Parser::BuildFragments() {
 					PopScope();
 					inFunction = false;
 
-					FunctionTail *ftail = new FunctionTail();
-					mFragments.push_back(ftail);
+					FunctionTail *tail = new FunctionTail();
+					AddFragment(tail);
+					PopFragmentTail();
+
+					tail->GetPositionReference()->AddInquirer(mHeaderJump);
 				} else {
 					throw InvalidTokenException("Unexpected }");
 				}
@@ -214,10 +278,10 @@ bool Parser::BuildFragments() {
 				PopNestedScope();
 			}
 			delete mTokens->PopNext();
+		} else {
+			throw InvalidTokenException("Unexpected '" + next->mToken + "'!");
 		}
 	}
-
-	AddDataEnd();
 
 	return true;
 }
@@ -225,8 +289,14 @@ bool Parser::BuildFragments() {
 bool Parser::BuildIntermediates() {
 	list<Fragment*>::iterator it;
 	for (it = mFragments.begin(); it != mFragments.end(); it++) {
+		if (!*it) continue;
 		(*it)->ProvideIntermediates(mOpcode, this);
 	}
+
+	// Add a final exit-statement
+	uint zero = 0;
+	mOpcode->AddInterop(new ByteOperation(OP_EXIT));
+	mOpcode->AddInterop(new DwordOperation(&zero));
 
 	return true;
 }
@@ -236,25 +306,54 @@ bool Parser::BuildBytecode() {
 }
 
 
-void Parser::AddDataBegin() {
+void Parser::AddFragment(Fragment *fragment) {
+	mFragments.insert(mFragmentTailStack.Peek(), fragment);
+}
+
+void Parser::PushFragmentTail(FragmentIter iter) {
+	mFragmentTailStack.Push(iter);
+}
+
+void Parser::PopFragmentTail() {
+	mFragmentTailStack.Pop();
+}
+
+
+void Parser::AddHeader() {
 	if (mOpcode->Length() != 0) {
 		throw InternalErrorException();
 	}
 	
 	mOpcode->AddInterop(new ByteOperation(OP_DATA_BEGIN));
+	mHeaderEnd = mOpcode->AddInterop(new ByteOperation(OP_DATA_END));
+
+	// Add the header-jump
+	mHeaderJump = new PositionInquirer();
+	mOpcode->AddInterop(new ByteOperation(OP_JMP));
+	mOpcode->AddInterop(mHeaderJump);
+
+	// If no functions are defined, mHeaderJump will be 0, causing
+	// an infinite loop. If no functions are defined, jump to the next
+	// position
+	PositionReference *posRef = new PositionReference();
+	posRef->AddInquirer(mHeaderJump);
+	mOpcode->AddInterop(posRef);
 }	
 
 void Parser::AddFunctionData(FunctionDefinition *funcDef) {
+	/* Insert the function ID and position into the header.
+	 */
+	mOpcode->PushTail(mHeaderEnd);
+
 	uint funcId = funcDef->GetId();
 
 	mOpcode->AddInterop(new ByteOperation(OP_DATA_FUNC));
 	mOpcode->AddInterop(new DwordOperation(&funcId));
 
+	// Request the final position for later
 	PositionInquirer *posInq = new PositionInquirer();
 	funcDef->GetPositionReference()->AddInquirer(posInq);
 	mOpcode->AddInterop(posInq);
-}
 
-void Parser::AddDataEnd() {
-	mOpcode->AddInterop(new ByteOperation(OP_DATA_END));
+	mOpcode->PopTail();
 }

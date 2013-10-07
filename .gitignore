@@ -18,3 +18,7 @@ test
 
 # Visual studio project folder
 vs11/
+
+# Xcode project folder
+xcode/
+.DS_Store

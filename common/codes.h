@@ -19,6 +19,8 @@
 #define VAR_LOCAL		0x40000000
 #define VAR_RETURN		0xFFFFFFFF
 
+#define FUNC_STD		0x20000000
+
 
 
 /***** BASIC OPERATIONS ***** 
@@ -90,28 +92,31 @@
 * b = pop()
 * a = pop()
 * if (a >= b) { stuff() }
+*
+* (*)	Expects an INT, followed by an UINT.
+* (**)	Expects a FLOAT, followed by an UINT
 *****/
-#define OP_JMP					0x20
-#define OP_JE					0x21
-#define OP_JNE					0x22
-#define OP_JG					0x23
-#define OP_JGE					0x24
-#define OP_JL					0x25
-#define OP_JLE					0x26
+#define OP_JMP					0x20	// PARAM
+#define OP_JE					0x21	// PARAM
+#define OP_JNE					0x22	// PARAM
+#define OP_JG					0x23	// PARAM
+#define OP_JGE					0x24	// PARAM
+#define OP_JL					0x25	// PARAM
+#define OP_JLE					0x26	// PARAM
 
-#define OP_JE_I					0x27	// PARAM
-#define OP_JNE_I				0x28	// PARAM
-#define OP_JG_I					0x29	// PARAM
-#define OP_JGE_I				0x2A	// PARAM
-#define OP_JL_I					0x2B	// PARAM
-#define OP_JLE_I				0x2C	// PARAM
+#define OP_JE_I					0x27	// PARAM (*)
+#define OP_JNE_I				0x28	// PARAM (*)
+#define OP_JG_I					0x29	// PARAM (*)
+#define OP_JGE_I				0x2A	// PARAM (*)
+#define OP_JL_I					0x2B	// PARAM (*)
+#define OP_JLE_I				0x2C	// PARAM (*)
 
-#define OP_JE_F					0x2D	// PARAM
-#define OP_JNE_F				0x2E	// PARAM
-#define OP_JG_F					0x2F	// PARAM
-#define OP_JGE_F				0x30	// PARAM
-#define OP_JL_F					0x31	// PARAM
-#define OP_JLE_F				0x32	// PARAM
+#define OP_JE_F					0x2D	// PARAM  (**)
+#define OP_JNE_F				0x2E	// PARAM  (**)
+#define OP_JG_F					0x2F	// PARAM  (**)
+#define OP_JGE_F				0x30	// PARAM  (**)
+#define OP_JL_F					0x31	// PARAM  (**)
+#define OP_JLE_F				0x32	// PARAM  (**)
 
 
 /***** DATA DEFINITIONS *****

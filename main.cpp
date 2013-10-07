@@ -13,6 +13,12 @@
 #include "compiler/parser.h"
 #include "common/optostr.h"
 
+
+void f(int a, int b, int c) {
+	printf("%i %i %i\n", a, b, c);
+}
+
+
 int main(int argc, char *argv[]) {
 	if (argc == 1) {
 		printf("No file specified.\n");
@@ -30,8 +36,8 @@ int main(int argc, char *argv[]) {
 						OpcodeText tostr;
 						tostr.Parse(parser.GetOpcodes());
 						
-						//Environment env(parser.GetOpcodes());
-						//env.Execute();
+						Environment env(parser.GetOpcodes());
+						env.Execute();
 					} catch (exception &e) {
 						printf("Runtime error:\n%s\n", e.what());
 					}

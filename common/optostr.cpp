@@ -60,13 +60,6 @@ int OpcodeText::ParamCount(byte code) {
 	case OP_DIV:
 	case OP_MUL:
 
-	case OP_JMP:
-	case OP_JE:
-	case OP_JNE:
-	case OP_JG:
-	case OP_JL:
-	case OP_JLE:
-
 	case OP_PUSH_SCOPE:
 	case OP_POP_SCOPE:
 
@@ -94,6 +87,21 @@ int OpcodeText::ParamCount(byte code) {
 	case OP_MUL_F:
 	case OP_DIV_F:
 
+	case OP_JMP:
+	case OP_JE:
+	case OP_JNE:
+	case OP_JG:
+	case OP_JL:
+	case OP_JLE:
+		return 1;
+
+		/* Operations with 2 parameters*/
+	case OP_MOV:
+	case OP_MOVI:
+	case OP_MOVF:
+	case OP_MOVS:
+	case OP_DATA_FUNC:
+
 	case OP_JE_I:
 	case OP_JNE_I:
 	case OP_JG_I:
@@ -105,20 +113,14 @@ int OpcodeText::ParamCount(byte code) {
 	case OP_JG_F:
 	case OP_JL_F:
 	case OP_JLE_F:
-		return 1;
-
-		/* Operations with 2 parameters*/
-	case OP_MOV:
-	case OP_MOVI:
-	case OP_MOVF:
-	case OP_MOVS:
-	case OP_DATA_FUNC:
 		return 2;
 
 		/* TODO: */
 	case OP_DATA_STRING:
 		return -1;
 	}
+	
+	return 0;
 }
 
 string OpcodeText::GetLiteral(byte code) {
@@ -199,6 +201,13 @@ string OpcodeText::GetParameter(byte ctx, int bytecodeIdx, int paramIdx) {
 	case OP_ALLOC:
 	case OP_POPMOV:
 	case OP_EXIT:
+
+	case OP_JMP:
+	case OP_JE:
+	case OP_JNE:
+	case OP_JG:
+	case OP_JL:
+	case OP_JLE:
 		return GetUint(bytecodeIdx);
 
 	case OP_ADD_I:
@@ -213,21 +222,6 @@ string OpcodeText::GetParameter(byte ctx, int bytecodeIdx, int paramIdx) {
 	case OP_MUL_F:
 	case OP_DIV_F:
 		return GetFloat(bytecodeIdx);
-
-	case OP_JE_I:
-	case OP_JNE_I:
-	case OP_JG_I:
-	case OP_JL_I:
-	case OP_JLE_I:
-		return GetInt(bytecodeIdx);
-
-	case OP_JE_F:
-	case OP_JNE_F:
-	case OP_JG_F:
-	case OP_JL_F:
-	case OP_JLE_F:
-		return GetFloat(bytecodeIdx);
-		
 
 		/* Operations with 2 parameters*/
 	case OP_MOV:
@@ -252,6 +246,24 @@ string OpcodeText::GetParameter(byte ctx, int bytecodeIdx, int paramIdx) {
 
 	case OP_DATA_FUNC:
 		return GetUint(bytecodeIdx);
+
+
+	case OP_JE_I:
+	case OP_JNE_I:
+	case OP_JG_I:
+	case OP_JL_I:
+	case OP_JLE_I:
+		if (!paramIdx)  return GetInt(bytecodeIdx);
+		return GetUint(bytecodeIdx);
+
+	case OP_JE_F:
+	case OP_JNE_F:
+	case OP_JG_F:
+	case OP_JL_F:
+	case OP_JLE_F:
+		if (!paramIdx)  return GetFloat(bytecodeIdx);
+		return GetUint(bytecodeIdx);
+
 
 		/* TODO: */
 	case OP_DATA_STRING:
@@ -279,6 +291,9 @@ string OpcodeText::GetUint(int opcodeIdx) {
 	} else if (val & VAR_LOCAL) {
 		val &= ~VAR_LOCAL;
 		ss << "L_";
+	} else if (val & FUNC_STD) {
+		val &= ~FUNC_STD;
+		ss << "STD_";
 	}
 
 	ss << val;

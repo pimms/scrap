@@ -1,5 +1,7 @@
 #include "env.h"
 #include "../common/scrapexcept.h"
+#include "../common/stdfunc.h"
+#include "../compiler/func.h"
 
 #include <stdlib.h>
 #include <cstring>
@@ -129,8 +131,10 @@ Var* Environment::GetVarById(uint id) {
 
 	if (id & VAR_GLOBAL) {
 		ret = mGScope.GetVar(id);
-	} else {
-		ret = mLScope.Peek()->GetVar(id);
+	} else if (id & VAR_LOCAL) {
+		if (mLScope.Size()) {
+			ret = mLScope.Peek()->GetVar(id);
+		}
 	}
 
 	return ret;
@@ -200,16 +204,40 @@ void Environment::OpPop() {
 
 void Environment::OpCall() {
 	uint funcId = GetOpcodeUint();
-	uint funcPos = mFunctions[funcId];
 
-	// Push the next instruction to be executed.
-	mFStack.Push(mOpPtr);
-	mOpPtr = funcPos;
+	if (funcId & FUNC_STD) {
+		OpCallStd(funcId);
+	} else {
+		uint funcPos = mFunctions[funcId];
 
-	Scope *localScope = new Scope();
-	mLScope.Push(localScope);
+		// Push the next instruction to be executed.
+		mFStack.Push(mOpPtr);
+		mOpPtr = funcPos;
+
+		Scope *localScope = new Scope();
+		mLScope.Push(localScope);
+	}
 
 	LOGF(("Calling %x\n", funcId));
+}
+
+void Environment::OpCallStd(uint funcId) {
+	int pCount = ScrapStd::GetParamCount(funcId);
+
+	Var **params = new Var*[pCount];
+	for (int i=0; i<pCount; i++) {
+		PopStackVar(params[i]);
+	}
+
+	Var *retVal = ScrapStd::CallStdFunc(funcId, pCount, params);
+
+	if (retVal) {
+		*GetVarById(VAR_RETURN) = *retVal;
+	} else {
+		GetVarById(VAR_RETURN)->Undefine();
+	}
+
+	delete[] params;
 }
 
 void Environment::OpRet() {
@@ -263,17 +291,20 @@ void Environment::OpPopMov() {
 	PopStackVar(source);
 
 	dest = GetOpcodeVar();
-	*dest = *source;
 
-	LOGF(("Popping Var %x into Var %x\n", source->GetId(), dest->GetId()));
+	if (source != NULL) {
+		*dest = *source;
+	} else {
+		dest->Undefine();
+	}
 }
 
 void Environment::OpMov() {
 	Var *source = NULL;
 	Var *dest = NULL;
 
-	PopStackVar(source);
-	PopStackVar(dest);
+	dest = GetOpcodeVar();
+	source = GetOpcodeVar();
 
 	*dest = *source;
 }

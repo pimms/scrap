@@ -80,6 +80,7 @@ public:
 	*		PopNext();  // <- returns the second Token
 	*****/
 	TokenIter			GetFrontIter();
+	TokenIter			GetCursor();
 	void				SetCursor(TokenIter front);
 
 private:
@@ -125,4 +126,6 @@ private:
 	*****/
 	void				SeekNextToken(ifstream &file);
 	void				SkipLine(ifstream &file);
+	
+	bool 				EndReached(ifstream &file);
 };

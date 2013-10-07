@@ -26,6 +26,7 @@ public:
 	void 		Set(int);
 	void 		Set(float);
 	void 		Set(const char*);
+	void		Undefine();
 
 	int 		GetInt() const;
 	float 		GetFloat() const;
