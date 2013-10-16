@@ -25,8 +25,6 @@ Environment::~Environment() {
 }
 
 int Environment::Execute() {
-	printf("Starting execution...\n");
-
 	while (mOpcodes[mOpPtr] != OP_EXIT) {
 		Operation();
 	}
