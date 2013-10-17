@@ -1,5 +1,5 @@
 CXX=g++
-FLG=-g -DLINUX -D_DEBUG
+FLG=-g -DLINUX -D_DEBUG -fasm-blocks
 SRCS=$(shell ls run/*.cpp) $(shell ls common/*.cpp) $(shell ls compiler/*.cpp)
 OBJS=$(subst .cpp,.o,$(SRCS))
 
