@@ -1,8 +1,6 @@
-var x;
-
-func f() {
-
+func f(var y) {
+	y = 5;
 }
 
-var y;
-f();
+var x;
+f(x);
