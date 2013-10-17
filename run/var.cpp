@@ -106,6 +106,13 @@ void Var::Set(const char *val) {
 	strcpy(mValString, val);
 }
 
+void Var::Undefine() {
+	mType = UNDEFINED;
+	mValFloat = 0.f;
+	mValInt = 0;
+	mValString = NULL;
+}
+
 
 
 int Var::GetInt() const {

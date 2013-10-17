@@ -24,6 +24,8 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 			stmt = new AssignStatement();
 		} else if (s == "return") {
 			stmt = new ReturnStatement();
+		} else if (s == "if") {
+			stmt = new IfStatement();
 		}
 	} else if (token->mType == Token::VARFUNC) {
 		stmt = new AssignStatement();
@@ -36,6 +38,19 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 	return stmt;
 }
 
+
+
+/***** IfStatement *****/
+void IfStatement::ParseStatement(Tokens *tokens, Parser *parser) {
+	delete tokens->PopExpected(Token::RESERVED);
+	delete tokens->PopExpected(Token::PARANTH_BEG);
+
+	throw NotImplementedException("If statements are not implemented");
+}
+
+void IfStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
+	throw NotImplementedException("If statements are not implemented");
+}
 
 
 /***** AssignStatement *****/
@@ -51,6 +66,7 @@ void AssignStatement::ParseStatement(Tokens *tokens, Parser *parser) {
 		delete tokens->PopExpected(Token::RESERVED);
 		
 		mAssignee = tokens->PopExpected(Token::VARFUNC);
+		mOperator = tokens->PopIfExists(Token::OPERATOR);
 	} else {
 		TokenIter it = tokens->GetCursor();
 		if ((*it++)->mType == Token::VARFUNC &&
@@ -85,9 +101,6 @@ void AssignStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 void AssignStatement::HandleOperator(Opcode *opcode, uint varId) {
 	string s = mOperator->mToken;
 	byte operation = 0;
-	
-	opcode->AddInterop(new ByteOperation(OP_PUSH));
-	opcode->AddInterop(new DwordOperation(&varId));
 
 	if (s == "+=") {
 		operation = OP_ADD;
@@ -100,19 +113,25 @@ void AssignStatement::HandleOperator(Opcode *opcode, uint varId) {
 	} else if (s == "%=") {
 		operation = OP_MOD;
 	} else if (s == "=") {
-		// The assignee-variable and the expression result
-		// is on the stack, but we only need to pop the expresion
-		// into the assignee.
+		// Pop the expression from the stack into the assignee-variable
 		opcode->AddInterop(new ByteOperation(OP_POPMOV));
 		opcode->AddInterop(new DwordOperation(&varId));
-		opcode->AddInterop(new ByteOperation(OP_POP));
 		return;
 	} else {
 		throw NotImplementedException("Operator not implemented: " + s);
 	}
 
+
+	// Push the assignee-variable
+	opcode->AddInterop(new ByteOperation(OP_PUSH));
+	opcode->AddInterop(new DwordOperation(&varId));
+	
+	// Perform the arithmetic
 	opcode->AddInterop(new ByteOperation(operation));
-	opcode->AddInterop(new ByteOperation(OP_POP));
+
+	// Pop the result into the assignee
+	opcode->AddInterop(new ByteOperation(OP_POPMOV));
+	opcode->AddInterop(new DwordOperation(&varId));
 }
 
 

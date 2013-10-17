@@ -56,7 +56,7 @@ bool Tokens::HasMore() {
 Token* Tokens::PopIfExists(Token::Type type) {
 	Token *token = NULL;
 
-	if ((*mCursor)->mType == type) {
+	if ((*mCursor)->mType & type) {
 		token = *mCursor;
 		mCursor = mTokens.erase(mCursor);
 	}
@@ -73,7 +73,6 @@ Token* Tokens::PopExpected(Token::Type type) {
 
 	// All hell is loose - RELEASE THE KRAKEN!
 	token = PopNext();
-
 	throw InvalidTokenException(
 							"Expected '" 
 							+ Token::GetStringValue(type) 
@@ -142,6 +141,9 @@ bool Tokens::GetOperator(ifstream &file) {
 	if (str.length()) {
 		Token *t = new Token(str, Token::OPERATOR);
 		mTokens.push_back(t);
+
+		DetermineOperator(t);
+
 		return true;
 	}
 
@@ -296,6 +298,46 @@ bool Tokens::PeekOperator(ifstream &file, char context) {
 	}
 
 	return false;
+}
+
+void Tokens::DetermineOperator(Token *token) {
+	string str = token->mToken;
+
+	switch (str[0]) {
+		case '+':
+		case '-':
+		case '*':
+		case '/':
+		case '%':
+			if (str.length() == 1) {
+				token->mType = Token::OPERATOR_ARIT;
+			} else {
+				if (str[1] == '=') {
+					token->mType = Token::OPERATOR_ASSIGN;
+				} else if (str[1] == str[0]) {
+					if (str[0] == '+' || str[0] == '-') {
+						token->mType = Token::OPERATOR_ASSIGN;
+						throw NotImplementedException("Operator ++ and -- are not implemented yet");
+					} else {
+						throw InvalidTokenException("Token not supported: " + token->mToken);
+					}
+				}
+			}
+			return;
+
+		case '=':
+			if (str.length() == 1) {
+				token->mType = Token::OPERATOR_ASSIGN;
+			} else if (str[0] == str[1]) {
+				token->mType = Token::OPERATOR_COMP;
+			}
+			return;
+
+		case '>':
+		case '<':
+			token->mType = Token::OPERATOR_COMP;
+			return;
+	}
 }
 
 

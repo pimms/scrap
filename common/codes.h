@@ -19,6 +19,8 @@
 #define VAR_LOCAL		0x40000000
 #define VAR_RETURN		0xFFFFFFFF
 
+#define FUNC_STD		0x20000000
+
 
 
 /***** BASIC OPERATIONS ***** 

@@ -30,9 +30,16 @@ public:
 // TODO
 
 /***** Class IfStatement *****
-* 
+* An if-statement. Stuff may happen. 
 *****/
-// TODO
+class IfStatement : public Statement {
+public:
+	void			ParseStatement(Tokens *tokens, Parser *parser);
+	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
+
+private:
+};
+
 
 
 /***** Class AssignStatement *****

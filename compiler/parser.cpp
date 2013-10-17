@@ -1,9 +1,11 @@
 #include "parser.h"
 #include "expr.h"
-#include "funcdef.h"
+#include "func.h"
 #include "interop.h"
+#include "../common/stdfunc.h"
 
 uint Parser::sFuncId = 0;
+uint Parser::sStdFuncId = 0;
 uint Parser::sGVarId = 0;
 
 
@@ -34,6 +36,8 @@ bool Parser::ParseFile() {
 }
 
 bool Parser::CompileTokens() {
+	ScrapStd::RegisterFunctions(this);
+
 	try {
 		if (!BuildFragments()) {
 			return false;
@@ -148,21 +152,74 @@ uint Parser::GetVariableId(string name) {
 
 
 
-uint Parser::RegisterFunction(string name) {
-	if (mFuncIds.count(name)) {
-		throw FuncAlreadyDefinedException("Function " + name + " is already defined");
+uint Parser::RegisterFunction(FunctionSignature funcSign) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcSign.GetName()) {
+			throw FuncAlreadyDefinedException("Function " 
+											+ funcSign.GetName() 
+											+ " is already defined");
+		}
 	}
 
-	mFuncIds[name] = ++sFuncId;
+	funcSign.SetId(++sFuncId);
+	mFuncSigns.push_back(funcSign);
+
 	return sFuncId;
 }
 
-uint Parser::GetFunctionId(string name) {
-	if (!mFuncIds.count(name)) {
-		throw FuncNotDefinedException("Function is undefined: " + name);
+uint Parser::RegisterStdFunction(FunctionSignature funcSign) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcSign.GetName()) {
+			throw FuncAlreadyDefinedException("Function " 
+											+ funcSign.GetName() 
+											+ " is already defined");
+		}
 	}
 
-	return mFuncIds[name];
+	funcSign.SetId(++sStdFuncId | FUNC_STD);
+	mFuncSigns.push_back(funcSign);
+
+	return funcSign.GetId();
+}
+
+uint Parser::GetFunctionId(string name) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == name) {
+			return it->GetId();
+		}
+	}
+
+	throw FuncNotDefinedException("Function is undefined: " + name);
+	return 0;
+}
+
+FunctionSignature Parser::GetFunctionSignature(string funcName) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetName() == funcName) {
+			return *it;
+		}
+	}
+
+	throw  FuncNotDefinedException("Function " + funcName + " not defined");
+}
+
+FunctionSignature Parser::GetFunctionSignature(uint funcId) {
+	list<FunctionSignature>::iterator it;
+	for (it = mFuncSigns.begin(); it != mFuncSigns.end(); it++) {
+		if (it->GetId() == funcId) {
+			return *it;
+		}
+	}
+
+	string errorMsg;
+	errorMsg += "Function with ID '";
+	errorMsg += funcId;
+	errorMsg += "' not defined";
+	throw  FuncNotDefinedException(errorMsg);
 }
 
 
@@ -274,9 +331,18 @@ void Parser::AddHeader() {
 	mHeaderJump = new PositionInquirer();
 	mOpcode->AddInterop(new ByteOperation(OP_JMP));
 	mOpcode->AddInterop(mHeaderJump);
+
+	// If no functions are defined, mHeaderJump will be 0, causing
+	// an infinite loop. If no functions are defined, jump to the next
+	// position
+	PositionReference *posRef = new PositionReference();
+	posRef->AddInquirer(mHeaderJump);
+	mOpcode->AddInterop(posRef);
 }	
 
 void Parser::AddFunctionData(FunctionDefinition *funcDef) {
+	/* Insert the function ID and position into the header.
+	 */
 	mOpcode->PushTail(mHeaderEnd);
 
 	uint funcId = funcDef->GetId();
@@ -284,6 +350,7 @@ void Parser::AddFunctionData(FunctionDefinition *funcDef) {
 	mOpcode->AddInterop(new ByteOperation(OP_DATA_FUNC));
 	mOpcode->AddInterop(new DwordOperation(&funcId));
 
+	// Request the final position for later
 	PositionInquirer *posInq = new PositionInquirer();
 	funcDef->GetPositionReference()->AddInquirer(posInq);
 	mOpcode->AddInterop(posInq);

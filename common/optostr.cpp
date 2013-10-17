@@ -291,6 +291,9 @@ string OpcodeText::GetUint(int opcodeIdx) {
 	} else if (val & VAR_LOCAL) {
 		val &= ~VAR_LOCAL;
 		ss << "L_";
+	} else if (val & FUNC_STD) {
+		val &= ~FUNC_STD;
+		ss << "STD_";
 	}
 
 	ss << val;

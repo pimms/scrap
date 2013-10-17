@@ -1,6 +1,9 @@
-func f(var y) {
-	y = 5;
+func printSquare(var root) {
+	print(root * root);
 }
 
-var x;
-f(x);
+printSquare( 3);
+printSquare( 9);
+printSquare(10);
+printSquare(12);
+printSquare(15);
