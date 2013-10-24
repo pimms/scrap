@@ -13,7 +13,7 @@ FunctionCall::FunctionCall(Token *funcToken) {
 	mFuncToken = funcToken;
 }
 
-void FunctionCall::ParseStatement(Tokens *tokens, Parser *parser) {
+void FunctionCall::ParseFragment(Tokens *tokens, Parser *parser) {
 	delete tokens->PopExpected(Token::PARANTH_BEG);
 
 	if (tokens->PeekNext()->mType == Token::PARANTH_END) {
@@ -21,7 +21,7 @@ void FunctionCall::ParseStatement(Tokens *tokens, Parser *parser) {
 	} else {
 		while (tokens->PeekNext()->mType != Token::PARANTH_END) {
 			Expression *expr = new Expression(true);
-			expr->ParseStatement(tokens, parser);
+			expr->ParseFragment(tokens, parser);
 			mParams.push_back(expr);
 
 			if (Token *t = tokens->PopIfExists(Token::COMMA)) {
@@ -93,7 +93,7 @@ PositionReference* FunctionDefinition::GetPositionReference() {
 }
 
 
-void FunctionDefinition::ParseStatement(Tokens *tokens, Parser *parser) {
+void FunctionDefinition::ParseFragment(Tokens *tokens, Parser *parser) {
 	// Ensure that this really is a function
 	Token *token = tokens->PopExpected(Token::RESERVED);
 	if (token->mToken != "func") {
@@ -158,7 +158,7 @@ FunctionTail::FunctionTail() {
 	mPosRef = new PositionReference();
 }
 
-void FunctionTail::ParseStatement(Tokens *tokens, Parser *parser) {
+void FunctionTail::ParseFragment(Tokens *tokens, Parser *parser) {
 	// Nothing to do
 }
 

@@ -16,7 +16,7 @@ class PositionReference;
 class FunctionCall : public Fragment {
 public:
 					FunctionCall(Token *funcToken);
-	void			ParseStatement(Tokens *tokens, Parser *parser);
+	void			ParseFragment(Tokens *tokens, Parser *parser);
 	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 	string			DbgGetString();
@@ -43,7 +43,7 @@ public:
 						FunctionDefinition();
 	PositionReference*	GetPositionReference();
 
-	void				ParseStatement(Tokens *tokens, Parser *parser);
+	void				ParseFragment(Tokens *tokens, Parser *parser);
 	void				ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 	uint				GetId();
@@ -66,7 +66,7 @@ protected:
 class FunctionTail : public Fragment {
 public:
 						FunctionTail();
-	void				ParseStatement(Tokens *tokens, Parser *parser);
+	void				ParseFragment(Tokens *tokens, Parser *parser);
 	void				ProvideIntermediates(Opcode *opcode, Parser *parser);
 	PositionReference*	GetPositionReference();
 

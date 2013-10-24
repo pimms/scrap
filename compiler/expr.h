@@ -25,7 +25,7 @@ public:
 					~Expression();
 	string			DbgGetString();
 
-	void			ParseStatement(Tokens *tokens, Parser *parser);
+	void			ParseFragment(Tokens *tokens, Parser *parser);
 	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 private:

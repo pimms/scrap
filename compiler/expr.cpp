@@ -32,7 +32,7 @@ string Expression::DbgGetString() {
 }
 
 
-void Expression::ParseStatement(Tokens *tokens, Parser *parser) {
+void Expression::ParseFragment(Tokens *tokens, Parser *parser) {
 	mPostfix.clear();
 
 	BuildPostfix(tokens, parser);
@@ -60,7 +60,7 @@ void Expression::BuildPostfix(Tokens *tokens, Parser *parser) {
 			// Function call
 			if (tokens->PeekNext()->mType == Token::PARANTH_BEG) {
 				FunctionCall *func = new FunctionCall(token);
-				func->ParseStatement(tokens, parser);
+				func->ParseFragment(tokens, parser);
 				mPostfix.push_back(new ExprTerm(func));
 			} else {
 				mPostfix.push_back(new ExprTerm(token));

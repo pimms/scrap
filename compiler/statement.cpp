@@ -32,7 +32,7 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 	}
 
 	if (stmt) {
-		stmt->ParseStatement(tokens, parser);
+		stmt->ParseFragment(tokens, parser);
 	}
 
 	return stmt;
@@ -41,7 +41,7 @@ Statement* Statement::CreateStatement(Tokens *tokens, Parser *parser) {
 
 
 /***** IfStatement *****/
-void IfStatement::ParseStatement(Tokens *tokens, Parser *parser) {
+void IfStatement::ParseFragment(Tokens *tokens, Parser *parser) {
 	delete tokens->PopExpected(Token::RESERVED);
 	delete tokens->PopExpected(Token::PARANTH_BEG);
 
@@ -54,7 +54,7 @@ void IfStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
 
 
 /***** AssignStatement *****/
-void AssignStatement::ParseStatement(Tokens *tokens, Parser *parser) {
+void AssignStatement::ParseFragment(Tokens *tokens, Parser *parser) {
 	mAlloc = false;
 	mOperator = NULL;
 	mExpression = NULL;
@@ -78,7 +78,7 @@ void AssignStatement::ParseStatement(Tokens *tokens, Parser *parser) {
 	
 	// Parse the expression
 	mExpression = new Expression();
-	mExpression->ParseStatement(tokens, parser);
+	mExpression->ParseFragment(tokens, parser);
 }
 
 void AssignStatement::ProvideIntermediates(Opcode *opcode, Parser *parser) {
@@ -136,7 +136,7 @@ void AssignStatement::HandleOperator(Opcode *opcode, uint varId) {
 
 
 /***** ReturnStatement *****/
-void ReturnStatement::ParseStatement(Tokens *tokens, Parser *parser) {
+void ReturnStatement::ParseFragment(Tokens *tokens, Parser *parser) {
 	delete tokens->PopExpected(Token::RESERVED);
 
 	if (tokens->PeekNext()->mType == Token::SEMICOLON) {
@@ -144,7 +144,7 @@ void ReturnStatement::ParseStatement(Tokens *tokens, Parser *parser) {
 		delete tokens->PopNext();
 	} else {
 		mExpression = new Expression;
-		mExpression->ParseStatement(tokens, parser);
+		mExpression->ParseFragment(tokens, parser);
 	}
 }
 

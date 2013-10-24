@@ -21,7 +21,7 @@ class Tokens;
 
 class Fragment {
 public:
-	virtual void	ParseStatement(Tokens *tokens, Parser *parser) = 0;
+	virtual void	ParseFragment(Tokens *tokens, Parser *parser) = 0;
 	virtual void	ProvideIntermediates(Opcode *opcode, Parser *parser) = 0;
 	
 	virtual string	DbgGetString();

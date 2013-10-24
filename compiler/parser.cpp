@@ -239,7 +239,7 @@ bool Parser::BuildFragments() {
 			AddFragment(statement);
 		} else if (FunctionDefinition::IsFunctionDefinition(mTokens)) {
 			FunctionDefinition *fdef = new FunctionDefinition();
-			fdef->ParseStatement(mTokens, this);
+			fdef->ParseFragment(mTokens, this);
 
 
 			PushFragmentTail(mIterFuncdefEnd);

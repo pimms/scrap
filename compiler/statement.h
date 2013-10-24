@@ -34,7 +34,7 @@ public:
 *****/
 class IfStatement : public Statement {
 public:
-	void			ParseStatement(Tokens *tokens, Parser *parser);
+	void			ParseFragment(Tokens *tokens, Parser *parser);
 	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 private:
@@ -56,7 +56,7 @@ private:
 *****/
 class AssignStatement : public Statement {
 public:
-	void			ParseStatement(Tokens *tokens, Parser *parser);
+	void			ParseFragment(Tokens *tokens, Parser *parser);
 	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 private:
@@ -74,7 +74,7 @@ private:
 *****/
 class ReturnStatement : public Statement {
 public:
-	void			ParseStatement(Tokens *tokens, Parser *parser);
+	void			ParseFragment(Tokens *tokens, Parser *parser);
 	void			ProvideIntermediates(Opcode *opcode, Parser *parser);
 
 private:
