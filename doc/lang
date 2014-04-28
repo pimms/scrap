@@ -1,0 +1,55 @@
+Scrap Language Description
+
+The scrap language is an object oriented, strictly 
+typed language, and share many similarities with 
+Java and C#. This document gives examples of what 
+the language will be able to do IN IT'S FINAL STATE, 
+and is by all means to be considered a work in 
+progress.  
+
+
+Hello World Example
+	import System;
+	class Main {
+		public void main() {
+			System.Print("Hello, World!\n");
+		}
+	}
+
+
+Fibonacci Example
+	import System;
+	class Main {
+		public void main() {
+			int num = fib(5);
+			System.Print("Fib(5): " + num);
+		}
+
+		private int fib(unsigned n) {
+			if (n <= 1) return n;
+			return fib(n-1) + fib(n-2);
+		}
+	}
+
+
+Inheritance Example
+	import System;
+	class Main {
+		public void main() {
+			// Create a new Bar-object
+			Bar b = new Bar();
+
+			// Prints "N(): 6"
+			System.Println("N(): " + b.N());
+		}
+	}
+
+	class FooA { 
+		protected int n = 6;
+	}
+
+	class Bar : FooA, FooB {
+		public int N() {
+			return n;
+		}
+	}
