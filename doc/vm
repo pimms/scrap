@@ -109,7 +109,7 @@ pop 				Pop the top value from stack 	value1 ->
 # - f 	float (32 bit)
 # - d 	double (64 bit)
 # - l 	long (64 bit)
-# - b	bool / char / byte (8 bit)
+# - c	bool / char / byte (8 bit)
 Tload 	#index		Push variable to stack		 	-> value1
 Tload_X 			Push variable to stack		 	-> value1
 Treturn				Return stack val from method 	value1 ->
@@ -150,10 +150,10 @@ i2f 				int to float 					value1(i) -> value2(f)
 i2d 				int to double 					value1(i) -> value2(d)
 i2c 				int to char 					value1(i) -> value2(c)
 
-b2i 				char to int 					value1(c) -> value2(i)
-b2l 				char to long 					value1(c) -> value2(l)
-b2f 				char to float 					value1(c) -> value2(f)
-b2d 				char to double 					value1(c) -> value2(d)
+c2i 				char to int 					value1(c) -> value2(i)
+c2l 				char to long 					value1(c) -> value2(l)
+c2f 				char to float 					value1(c) -> value2(f)
+c2d 				char to double 					value1(c) -> value2(d)
 
 # Arithmetic operations, available with the following values for T. Both 
 # operands on the stack must be of the same type.
@@ -161,7 +161,7 @@ b2d 				char to double 					value1(c) -> value2(d)
 # - d	double
 # - i	int
 # - l 	long
-# - b 	char
+# - c 	char
 Tadd				Add two numbers					value1 value2 -> result
 Tsub 				Subtract value2 from value1 	value1 value2 -> result
 Tmul 				Multiply two numbers 			value1 value2 -> result
