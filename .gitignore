@@ -12,13 +12,16 @@
 *.la
 *.a
 
-# The final executable
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# Vim swap files
+.*.swp
+.*.swo
+
+# Built executable
 scrap
-test
-
-# Visual studio project folder
-vs11/
-
-# Xcode project folder
-xcode/
-.DS_Store
+build/
