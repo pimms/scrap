@@ -6,28 +6,6 @@ namespace scrap {
 
 class Object;
 
-enum VarType {
-	a 		= 0x00,
-	OBJECT 	= 0x00,		
-
-	i 		= 0x01,
-	INT 	= 0x01,
-
-	f 		= 0x02,
-	FLOAT 	= 0x02,
-
-	d 		= 0x04,
-	DOUBLE 	= 0x04,
-
-	l 		= 0x08,
-	LONG 	= 0x08,
-
-	c 		= 0x10,
-	CHAR 	= 0x10,
-
-	b 		= 0x20,
-	BOOL 	= 0x20,
-};
 
 string VarTypeToString(VarType t);
 
@@ -67,7 +45,7 @@ public:
 	void Set(char c);
 	void Set(bool c);
 
-	// All value-getter methods throws InvalidType-exception if
+	// All value-getter methods throws InvalidTypeException if
 	// their type does not match the getter method called.
 	Object* Value_a() const;
 	int Value_i() const;
@@ -79,10 +57,22 @@ public:
 
 	VarType Type() const;
 
+	// All arithmetic methods require that both Variable objects has
+	// the same type. Not all operations are available for all types.
+	// InvalidOperationException is thrown is an invalid operation
+	// is attempted.
+	void Add(const Variable &var);
+	void Sub(const Variable &var);
+	void Mul(const Variable &var);
+	void Div(const Variable &var);
+	void Shr(unsigned steps);
+	void Shl(unsigned steps);
+	void Mod(const Variable &var);
+	void Xor(const Variable &var);
+
 private:
 	VarValue _value;
 	VarType _type;
-
 };
 
 }

@@ -30,6 +30,46 @@ typedef unsigned long ulong;
 
 namespace scrap {
 
+
+// Primitive types
+enum VarType {
+	a 		= 0x00,
+	OBJECT 	= 0x00,		
+
+	i 		= 0x01,
+	INT 	= 0x01,
+
+	f 		= 0x02,
+	FLOAT 	= 0x02,
+
+	d 		= 0x04,
+	DOUBLE 	= 0x04,
+
+	l 		= 0x08,
+	LONG 	= 0x08,
+
+	c 		= 0x10,
+	CHAR 	= 0x10,
+
+	b 		= 0x20,
+	BOOL 	= 0x20,
+};
+
+// Arithmetic operations 
+enum AritOp {
+	ADD,
+	SUB,
+	MUL,
+	DIV,
+	SHR,
+	SHL,
+	MOD,
+	XOR,
+};
+
+
+// Superclass for all exceptions thrown in Scrap
+// during both compilation and execution.
 class GenericException : public runtime_error {
 public:
 	GenericException(string file, 
@@ -63,8 +103,8 @@ public:
 			: GenericException(f, l, pf, m) {}				\
 	};
 
-/* Generic macro for throwing an exception type taking a 
- * single std::string as it`s only parameter.
+/* Generic macro for throwing an exception type which inherits
+ * from GenericException.
  */
 #define THROW(_EXCLASS, _MSG)								\
 	{														\
@@ -81,6 +121,7 @@ public:
 
 EXCEPTION_DECL(InvalidTypeException)
 EXCEPTION_DECL(InvalidCastException)
+EXCEPTION_DECL(InvalidOperationException)
 
 }
 

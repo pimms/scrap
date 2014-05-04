@@ -1,5 +1,6 @@
 #include "../Variable.h"
 #include "../Object.h"
+#include "../Scrap.h"
 #include "gtest/gtest.h"
 
 using scrap::Variable;
@@ -12,12 +13,6 @@ using scrap::Object;
  * This test focuses on casting Variable-objects between different types
  * and performing arithmetic operations on them. The tests thoroughly 
  * checks all permutations of casting between compatible types. 
- *
- * The tests does not check for the invalidity of invalid casts directly, 
- * but uses the internally used method 
- * VarValue::CastAvailable(VarType,VarType) to ensure that it returns 
- * the expected values. Internally, exceptions are thrown if conversions
- * are attempted when this method returns false.
  */
 
 TEST (VariableTest, AvailableCasts)
@@ -107,6 +102,13 @@ TEST (VariableTest, CastFromObject)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
+
+	var.Set((Object*)0xDEADBEEF);
+	EXPECT_EQ(var.Cast(VarType::INT), false);
+	EXPECT_EQ(var.Cast(VarType::FLOAT), false);
+	EXPECT_EQ(var.Cast(VarType::DOUBLE), false);
+	EXPECT_EQ(var.Cast(VarType::LONG), false);
+	EXPECT_EQ(var.Cast(VarType::CHAR), false);
 }
 
 TEST (VariableTest, CastFromInt) 
@@ -138,6 +140,9 @@ TEST (VariableTest, CastFromInt)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
+
+	var.Set((int) 4);
+	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromFloat) 
@@ -169,6 +174,9 @@ TEST (VariableTest, CastFromFloat)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
+
+	var.Set((float) 4.f);
+	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromDouble) 
@@ -200,6 +208,9 @@ TEST (VariableTest, CastFromDouble)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
+
+	var.Set((double) 4.0);
+	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromLong) 
@@ -231,6 +242,9 @@ TEST (VariableTest, CastFromLong)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
+
+	var.Set((long) 4);
+	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromChar) 
@@ -262,6 +276,9 @@ TEST (VariableTest, CastFromChar)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
+
+	var.Set((char) 4);
+	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromBool) 
@@ -293,6 +310,9 @@ TEST (VariableTest, CastFromBool)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
+
+	var.Cast(VarType::BOOL);
+	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastToBool)

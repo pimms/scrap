@@ -5,6 +5,7 @@
 
 namespace scrap {
 
+
 string VarTypeToString(VarType t)
 {
 	switch (t) {
@@ -16,6 +17,8 @@ string VarTypeToString(VarType t)
 			return "float";
 		case DOUBLE:
 			return "double";
+		case LONG:
+			return "long";
 		case CHAR:
 			return "char";
 		case BOOL:
@@ -276,5 +279,47 @@ VarType Variable::Type() const
 {
 	return _type;
 }
+
+
+void Variable::Add(const Variable &var) 
+{
+
+}
+
+void Variable::Sub(const Variable &var) 
+{
+
+}
+
+void Variable::Mul(const Variable &var) 
+{
+
+}
+
+void Variable::Div(const Variable &var) 
+{
+
+}
+
+void Variable::Shr(unsigned steps)
+{
+
+}
+
+void Variable::Shl(unsigned steps)
+{
+
+}
+
+void Variable::Mod(const Variable &var)
+{
+
+}
+
+void Variable::Xor(const Variable &var)
+{
+
+}
+
 
 }
