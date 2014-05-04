@@ -120,8 +120,8 @@ public:
 			: GenericException(f, l, pf, m) {}				\
 	};
 
-/* Generic macro for throwing an exception type which inherits
- * from GenericException.
+/* Macro for throwing an exception type which inherits
+ * from GenericException (which includes them all, lol).
  */
 #define THROW(_EXCLASS, _MSG)								\
 	{														\
@@ -141,6 +141,9 @@ EXCEPTION_DECL(InvalidCastException)
 EXCEPTION_DECL(InvalidOperationException)
 EXCEPTION_DECL(NotImplementedException)
 EXCEPTION_DECL(DivisionByZeroException)
+EXCEPTION_DECL(StackUnderflowException)
+EXCEPTION_DECL(StackOverflowException)
+EXCEPTION_DECL(StackNotEmptyException)
 
 }
 

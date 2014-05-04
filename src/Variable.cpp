@@ -142,10 +142,7 @@ Variable::Variable()
 
 Variable::~Variable()
 {
-	if (_type == OBJECT && _value.a) {
-		// TODO:
-		// Decrement counter of object
-	}
+
 }
 
 

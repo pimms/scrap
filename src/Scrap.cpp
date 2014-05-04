@@ -2,6 +2,25 @@
 
 using namespace scrap;
 
+
+const char *scrap_hello =
+	"SCRAP\n"
+	"=====\n\n"
+	"Until things actually work, Scrap is limited to printing\n"
+	"this message. However, it is a nice message.\n"
+	"Development is for now focused on the test-suite and testable\n"
+	"code. Around the time we are able to execute bytecode, this\n"
+	"message will be replaced with something actually useful.\n\n"
+	"Until then, enjoy this message :-)\n"
+	;
+
+int main(int argc, char *argv[]) 
+{
+	printf("%s", scrap_hello);
+	return 0;
+}
+
+
 string VarTypeToString(VarType t)
 {
 	switch (t) {
@@ -51,14 +70,3 @@ string AritOpToString(AritOp op)
 
 	return "undefined";
 }
-
-
-int main(int argc, char *argv[]) 
-{
-	try {
-		THROW(InvalidTypeException, "hey hey");
-	} catch (GenericException ex) {
-		printf("Exception caught:\n%s\n", ex.msg.c_str());
-	}
-}
-

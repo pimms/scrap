@@ -26,6 +26,14 @@ struct VarValue {
 };
 
 
+/* Variable
+ * The core wrapper around a Scrap Variable. 
+ *
+ * "Variable" objects are EXPENDABLE and STACK MANAGED. Objects are
+ * not managed by the Variable in any way bar keeping a reference to one.
+ * Deleting a Variable does therefore NOT delete the Object-member, even if
+ * it´s reference counter is zero or lower. 
+ */
 class Variable {
 public:
 	Variable(VarType type);
