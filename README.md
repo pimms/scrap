@@ -12,6 +12,7 @@ I like the name :)
 
 
 **PORTABILITY**
+
 Scrap will run on all platforms eventually, but for now it is only
 tested on Linux. It will probably work without a hitch on OS X, but
 some reconfiguration of the CMakeLists.txt file will be required for
@@ -19,6 +20,7 @@ full Windows-support.
 
 
 **BUILDING**
+
 Scrap uses GoogleTest for unit testing, and this must be configured
 and built for the configuration to work properly. The googletest
 framework is found in the "gtest" directory, and the built library
@@ -41,6 +43,12 @@ commands:
 	$ cmake .
 
 	$ make
+	
+	Alternatively:
+
+	$ make test
+
+	$ make scrap
 
 
 The tests can be run by executing the "test" binary, and you may test
