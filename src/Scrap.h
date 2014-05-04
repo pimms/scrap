@@ -65,7 +65,24 @@ enum AritOp {
 	SHL,
 	MOD,
 	XOR,
+	AND,
+	OR,
 };
+
+string VarTypeToString(VarType t);
+string AritOpToString(AritOp op);
+
+#ifdef _SCRAP_TEST_
+// Scrap.cpp is not compiled in the test-binary, include placeholder
+// stubs for the test binary.
+inline string VarTypeToString(VarType t) {
+	return "[not available during tests]";
+}
+
+inline string AritOpToString(AritOp op) {
+	return "[not available during tests]";
+}
+#endif /* _SCRAP_TEST_ */
 
 
 // Superclass for all exceptions thrown in Scrap
@@ -122,6 +139,8 @@ public:
 EXCEPTION_DECL(InvalidTypeException)
 EXCEPTION_DECL(InvalidCastException)
 EXCEPTION_DECL(InvalidOperationException)
+EXCEPTION_DECL(NotImplementedException)
+EXCEPTION_DECL(DivisionByZeroException)
 
 }
 

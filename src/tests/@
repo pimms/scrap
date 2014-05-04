@@ -358,23 +358,23 @@ void Variable::Div(const Variable &var)
 	switch (_type) {
 		case INT:
 			ZERO_DIV_CHECK(var._value, i, int);
-			_value.i /= var._value.i;
+			_value.i *= var._value.i;
 			break;
 		case FLOAT:
 			ZERO_DIV_CHECK(var._value, f, float);
-			_value.f /= var._value.f;
+			_value.f *= var._value.f;
 			break;
 		case DOUBLE:
 			ZERO_DIV_CHECK(var._value, d, double);
-			_value.d /= var._value.d;
+			_value.d *= var._value.d;
 			break;
 		case LONG:
 			ZERO_DIV_CHECK(var._value, l, long);
-			_value.l /= var._value.l;
+			_value.l *= var._value.l;
 			break;
 		case CHAR:
 			ZERO_DIV_CHECK(var._value, c, char);
-			_value.c /= var._value.c;
+			_value.c *= var._value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::DIV);
@@ -495,7 +495,6 @@ void Variable::Or(const Variable &var)
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::OR);
-	}
 }
 
 

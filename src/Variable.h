@@ -7,8 +7,6 @@ namespace scrap {
 class Object;
 
 
-string VarTypeToString(VarType t);
-
 struct VarValue {
 	static bool CastAvailable(VarType from, VarType to);
 
@@ -61,18 +59,32 @@ public:
 	// the same type. Not all operations are available for all types.
 	// InvalidOperationException is thrown is an invalid operation
 	// is attempted.
+	//
+	// All operations act on the called object, as this works fine with
+	// how the stack operates during arithmetic operations:
+	// 		push A		[A]
+	// 		push B		[A,B]
+	// 		add			[A]		(A is now equal to A+B)
 	void Add(const Variable &var);
 	void Sub(const Variable &var);
 	void Mul(const Variable &var);
 	void Div(const Variable &var);
-	void Shr(unsigned steps);
-	void Shl(unsigned steps);
+	void Shr(const Variable &var);
+	void Shl(const Variable &var);
 	void Mod(const Variable &var);
 	void Xor(const Variable &var);
+	void And(const Variable &var);
+	void Or(const Variable &var);
 
 private:
 	VarValue _value;
 	VarType _type;
+
+	// Throws either an InvalidOperationException 
+	// InvalidTypeException if the operation cannot be performed.
+	void ValidOperationCheck(AritOp op, const Variable &var);
+
+	static bool IsOperationAvailable(AritOp op, VarType type);
 };
 
 }

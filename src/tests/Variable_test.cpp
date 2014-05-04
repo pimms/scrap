@@ -13,6 +13,9 @@ using scrap::Object;
  * This test focuses on casting Variable-objects between different types
  * and performing arithmetic operations on them. The tests thoroughly 
  * checks all permutations of casting between compatible types. 
+ *
+ * Correctly functioning variables is at the heart of the language, and
+ * everything must be verified to work or scream loudly when it doesn´t.
  */
 
 TEST (VariableTest, AvailableCasts)
@@ -384,4 +387,178 @@ TEST (VariableTest, CastToBool)
 	var.Cast(VarType::BOOL);
 	EXPECT_EQ(var.Value_b(), false);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
+}
+
+
+/* Arithmetic Tests
+ *
+ * Ensure that all operations give the correct result and
+ * that operations on different types / invalid operations on
+ * types are prohibited with exceptions.
+ */
+
+
+// Concatenate "Value_" and "_T" to "Value_`_T`()". For _T=i,
+// the result is "Value_i()".
+#define TM_VALUE_T(_T) 	Value_ ## _T()
+
+// Define two Variables, calculate the result, assert equality
+// with regular C-variables. 
+//
+// Example values for parameters:
+// 		_OPFUNC 			Add		Variable::_OPFUNC
+// 		_OP 				+ 		Must be a valid operand	
+// 		_T 					i		Shorthand type mnemonic
+// 		_TYPE 				int 	"Real-world" type
+#define TM_ARIT_GENERIC(_OPFUNC, _OP, _T, _TYPE) 	\
+	{												\
+		_TYPE va = (_TYPE)4.5;						\
+		_TYPE vb = (_TYPE)9.9;						\
+		_TYPE r = va _OP vb;						\
+		Variable a(VarType::_T);					\
+		Variable b(VarType::_T);					\
+		a.Set((_TYPE) va);							\
+		b.Set((_TYPE) vb);							\
+		a._OPFUNC(b);								\
+		ASSERT_EQ(a.TM_VALUE_T(_T), r);				\
+	}
+
+
+#define TM_ADD(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(Add, +, _T, _TYPE)
+#define TM_SUB(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(Sub, -, _T, _TYPE)
+#define TM_MUL(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(Mul, *, _T, _TYPE)
+#define TM_DIV(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(Div, /, _T, _TYPE) 
+#define TM_SHR(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(Shr, >>, _T, _TYPE) 
+#define TM_SHL(_T, _TYPE)							\
+	TM_ARIT_GENERIC(Shl, <<, _T, _TYPE)
+#define TM_MOD(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(Mod, %, _T, _TYPE)
+#define TM_XOR(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(Xor, ^, _T, _TYPE)
+#define TM_AND(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(And, &, _T, _TYPE)
+#define TM_OR(_T, _TYPE) 							\
+	TM_ARIT_GENERIC(Or, |, _T, _TYPE)
+
+// Assert that an operation is invalid. 
+#define TM_INVALID_OP(_T, _OPFUNC) 					\
+	{												\
+		Variable a(VarType::_T);					\
+		Variable b(VarType::_T);					\
+		ASSERT_ANY_THROW(a._OPFUNC(b));				\
+	}
+
+TEST (VariableTest, TestAdd)
+{
+	TM_ADD(i, int);
+	TM_ADD(f, float);
+	TM_ADD(d, double);
+	TM_ADD(l, long);
+	TM_ADD(c, char);
+
+	TM_INVALID_OP(a, Add);
+}
+
+TEST (VariableTest, TestSub)
+{
+	TM_SUB(i, int);
+	TM_SUB(f, float);
+	TM_SUB(d, double);
+	TM_SUB(l, long);
+	TM_SUB(c, char);
+
+	TM_INVALID_OP(a, Sub);
+}
+
+TEST (VariableTest, TestMul)
+{
+	TM_MUL(i, int);
+	TM_MUL(f, float);
+	TM_MUL(d, double);
+	TM_MUL(l, long);
+	TM_MUL(c, char);
+
+	TM_INVALID_OP(a, Mul);
+}
+
+TEST (VariableTest, TestDiv)
+{
+	TM_DIV(i, int);
+	TM_DIV(f, float);
+	TM_DIV(d, double);
+	TM_DIV(l, long);
+	TM_DIV(c, char);
+
+	TM_INVALID_OP(a, Div);
+}
+
+TEST (VariableTest, TestShr)
+{
+	TM_SHR(i, int);
+	TM_SHR(l, long);
+	TM_SHR(c, char);
+
+	TM_INVALID_OP(f, Shr);
+	TM_INVALID_OP(d, Shr);
+	TM_INVALID_OP(a, Shr);
+}
+
+TEST (VariableTest, TestShl)
+{
+	TM_SHL(i, int);
+	TM_SHL(l, long);
+	TM_SHL(c, char);
+
+	TM_INVALID_OP(f, Shl);
+	TM_INVALID_OP(d, Shl);
+	TM_INVALID_OP(a, Shl);
+}
+
+TEST (VariableTest, TestMod)
+{
+	TM_MOD(i, int);
+	TM_MOD(l, long);
+	TM_MOD(c, char);
+
+	TM_INVALID_OP(f, Mod);
+	TM_INVALID_OP(d, Mod);
+	TM_INVALID_OP(a, Mod);
+}
+
+TEST (VariableTest, TestXor)
+{
+	TM_XOR(i, int);
+	TM_XOR(l, long);
+	TM_XOR(c, char);
+
+	TM_INVALID_OP(f, Xor);
+	TM_INVALID_OP(d, Xor);
+	TM_INVALID_OP(a, Xor);
+}
+
+TEST (VariableTest, TestAnd)
+{
+	TM_AND(i, int);
+	TM_AND(l, long);
+	TM_AND(c, char);
+
+	TM_INVALID_OP(f, And);
+	TM_INVALID_OP(d, And);
+	TM_INVALID_OP(a, And);
+}
+
+TEST (VariableTest, TestOr)
+{
+	TM_OR(i, int);
+	TM_OR(l, long);
+	TM_OR(c, char);
+
+	TM_INVALID_OP(f, Or);
+	TM_INVALID_OP(d, Or);
+	TM_INVALID_OP(a, Or);
 }
