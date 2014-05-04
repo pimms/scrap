@@ -101,7 +101,7 @@ Instruction with class and method IDs
 
 MNEMONIC 			DESCRIPTION						STACK [before -> after]
 pop 				Pop the top value from stack 	value1 -> 
-
+copy 				Copy the top value and push it	value1 -> value1 value2
 
 # Variable and stack modification for types: replace T with any of the following:
 # - a	object reference 
@@ -109,7 +109,8 @@ pop 				Pop the top value from stack 	value1 ->
 # - f 	float (32 bit)
 # - d 	double (64 bit)
 # - l 	long (64 bit)
-# - c	bool / char / byte (8 bit)
+# - c	char (8 bit)
+# - b 	bool (8 bit)
 Tload 	#index		Push variable to stack		 	-> value1
 Tload_X 			Push variable to stack		 	-> value1
 Treturn				Return stack val from method 	value1 ->
@@ -130,33 +131,47 @@ Tastore_X #array	Store array element				value1 ->
 arraylength			Push the length of the array 	arrayref -> value1
 
 # Conversion is required to allow for cross-type arithmetics. 
+a2b 				object to bool 					value1(a) -> value2(c)
+
 f2d					float to double 				value1(f) -> value2(d)
 f2l 				float to long					value1(f) -> value2(l)
 f2i					float to int					value1(f) -> value2(i)
 f2c 				float to char 					value1(f) -> value2(c)
+f2b 				float to bool 					value1(f) -> value2(b)
 
 d2f 				double to float					value1(d) -> value2(f)
 d2l					double to long					value1(d) -> value2(l)
 d2i 				double to int 					value1(d) -> value2(i)
 d2c 				double to char 					value1(d) -> value2(c)
+d2b 				double to bool 					value1(d) -> value2(b)
 
 l2i 				long to int						value1(l) -> value2(i)
 l2f 				long to float 					value1(l) -> value2(f)
 l2d 				long to double 					value1(l) -> value2(d)
 l2c 				long to char 					value1(l) -> value2(c)
+l2b 				long to bool 					value1(l) -> value2(b)
 
 i2l 				int to long 					value1(i) -> value2(l)
 i2f 				int to float 					value1(i) -> value2(f)
 i2d 				int to double 					value1(i) -> value2(d)
 i2c 				int to char 					value1(i) -> value2(c)
+i2b 				int to bool 					value1(i) -> value2(b)
 
 c2i 				char to int 					value1(c) -> value2(i)
 c2l 				char to long 					value1(c) -> value2(l)
 c2f 				char to float 					value1(c) -> value2(f)
 c2d 				char to double 					value1(c) -> value2(d)
+c2b 				char to bool 					value1(c) -> value2(b)
+
+b2i					bool to int 					value1(b) -> value2(i)
+b2f					bool to float 					value1(b) -> value2(f)
+b2d					bool to double 					value1(b) -> value2(d)
+b2l					bool to long 					value1(b) -> value2(l)
+b2c					bool to char 					value1(b) -> value2(c)
 
 # Arithmetic operations, available with the following values for T. Both 
-# operands on the stack must be of the same type.
+# operands on the stack must be of the same type. The operations are unless
+# otherwise specified available with the following types for <T>:
 # - f	float
 # - d	double
 # - i	int
@@ -188,7 +203,7 @@ stinvoke #classID  	Invoke a static method 			->
 		 #methodID
 
 # When loading and storing member/static variables, the type of the 
-# field is known beforehand.
+# field is known beforehand and need not be specified in the opcode.
 loadfield #fieldID 	Push member variable 			-> value1
 loadstatic #fieldID	Push static variable 			-> value1
 storefield #fieldID	Pop into member variable 		value1 ->
