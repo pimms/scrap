@@ -24,4 +24,8 @@ install_manifest.txt
 
 # Built executable
 scrap
+test
 build/
+
+# Google-test build directory
+gtest/build/
