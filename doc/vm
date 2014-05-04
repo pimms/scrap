@@ -188,6 +188,8 @@ Tshl #count 		Shift left #count times 		value1 -> value2
 Tshr #count 		Shift right #count times 		value1 -> value2
 Tmod 				Remainder of value1/value2 		value1 value2 -> result
 Txor 				Exclusive or two numbers 		value1 value2 -> result
+Tand 				Bitwise and of two numbers 		value1 value2 -> result
+Tor 				Bitwise or of two numbers 		value1 value2 -> result
 
 # Object operations
 new #classID 		Create a new instance of a class with ID #classID. The new
