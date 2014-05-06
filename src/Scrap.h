@@ -136,6 +136,7 @@ public:
 	}
 		
 
+EXCEPTION_DECL(InternalInconsistencyException)
 EXCEPTION_DECL(InvalidTypeException)
 EXCEPTION_DECL(InvalidCastException)
 EXCEPTION_DECL(InvalidOperationException)
@@ -144,6 +145,8 @@ EXCEPTION_DECL(DivisionByZeroException)
 EXCEPTION_DECL(StackUnderflowException)
 EXCEPTION_DECL(StackOverflowException)
 EXCEPTION_DECL(StackNotEmptyException)
+EXCEPTION_DECL(ObjectRetainException)
+EXCEPTION_DECL(NullPointerException)
 
 }
 

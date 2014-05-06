@@ -195,6 +195,9 @@ Tor 				Bitwise or of two numbers 		value1 value2 -> result
 new #classID 		Create a new instance of a class with ID #classID. The new
 					reference is pushed at the top of the stack.
 													-> objref
+retain 				Retain the object at the top of
+					the stack - increment reference 
+					counter by 1.					objref -> 
 release 			Releases the object reference at the top of the stack. This
 					only decrements the reference count, and the object is not
 					necessarily deleted by this instruction.
