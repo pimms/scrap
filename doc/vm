@@ -75,7 +75,7 @@ anyways.
 
 Note that in the case of "_X"-post fixes, "X" denotes the local variable 
 register and must be replaced with a number 0-3. Parameters are prefixed
-with "#".
+with "#". 	
 
 Parameters can be either literal values or register references. Uness otherwise
 specified (literally or implied by context), parameters must be 32 bit integer
@@ -104,6 +104,7 @@ pop 				Pop the top value from stack 	value1 ->
 copy 				Copy the top value and push it	value1 -> value1 value2
 
 # Variable and stack modification for types: replace T with any of the following:
+# Note that "astore" works for both object and array references.
 # - a	object reference 
 # - i	integer (32 bit)
 # - f 	float (32 bit)
@@ -111,24 +112,24 @@ copy 				Copy the top value and push it	value1 -> value1 value2
 # - l 	long (64 bit)
 # - c	char (8 bit)
 # - b 	bool (8 bit)
-Tload 	#index		Push variable to stack		 	-> value1
-Tload_X 			Push variable to stack		 	-> value1
+Tload 	#index		Push register value with #index	-> value1
 Treturn				Return stack val from method 	value1 ->
-Tstore_X			Pop stack into variable			value1 ->
-Tstore_X #value		Store literal in variable. NOT	->
-					AVAILABLE FOR T=a! #value may
-					be a register reference
+Tstore  #index		Pop stack into register #index 	value1 ->
+Tloadl #literal		Push literal value to stack.	-> literal
+					Not available for (T=a).
 
 # Array instructions - arrays are FIXED SIZE and single type only. 
 # Multi dimensional arrays are NOT supported (yet).
 newarray #type 		Create array T[value1] 			value1 -> arrayref
 Tarelease 			Release an array of type T		arrayref ->
 					(reference count decrement)
-Taload 	#array		Push array element 			 	-> value1
-	   	#index		#array[#index] to stack
-Tastore_X #array	Store array element				value1 -> 
-		  #index 	#array[#index] in register X
+Taload #index		Push array element 			 	arrayref -> value1
+	   				arrayref[#index] to stack
+Tastore_X #index	Store array element				arrayref value1 -> 
+		  			#array[#index] in register X
 arraylength			Push the length of the array 	arrayref -> value1
+arrayload #index	Push the array reference from	-> arrayref
+					register #index
 
 # Conversion is required to allow for cross-type arithmetics. 
 a2b 				object to bool 					value1(a) -> value2(c)
@@ -183,7 +184,11 @@ Tmul 				Multiply two numbers 			value1 value2 -> result
 Tdiv 				Divide value1 by value2 		value1 value2 -> result
 
 # Integer-only operations: d and f are not valid values for T for the 
-# following instructions.
+# following instructions. SHR and SHL are implemented in a different 
+# manner than other instructions. The #count argument is 8 bits, and the
+# high order bit is enabled if the value refers to a register (0-3). The
+# register value CANNOT BE OBJECT OR ARRAY, and is casted to int before 
+# shifting.
 Tshl #count 		Shift left #count times 		value1 -> value2
 Tshr #count 		Shift right #count times 		value1 -> value2
 Tmod 				Remainder of value1/value2 		value1 value2 -> result
@@ -202,8 +207,8 @@ release 			Releases the object reference at the top of the stack. This
 					only decrements the reference count, and the object is not
 					necessarily deleted by this instruction.
 													objref ->
-invoke #methodID 	Invoke a method on object		objref -> objref
-vinvoke #methodID 	Invoke a virtual method on obj	objref -> objref
+invoke #methodID 	Invoke a method on object		objref -> 
+vinvoke #methodID 	Invoke a virtual method on obj	objref ->
 stinvoke #classID  	Invoke a static method 			->	
 		 #methodID
 
