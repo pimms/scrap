@@ -6,14 +6,6 @@
  */
 typedef unsigned char Operation;
 
-enum ArgumentType {
-	REGISTER	= 0x01,
-	LITERAL 	= 0x02,
-	TYPE		= 0x04,
-
-	REG_OR_LIT	= 0x03,
-};
-
 
 // 		MNEMONIC 			VALUE	ARGS		DESCRIPTION
 #define OP_POP				0x00 //				Pop and discard top value
@@ -21,6 +13,7 @@ enum ArgumentType {
 #define OP_ARRAYLENGTH 		0x02 //				Pops array, pushes length
 #define OP_ARRAYLOAD 		0x03 //	LIT			Pushes array from register LIT
 
+// Stack management 
 #define OP_A_LOAD 			0x10 //	LIT			Pushes object in reg LIT
 #define OP_A_RETURN 		0x11 //				Returns an object
 #define OP_A_STORE			0x12 //	LIT			Pop object into reg LIT
@@ -83,6 +76,7 @@ enum ArgumentType {
 #define OP_B_ALOAD 			0x76 // LIT
 #define OP_B_ASTORE 		0x77 // LIT
 
+// Conversion
 #define OP_A2B				0x80 //
 
 #define OP_F2D				0x81 //
@@ -121,27 +115,33 @@ enum ArgumentType {
 #define OP_B2L				0x9D //
 #define OP_B2C				0x9E //
 
+// Common arithmetics
 #define OP_I_ADD			0xA0 //
 #define OP_I_SUB			0xA1 //
 #define OP_I_MUL			0xA2 //
 #define OP_I_DIV			0xA3 //
+
 #define OP_F_ADD			0xA4 //
 #define OP_F_SUB			0xA5 //
 #define OP_F_MUL			0xA6 //
 #define OP_F_DIV			0xA7 //
+
 #define OP_D_ADD			0xA8 //
 #define OP_D_SUB			0xA9 //
 #define OP_D_MUL			0xAA //
 #define OP_D_DIV			0xAB //
+
 #define OP_L_ADD			0xAC //
 #define OP_L_SUB			0xAD //
 #define OP_L_MUL			0xAE //
 #define OP_L_DIV			0xAF //
+
 #define OP_C_ADD			0xB0 //
 #define OP_C_SUB			0xB1 //
 #define OP_C_MUL			0xB2 //
 #define OP_C_DIV			0xB3 //
 
+// Integral arithmetic
 #define OP_I_SHL 			0xB4 // REG OR LIT
 #define OP_I_SHR			0xB5 // REG OR LIT
 #define OP_I_MOD			0xB6 //
@@ -163,6 +163,7 @@ enum ArgumentType {
 #define OP_C_AND			0xC4 //
 #define OP_C_OR 			0xC5 //
 
+// Object related instructions
 #define OP_NEW				0xC6 // LIT				Create a new object
 #define OP_RETAIN			0xC7 //					Increment ref. counter
 #define OP_RELEASE 			0xC8 //					Decrement ref. counter
