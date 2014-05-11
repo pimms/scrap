@@ -18,8 +18,11 @@ MethodInvocation::MethodInvocation(Method *method, Object *object,
 		_caller(caller)
 {
 	if (_method->GetMethodType() == METHOD_STATIC) {
-		THROW(InvalidOperationException, 
-			"Cannot call static methods on objects");
+		THROW(InvalidOperationException, "Cannot call static methods on objects");
+	}
+
+	if (_method->GetClass()->GetClassID() != object->GetClass()->GetClassID()) {
+		THROW(InvalidClassException, "Method called on object of wrong class");
 	}
 }
 
@@ -31,8 +34,11 @@ MethodInvocation::MethodInvocation(Method *method, const Class *c,
 		_caller(caller)
 {
 	if (_method->GetMethodType() != METHOD_STATIC) {
-		THROW(InvalidOperationException,
-			"Cannot call non-static method on class");
+		THROW(InvalidOperationException, "Cannot call non-static method on class");
+	}
+	
+	if (_method->GetClass()->GetClassID() != c->GetClassID()) {
+		THROW(InvalidClassException, "Static method called on wrong class");
 	}
 }
 
@@ -82,6 +88,15 @@ void MethodInvocation::ReturnValue()
 	}
 
 	_caller->_stack.Push(var);
+}
+
+#ifdef _SCRAP_TEST_
+Stack* MethodInvocation::GetStack() 
+#else
+const Stack* MethodInvocation::GetStack() const 
+#endif
+{
+	return &_stack;
 }
 	
 }

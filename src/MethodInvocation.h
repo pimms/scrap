@@ -26,6 +26,13 @@ public:
 	// Push return value (top stack value) onto the calling stack
 	void ReturnValue();
 
+#ifdef _SCRAP_TEST_		
+	// Allow modification in test environments
+	Stack* GetStack();	
+#else
+	const Stack* GetStack() const;
+#endif
+
 private:
 	const Class *_class;
 	Object *_object;

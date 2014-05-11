@@ -22,6 +22,9 @@ install_manifest.txt
 .*.swp
 .*.swo
 
+# You Complete Me configuration
+.ycm_*.py*
+
 # Built executable
 scrap
 test
