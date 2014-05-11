@@ -207,9 +207,9 @@ release 			Releases the object reference at the top of the stack. This
 					only decrements the reference count, and the object is not
 					necessarily deleted by this instruction.
 													objref ->
-invoke #methodID 	Invoke a method on object		objref -> 
-vinvoke #methodID 	Invoke a virtual method on obj	objref ->
-stinvoke #classID  	Invoke a static method 			->	
+invoke #methodID 	Invoke a method on object		objref -> [retvalue]
+vinvoke #methodID 	Invoke a virtual method on obj	objref -> [retvalue]
+stinvoke #classID  	Invoke a static method 			-> [retvalue]	
 		 #methodID
 
 # When loading and storing member/static variables, the type of the 
