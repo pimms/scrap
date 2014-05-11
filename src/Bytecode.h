@@ -1,12 +1,6 @@
 #pragma once
 
 
-
-/* Bytecode Definitions
- */
-typedef unsigned char Operation;
-
-
 // 		MNEMONIC 			VALUE	ARGS		DESCRIPTION
 #define OP_POP				0x00 //				Pop and discard top value
 #define OP_COPY 			0x01 //				Copy top value

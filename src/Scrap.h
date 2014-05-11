@@ -23,13 +23,14 @@ using std::map;
 using std::runtime_error;
 
 
-typedef unsigned char uchar;
-typedef unsigned char byte;
-typedef unsigned long ulong;
-
 
 namespace scrap {
 
+typedef unsigned char uchar;
+typedef unsigned char byte;
+typedef unsigned long ulong;
+typedef unsigned int  ClassID;
+typedef unsigned int  MethodID;
 
 // Primitive types
 enum VarType {
@@ -53,6 +54,9 @@ enum VarType {
 
 	b 		= 0x20,
 	BOOL 	= 0x20,
+
+	v 		= 0x40,
+	VOID	= 0x40,
 };
 
 // Arithmetic operations 
@@ -140,6 +144,7 @@ EXCEPTION_DECL(InternalInconsistencyException)
 EXCEPTION_DECL(InvalidTypeException)
 EXCEPTION_DECL(InvalidCastException)
 EXCEPTION_DECL(InvalidOperationException)
+EXCEPTION_DECL(InvalidArgumentException)
 EXCEPTION_DECL(NotImplementedException)
 EXCEPTION_DECL(DivisionByZeroException)
 EXCEPTION_DECL(StackUnderflowException)
