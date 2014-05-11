@@ -51,7 +51,7 @@ const MethodAttributes& Method::GetMethodAttributes() const
 	return _attrs;
 }
 
-const ReturnType Method::GetReturnType() const 
+const TypeDesc Method::GetReturnType() const 
 {
 	return _attrs.GetReturnType();
 }
@@ -59,33 +59,33 @@ const ReturnType Method::GetReturnType() const
 
 
 
-MethodAttributes::MethodAttributes(ReturnType ret, vector<Argument> args)
+MethodAttributes::MethodAttributes(TypeDesc ret, vector<TypeDesc> args)
 	:	_rettype(ret),
 		_args(args)
 {
 
 }
 
-MethodAttributes::MethodAttributes(ReturnType ret, int args, ...)
+MethodAttributes::MethodAttributes(TypeDesc ret, int args, ...)
 	:	_rettype(ret)
 {
 	va_list vl;	
 	va_start(vl, args);
 
 	for (int i=0; i<args; i++) {
-		Argument val = va_arg(vl, Argument);
+		TypeDesc val = va_arg(vl, TypeDesc);
 		_args.push_back(val);
 	}
 
 	va_end(vl);
 }
 
-ReturnType MethodAttributes::GetReturnType() const
+TypeDesc MethodAttributes::GetReturnType() const
 {
 	return _rettype;
 }
 
-vector<Argument> MethodAttributes::GetArguments() const
+vector<TypeDesc> MethodAttributes::GetArguments() const
 {
 	return _args;
 }

@@ -56,7 +56,7 @@ void MethodInvocation::TransferArguments()
 	MethodAttributes attr = _method->GetMethodAttributes();
 
 	for (int i=0; i<attr.GetArguments().size(); i++) {
-		Argument arg = attr.GetArguments()[i];
+		TypeDesc arg = attr.GetArguments()[i];
 		Variable *var = _caller->_stack.Pop();
 
 		// In the future, the variable will be attempted casted to

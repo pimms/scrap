@@ -27,25 +27,17 @@ enum MethodType {
 };
 
 
-
-struct Argument {
-	VarType type;
-	const char *className;
-};
-typedef Argument ReturnType;
-
-
 class MethodAttributes {
 public:
-	MethodAttributes(ReturnType ret, vector<Argument> args);
-	MethodAttributes(ReturnType ret, int args, ...);
+	MethodAttributes(TypeDesc ret, vector<TypeDesc> args);
+	MethodAttributes(TypeDesc ret, int argc, ...);
 
-	ReturnType GetReturnType() const;
-	vector<Argument> GetArguments() const;
+	TypeDesc GetReturnType() const;
+	vector<TypeDesc> GetArguments() const;
 
 private:
-	vector<Argument> _args;
-	ReturnType _rettype;
+	vector<TypeDesc> _args;
+	TypeDesc _rettype;
 };
 
 
@@ -64,7 +56,7 @@ public:
 	const Class* GetClass() const;
 	MethodType GetMethodType() const;
 	const MethodAttributes& GetMethodAttributes() const;
-	const ReturnType GetReturnType() const;
+	const TypeDesc GetReturnType() const;
 	
 private:
 	const MethodType _type;

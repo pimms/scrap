@@ -6,7 +6,7 @@ using namespace scrap;
 
 // Global MethodAttributes, because they are annoying to create
 // every single test.
-MethodAttributes attr(ReturnType{VOID, NULL}, 1, Argument{INT, NULL});
+MethodAttributes attr(TypeDesc{VOID, NULL}, 1, TypeDesc{INT, NULL});
 Class clss(0, "TestClass");
 
 
@@ -63,8 +63,8 @@ TEST (MethodTest, TestAttributesAndReturnType)
 			  attr.GetArguments().size());
 
 	for (int i=0; i<attr.GetArguments().size(); i++) {
-		Argument a = attr.GetArguments()[i];
-		Argument b = m.GetMethodAttributes().GetArguments()[i];
+		TypeDesc a = attr.GetArguments()[i];
+		TypeDesc b = m.GetMethodAttributes().GetArguments()[i];
 
 		ASSERT_EQ(a.type, b.type);
 	}

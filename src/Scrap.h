@@ -59,6 +59,16 @@ enum VarType {
 	VOID	= 0x40,
 };
 
+
+// Descriptor of return types, argument types and field types.
+struct TypeDesc {
+	VarType type;
+
+	// Must contain the class name in the case of "type == OBJECT".
+	const char *className;
+};
+
+
 // Arithmetic operations 
 enum AritOp {
 	ADD,
