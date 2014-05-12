@@ -1,12 +1,4 @@
-#include "gtest/gtest.h"
-#include "../Heap.h"
-#include "../Object.h"
-#include "../Class.h"
-
-using scrap::Object;
-using scrap::Heap;
-using scrap::Class;
-
+#include "ScrapTest.h"
 
 TEST (HeapTest, TestGarbageCollection)
 {

@@ -1,11 +1,4 @@
-#include "gtest/gtest.h"
-#include "../Object.h"
-#include "../Heap.h"
-#include "../Class.h"
-
-using scrap::Object;
-using scrap::Heap;
-using scrap::Class;
+#include "ScrapTest.h"
 
 
 TEST (ObjectTest, TestRetainCount)

@@ -1,8 +1,4 @@
-#include "gtest/gtest.h"
-#include "../Method.h"
-#include "../Class.h"
-
-using namespace scrap;
+#include "ScrapTest.h"
 
 // Global MethodAttributes, because they are annoying to create
 // every single test.

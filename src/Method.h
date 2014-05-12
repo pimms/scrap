@@ -21,9 +21,9 @@ struct MethodBody {
 /* Method Type
  */
 enum MethodType {
-	METHOD_NORMAL,
-	METHOD_VIRTUAL,
-	METHOD_STATIC,
+	METHOD_NORMAL 		= 0x01,
+	METHOD_VIRTUAL		= 0x02,
+	METHOD_STATIC 		= 0x04,
 };
 
 

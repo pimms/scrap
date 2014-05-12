@@ -1,31 +1,7 @@
-#include "gtest/gtest.h"
-#include "../MethodInvocation.h"
-#include "../Method.h"
-#include "../Class.h"
-#include "../Object.h"
-#include "../Heap.h"
-#include "../Stack.h"
-#include "../Variable.h"
-
-using namespace scrap;
+#include "ScrapTest.h"
 
 Class class0(0, "Class0");
 Class class1(1, "Class1");
-
-// All methods created take a single DOUBLE as an argument, and returns
-// an INT. 
-Method CreateMethod(Class *c, MethodType type = METHOD_NORMAL) 
-{
-	MethodBody body;
-	body.length = 10;
-	body.code = new byte[10];
-
-	MethodAttributes attr(TypeDesc{INT}, 1, TypeDesc{DOUBLE});
-	Method m(type, c, &body, attr);
-
-	delete[] body.code;
-	return m;
-}
 
 TEST (MethodInvocationTest, TestValidConstructors)
 {

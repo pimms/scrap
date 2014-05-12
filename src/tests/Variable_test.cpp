@@ -1,12 +1,4 @@
-#include "../Variable.h"
-#include "../Object.h"
-#include "../Scrap.h"
-#include "gtest/gtest.h"
-
-using scrap::Variable;
-using scrap::VarType;
-using scrap::VarValue;
-using scrap::Object;
+#include "ScrapTest.h"
 
 /* VariableTest
  *

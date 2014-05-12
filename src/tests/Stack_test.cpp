@@ -1,9 +1,4 @@
-#include "gtest/gtest.h"
-#include "../Stack.h"
-#include "../Variable.h"
-
-using scrap::Variable;
-using scrap::Stack;
+#include "ScrapTest.h"
 
 
 TEST (StackTest, TestPushPop)
