@@ -1,0 +1,122 @@
+BINARY FORMAT DESCRIPTION
+	This document explains the format of the binary files in Scrap. 
+
+	The format MAY (TBD) be used internally as the general input format for the 
+	execution module, and WILL be used when executing previously compiled files.
+
+
+FORMAT OVERVIEW
+	A general, abstract view of the format. Note that the format is stored
+	binary, and the XML-like syntax is for clarification purposes only.
+
+	<class name="Foo">
+		<field type="int" name="my_int"/>
+		<field type="float" name="my_float"/>
+		<field type="Object:MyClass" name="my_obj"/>
+		<st_field type="Object:Foo" name="singleton"/>
+		<method name="sayHello">
+			<return type="void"/>
+			<argument type="string" name="name"/>
+			<bytecode> ... </bytecode>
+		</method>
+		<st_method name="createSingleton">
+			<return type="Object:Foo"/>
+			<bytecode> ... </bytecode>
+		</st_method>
+	</class>
+	<class name="Bar">
+		...
+	</class>
+
+	Classes, methods and fields are implicitly enumerated in the order in 
+	which they appear. For instance, in the class Foo, the IDs are as 
+	follows. 
+		TYPE 		ID	DEFINITION
+		class 		0	Foo
+		class 		1 	Bar
+		field 		0 	int my_int
+		field 		1 	float my_float
+		st field 	0	Foo singleton
+		method 		0	void sayHello()
+		st method 	0	Foo createSingleton()
+
+HIGH LEVEL FORMAT SPECIFICATION
+	The following fields define the Scrap binary format. The fields are
+	defined in greated detail below. Fields beginning with an E are endian
+	sensitive which must be taken into account when both writing and reading.
+		[MAGIC_NUMBER]
+		[VER_MAJ]
+		[VER_MIN]
+		[ENDIAN]
+		[E CLASS_COUNT]
+			[CLASS 1]
+			...
+			[CLASS N]
+
+	MAGIC_NUMBER
+		The first five bytes of all Scrap files spell out "SCRAP", 
+		capital ASCII format. 
+	VER_MAJ
+		Single byte that holds the major version number
+	VER_MIN
+		Single byte that holds the minor version number
+	ENDIAN
+		The files are stored in binary, so endianess must be taken 
+		into account. If the byte ENDIAN is 0x01, the file is BIG 
+		ENDIAN. If the byte is 0x02, the file is LITTLE ENDIAN. 
+	CLASS_COUNT
+		32 bit unsigned holding the number of classes 
+	CLASS x
+		See the detailed CLASS-specification below.
+		
+CLASS SPECIFICATION
+	The following fields define a Scrap class. Again an "E"-prefix
+	means than endianess must be taken into account for the field.
+	Fields encapsulated within {} are conditionally included. Indentation
+	indicates ownership. Fields prefixed with "D" are described in 
+	detail longer down.
+		
+		TYPE						DESCRIPTION
+		-------------------------------------------------------------------------
+		[CLASS NAME]				Name of the class
+		[E SUPER ID]				ID of the superclass
+		[E NUM]						Number of fields
+			[D FIELD] 		
+		[E NUM]						Number of static fields
+			[D FIELD] 			
+		[E NUM]						Number of methods
+			[D METHOD]				
+		[E NUM]						Number of static methods
+			[D METHOD]
+
+	METHOD
+		[NAME]						Name of the method
+		[VIRTUAL]					Indicator of whether the method is virtual
+		[NUM]						Number of arguments
+			[NAME]					Name of the argument
+			[TYPE]					Type of the argument
+			{CLASS ID}				Class ID (if type is object)
+		[TYPE]						Return type
+		{CLASS ID}					Class ID (if type is object)
+		[E BYTECODE LENGTH]			Number of bytes in the method body
+		[E BYTECODE]				The bytecode itself
+
+	FIELD	
+		[NAME]						Name of the variable
+		[TYPE]						Type 
+		{CLASS ID}					Class ID (if type is object)
+	
+	xxx NAME
+		Null-terminated ASCII name of the class
+	CLASS ID 
+		32 bit unsigned ID of the class
+	NUM xxx
+		32 bit unsigned, count of "xxx"
+	TYPE
+		8 bit unsigned, holds a scrap::VarType
+	VIRTUAL
+		8 bit unsigned bool. 0x00 for FALSE, 0x01 for TRUE.
+	BYTECODE LENGTH
+		32 bit unsigned, number of bytes in the method body
+	BYTECODE
+		The bytecode itself. Arguments > 8 bits are endian sensitive.

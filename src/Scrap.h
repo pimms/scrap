@@ -164,6 +164,7 @@ EXCEPTION_DECL(StackNotEmptyException)
 EXCEPTION_DECL(ObjectRetainException)
 EXCEPTION_DECL(NullPointerException)
 EXCEPTION_DECL(IndexOutOfRangeException)
+EXCEPTION_DECL(FileException)
 
 }
 
