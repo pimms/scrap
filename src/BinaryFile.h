@@ -49,6 +49,7 @@ private:
 
 	// Ensure that there is at least "count" bytes left in the file
 	void FileReadCheck(unsigned count);
+	void FileWriteCheck();
 
 	fstream _file;
 	Endian _endian;		// Endianess of the system

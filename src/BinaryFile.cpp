@@ -26,9 +26,11 @@ BinaryFile::BinaryFile(string filename, OpenMode mode)
 	if (!_file.is_open()) 
 		THROW(FileException, "Failed to open file " + filename);
 
-	_file.seekg(0, _file.end);
-	_size = _file.tellg();
-	_file.seekg(0, _file.beg);
+	if (_mode == READ) {
+		_file.seekg(0, _file.end);
+		_size = _file.tellg();
+		_file.seekg(0, _file.beg);
+	}
 
 	_endian = SystemEndian();
 }
@@ -40,6 +42,8 @@ void BinaryFile::SetFileEndianess(Endian fendian)
 
 unsigned BinaryFile::RemainingBytes()
 {
+	if (_mode == WRITE)
+		return 0;
 	return _size - _file.tellg();
 }
 
@@ -82,13 +86,15 @@ string BinaryFile::ReadString()
 
 void BinaryFile::WriteByte(byte b)
 {
+	FileWriteCheck();
 	_file.put(b);
 }
 
 void BinaryFile::WriteUnsigned(unsigned u)
 {
+	FileWriteCheck();
+
 	u = Convert(u);
-	
 	byte *p = (byte*)&u;
 	for (int i=0; i<4; i++) 
 		_file.put(p[i]);
@@ -96,6 +102,8 @@ void BinaryFile::WriteUnsigned(unsigned u)
 
 void BinaryFile::WriteString(string str)
 {
+	FileWriteCheck();
+
 	for (int i=0; i<str.length(); i++) {
 		_file.put(str[i]);
 	}
@@ -126,12 +134,27 @@ unsigned BinaryFile::Convert(unsigned u) const
 
 void BinaryFile::FileReadCheck(unsigned count)
 {
+	if (_mode != READ) {
+		THROW(FileException, "Cannot read on BinaryFile in WRITE-format");
+	}
+	
 	if (RemainingBytes() < count) {
 		THROW(FileException, "Attempted to read past end of file");
 	}
 
 	if (!_file.good()) {
 		THROW(FileException, "Error occurred when reading the file");
+	}
+}
+
+void BinaryFile::FileWriteCheck()
+{
+	if (_mode != WRITE) {
+		THROW(FileException, "Cannot write from BinaryFile in READ-mode");
+	}
+
+	if (!_file.good()) {
+		THROW(FileException, "Filestatus is not good");
 	}
 }
 

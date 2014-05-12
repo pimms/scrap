@@ -48,6 +48,8 @@ HIGH LEVEL FORMAT SPECIFICATION
 		[VER_MAJ]
 		[VER_MIN]
 		[ENDIAN]
+		[MAIN CLASS]
+		[MAIN METHOD]
 		[E CLASS_COUNT]
 			[CLASS 1]
 			...
@@ -68,6 +70,10 @@ HIGH LEVEL FORMAT SPECIFICATION
 		32 bit unsigned holding the number of classes 
 	CLASS x
 		See the detailed CLASS-specification below.
+	MAIN CLASS
+		32 bit int, the ID of the main class
+	MAIN METHOD
+		32 bit int, the static method ID of the main class to call first
 		
 CLASS SPECIFICATION
 	The following fields define a Scrap class. Again an "E"-prefix
