@@ -29,6 +29,7 @@ install_manifest.txt
 scrap
 test
 build/
+testfiles/temp
 
 # Google-test build directory
 gtest/build/

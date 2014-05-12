@@ -76,4 +76,6 @@ TEST (BinaryFileTest, TestWriteCorrectEndian)
 		ASSERT_NO_THROW(u = in.ReadUnsigned());
 		ASSERT_EQ(u, 1);
 	}
+
+	DELETE_TEMP();
 }
