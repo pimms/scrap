@@ -187,3 +187,30 @@ TEST (BinaryFileTest, ReadInWriteMode)
 
 	DELETE_TEMP();
 }
+
+TEST (BinaryFileTest, TestSeekToStart)
+{
+	DELETE_TEMP();
+
+	{
+		BinaryFile file(FILE_TEMP, WRITE);
+		file.WriteByte(0xF0);
+		file.WriteByte(0x0D);
+		file.WriteByte(0x15);
+		file.WriteByte(0xBA);
+		file.WriteByte(0xD);
+	}
+
+	byte b0, b1;
+	BinaryFile file(FILE_TEMP, READ);
+
+	b0 = file.ReadByte();
+	ASSERT_EQ(b0, 0xF0);
+	ASSERT_NE(b0, file.ReadByte());
+
+	file.SeekToStart();
+	b1 = file.ReadByte();
+	ASSERT_EQ(b0, b1);
+
+	DELETE_TEMP();
+}

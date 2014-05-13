@@ -6,7 +6,10 @@ Method CreateMethod(Class *c, MethodType type)
 	body.length = 10;
 	body.code = new byte[10];
 
-	MethodAttributes attr(TypeDesc{INT}, 1, TypeDesc{DOUBLE});
+	vector<TypeDesc> args;
+	args.push_back(TypeDesc{DOUBLE});
+
+	MethodAttributes attr(TypeDesc{INT}, args);
 	Method m(type, c, &body, attr);
 
 	delete[] body.code;

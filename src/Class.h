@@ -33,8 +33,8 @@ public:
 
 	const Field* GetField(unsigned id) const;
 	Field* GetStaticField(unsigned id) const;
-	const Method* GetMethod(unsigned id) const;
-	const Method* GetStaticMethod(unsigned id) const;
+	Method* GetMethod(unsigned id) const;
+	Method* GetStaticMethod(unsigned id) const;
 
 	void SetSuper(const Class *super);
 

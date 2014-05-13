@@ -30,7 +30,6 @@ enum MethodType {
 class MethodAttributes {
 public:
 	MethodAttributes(TypeDesc ret, vector<TypeDesc> args);
-	MethodAttributes(TypeDesc ret, int argc, ...);
 
 	TypeDesc GetReturnType() const;
 	vector<TypeDesc> GetArguments() const;

@@ -33,6 +33,7 @@ public:
 	void SetFileEndianess(Endian fendian);
 
 	unsigned RemainingBytes();
+	void SeekToStart();
 
 	byte ReadByte();
 	unsigned ReadUnsigned();

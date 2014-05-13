@@ -90,6 +90,12 @@ void MethodInvocation::ReturnValue()
 	_caller->_stack.Push(var);
 }
 
+
+void MethodInvocation::Execute()
+{
+	printf("[WARNING]: MethodInvocation::Execute() not implemented\n");
+}
+
 #ifdef _SCRAP_TEST_
 Stack* MethodInvocation::GetStack() 
 #else

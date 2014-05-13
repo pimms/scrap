@@ -1,4 +1,4 @@
-#include "MemberList.h"
+#include "IndexList.h"
 #include "Variable.h"
 #include "Method.h"
 
@@ -73,7 +73,7 @@ void MethodList::AddMethod(Method *method)
 	_methods.push_back(method);
 }
 
-const Method* MethodList::GetMethod(unsigned id) const 
+Method* MethodList::GetMethod(unsigned id) const 
 {
 	if (id >= _methods.size())
 		THROW(IndexOutOfRangeException,
@@ -90,6 +90,33 @@ void MethodList::InsertFromSuperclass(const MethodList *methodList)
 	for (int i=0; i<methodList->_methods.size(); i++) {
 		_methods.push_back(methodList->_methods[i]);
 	}
+}
+
+
+
+void ClassList::AddClass(Class *c, unsigned id)
+{
+	if (_classes.count(id) != 0) {
+		THROW(InvalidOperationException,
+			"Attempted to add multiple classes with the same ID");
+	}
+
+	_classes[id] = c;
+}
+
+Class* ClassList::GetClass(unsigned id) 
+{
+	if (_classes.count(id) == 0) {
+		THROW(IndexOutOfRangeException,
+		"Attempted to get class from undefined ID");
+	}
+	
+	return _classes[id];
+}
+
+unsigned ClassList::GetClassCount() const 
+{
+	return _classes.size();
 }
 
 }

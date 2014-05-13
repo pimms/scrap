@@ -47,6 +47,11 @@ unsigned BinaryFile::RemainingBytes()
 	return _size - _file.tellg();
 }
 
+void BinaryFile::SeekToStart()
+{
+	_file.seekg(_file.beg);
+}
+
 
 byte BinaryFile::ReadByte()
 {

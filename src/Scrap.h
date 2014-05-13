@@ -23,6 +23,8 @@ using std::map;
 using std::runtime_error;
 
 
+#define ID_UNDEFINED ((unsigned int)~0)
+
 
 namespace scrap {
 
@@ -62,10 +64,16 @@ enum VarType {
 
 // Descriptor of return types, argument types and field types.
 struct TypeDesc {
+	TypeDesc() ;
+
 	VarType type;
 
-	// Must contain the class name in the case of "type == OBJECT".
-	const char *className;
+	// Must contain class data in the case of "type == OBJECT".
+	unsigned classID;
+
+	// If the TypeDesc object is used for argument purposes, a name
+	// may optionally be included.
+	string argName;
 };
 
 
@@ -165,7 +173,6 @@ EXCEPTION_DECL(ObjectRetainException)
 EXCEPTION_DECL(NullPointerException)
 EXCEPTION_DECL(IndexOutOfRangeException)
 EXCEPTION_DECL(FileException)
+EXCEPTION_DECL(ParseError)
 
 }
-
-

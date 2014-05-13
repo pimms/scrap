@@ -38,6 +38,8 @@ string VarTypeToString(VarType t)
 			return "char";
 		case BOOL:
 			return "bool";
+		case VOID:
+			return "void";
 	}
 	
 	return "Undefined";
@@ -69,4 +71,11 @@ string AritOpToString(AritOp op)
 	}
 
 	return "undefined";
+}
+
+
+TypeDesc::TypeDesc() 
+{
+	type = VOID;
+	classID = ID_UNDEFINED;
 }

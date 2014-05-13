@@ -9,7 +9,7 @@
 #include "../MethodInvocation.h"
 #include "../Heap.h"
 #include "../Stack.h"
-#include "../MemberList.h"
+#include "../IndexList.h"
 #include "../BinaryFile.h"
 
 using namespace scrap;

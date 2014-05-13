@@ -26,6 +26,8 @@ public:
 	// Push return value (top stack value) onto the calling stack
 	void ReturnValue();
 
+	void Execute();
+
 #ifdef _SCRAP_TEST_		
 	// Allow modification in test environments
 	Stack* GetStack();	

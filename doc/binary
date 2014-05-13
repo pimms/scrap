@@ -5,10 +5,11 @@ BINARY FORMAT DESCRIPTION
 	execution module, and WILL be used when executing previously compiled files.
 
 
-FORMAT OVERVIEW
+ABSTRACT FORMAT OVERVIEW
 	A general, abstract view of the format. Note that the format is stored
 	binary, and the XML-like syntax is for clarification purposes only.
 
+	<metadata> ... </metadata>
 	<class name="Foo">
 		<field type="int" name="my_int"/>
 		<field type="float" name="my_float"/>
@@ -51,9 +52,11 @@ HIGH LEVEL FORMAT SPECIFICATION
 		[MAIN CLASS]
 		[MAIN METHOD]
 		[E CLASS_COUNT]
-			[CLASS 1]
-			...
-			[CLASS N]
+			[CLASS ID]
+			[CLASS NAME]
+		[CLASS 1]
+		...
+		[CLASS N]
 
 	MAGIC_NUMBER
 		The first five bytes of all Scrap files spell out "SCRAP", 
@@ -84,10 +87,10 @@ CLASS SPECIFICATION
 		
 		TYPE						DESCRIPTION
 		-------------------------------------------------------------------------
-		[CLASS NAME]				Name of the class
+		[CLASS ID] 					ID of the class (name is given in the class header)
 		[E SUPER ID]				ID of the superclass
 		[E NUM]						Number of fields
-			[D FIELD] 		
+			[D FIELD] 				
 		[E NUM]						Number of static fields
 			[D FIELD] 			
 		[E NUM]						Number of methods
@@ -116,6 +119,8 @@ CLASS SPECIFICATION
 		Null-terminated ASCII name of the class
 	CLASS ID 
 		32 bit unsigned ID of the class
+	SUPER ID
+		32 bit unsigned ID of the class. If no superclass, holds the value (~0).
 	NUM xxx
 		32 bit unsigned, count of "xxx"
 	TYPE

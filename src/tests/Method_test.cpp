@@ -2,12 +2,20 @@
 
 // Global MethodAttributes, because they are annoying to create
 // every single test.
-MethodAttributes attr(TypeDesc{VOID, NULL}, 1, TypeDesc{INT, NULL});
 Class clss(0, "TestClass");
+
+// Macro that will create a MethodAttribute object which returns void
+// and takes a single int as a parameter.
+#define DECLARE_ATTR								\
+	vector<TypeDesc> _vtdesc__;						\
+	_vtdesc__.push_back(TypeDesc{INT});				\
+	MethodAttributes attr(TypeDesc{VOID}, _vtdesc__);
 
 
 TEST (MethodTest, TestInvalidConstructorArguments)
 {
+	DECLARE_ATTR;
+
 	// Passing either a 0 as body length or a null pointer should throw 
 	// exceptions.
 	MethodBody body;
@@ -28,6 +36,8 @@ TEST (MethodTest, TestInvalidConstructorArguments)
 
 TEST (MethodTest, TestMethodBodyCreation)
 {
+	DECLARE_ATTR;
+
 	// The method body is copied and placed in a new buffer. The contents
 	// must however be identical.
 	MethodBody body;
@@ -48,6 +58,8 @@ TEST (MethodTest, TestMethodBodyCreation)
 
 TEST (MethodTest, TestAttributesAndReturnType)
 {
+	DECLARE_ATTR;
+
 	MethodBody body;
 	body.length = 10;
 	body.code = new byte[10];

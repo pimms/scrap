@@ -1,5 +1,5 @@
 #include "Class.h"
-#include "MemberList.h"
+#include "IndexList.h"
 #include "Method.h"
 
 
@@ -80,12 +80,12 @@ Field* Class::GetStaticField(unsigned id) const
 	return _stFields->GetField(id);
 }
 
-const Method* Class::GetMethod(unsigned id) const
+Method* Class::GetMethod(unsigned id) const
 {
 	return _methods->GetMethod(id);
 }
 
-const Method* Class::GetStaticMethod(unsigned id) const
+Method* Class::GetStaticMethod(unsigned id) const
 {
 	return _stMethods->GetMethod(id);
 }

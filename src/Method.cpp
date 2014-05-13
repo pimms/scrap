@@ -66,20 +66,6 @@ MethodAttributes::MethodAttributes(TypeDesc ret, vector<TypeDesc> args)
 
 }
 
-MethodAttributes::MethodAttributes(TypeDesc ret, int args, ...)
-	:	_rettype(ret)
-{
-	va_list vl;	
-	va_start(vl, args);
-
-	for (int i=0; i<args; i++) {
-		TypeDesc val = va_arg(vl, TypeDesc);
-		_args.push_back(val);
-	}
-
-	va_end(vl);
-}
-
 TypeDesc MethodAttributes::GetReturnType() const
 {
 	return _rettype;
