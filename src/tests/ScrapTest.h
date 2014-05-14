@@ -11,6 +11,7 @@
 #include "../Stack.h"
 #include "../IndexList.h"
 #include "../BinaryFile.h"
+#include "../Bytecode.h"
 
 using namespace scrap;
 

@@ -14,12 +14,17 @@ const char *scrap_hello =
 	"Until then, enjoy this message :-)\n"
 	;
 
-int main(int argc, char *argv[]) 
+
+#ifndef _SCRAP_TEST_
+int main(int argc, char *argv[])
 {
 	printf("%s", scrap_hello);
 	return 0;
 }
+#endif
 
+
+namespace scrap {
 
 string VarTypeToString(VarType t)
 {
@@ -75,7 +80,24 @@ string AritOpToString(AritOp op)
 
 
 TypeDesc::TypeDesc() 
-{
-	type = VOID;
-	classID = ID_UNDEFINED;
+	:	type(VOID),
+		classID(ID_UNDEFINED)
+{ } 
+
+TypeDesc::TypeDesc(VarType t)
+	:	type(t),
+		classID(ID_UNDEFINED)
+{ }
+
+TypeDesc::TypeDesc(VarType t, unsigned id)
+	:	type(t),
+		classID(id)
+{ }
+
+TypeDesc::TypeDesc(VarType t, unsigned id, string name)
+	:	type(t),
+		classID(id),
+		argName(name)
+{ }
+
 }

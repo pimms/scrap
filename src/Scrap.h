@@ -64,7 +64,10 @@ enum VarType {
 
 // Descriptor of return types, argument types and field types.
 struct TypeDesc {
-	TypeDesc() ;
+	TypeDesc();
+	TypeDesc(VarType t);
+	TypeDesc(VarType t, unsigned classID);
+	TypeDesc(VarType t, unsigned classID, string argName);
 
 	VarType type;
 
@@ -93,18 +96,6 @@ enum AritOp {
 
 string VarTypeToString(VarType t);
 string AritOpToString(AritOp op);
-
-#ifdef _SCRAP_TEST_
-// Scrap.cpp is not compiled in the test-binary, include placeholder
-// stubs for the test binary.
-inline string VarTypeToString(VarType t) {
-	return "[not available during tests]";
-}
-
-inline string AritOpToString(AritOp op) {
-	return "[not available during tests]";
-}
-#endif /* _SCRAP_TEST_ */
 
 
 // Superclass for all exceptions thrown in Scrap
