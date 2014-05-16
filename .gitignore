@@ -25,6 +25,12 @@ install_manifest.txt
 # You Complete Me configuration
 .ycm_*.py*
 
+# CScope
+cscope.out
+
+# KDevelop 
+Project.kdev*
+
 # Built executable
 scrap
 test
