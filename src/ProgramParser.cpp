@@ -232,14 +232,6 @@ MethodBody ProgramParser::ReadMethodBody()
 				body.code[read++] = _file->ReadByte();
 				break;
 			}
-							  
-			case ARG_IDX_OR_REG: {
-				body.code[read++] = _file->ReadByte();
-				unsigned u = _file->ReadUnsigned();
-				memcpy(body.code+read, &u, 4);
-				read += 4;
-				break;
-			 }
 
 			case ARG_BRANCH:
 				/* FALLTHROUGH */
@@ -250,6 +242,8 @@ MethodBody ProgramParser::ReadMethodBody()
 				break;
 			}
 
+			case ARG_IDX_OR_REG:
+				/* FALLTHROUGH */
 			case ARG_TYPE:{
 				body.code[read++] = _file->ReadByte();
 				unsigned u = _file->ReadUnsigned();
