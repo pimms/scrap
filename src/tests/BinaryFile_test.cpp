@@ -1,5 +1,6 @@
 #include "ScrapTest.h"
 
+#define FILE_ULONG 		"testfiles/binary_ulong"
 #define FILE_UNSIGNED	"testfiles/binary_unsigned"
 #define FILE_STRING		"testfiles/binary_string"
 #define FILE_TEMP		"testfiles/temp"
@@ -43,6 +44,26 @@ TEST (BinaryFileTest, TestReadUnsigned)
 			file.SetFileEndianess(endian);
 			u = file.ReadUnsigned();
 			ASSERT_EQ(u, 1);
+		});
+	}
+}
+
+TEST (BinaryFileTest, TestReadULong)
+{
+	Endian endian;
+	unsigned long ul;
+
+	BinaryFile file(FILE_ULONG, READ);
+
+	// As with the unsigned test, there are two numbers in the file, 
+	// one of each endianness. Both numbers are 1 in their respective
+	// byte order.
+	for (int i=0; i<2; i++) {
+		ASSERT_NO_THROW({
+			endian = (Endian)file.ReadByte();	
+			file.SetFileEndianess(endian);
+			ul = file.ReadULong();
+			ASSERT_EQ(ul, 1);
 		});
 	}
 }

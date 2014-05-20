@@ -200,7 +200,9 @@ MethodBody ProgramParser::ReadMethodBody()
 		body.code[read++] = instr;
 		int len = arglen(&g_instructionMap[instr]);
 
-		// Read the arguments 
+		// Read the arguments. The BinaryFile will make sure that the
+		// byte order in whatever arbitrary argument is correct, and they
+		// can simply be copied into the method buffer.
 		switch (g_instructionMap[instr].argtype) {
 			case ARG_NONE: 
 				break;
