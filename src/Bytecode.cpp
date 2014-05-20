@@ -43,6 +43,8 @@ unsigned arglen(const InstructionInfo *info)
 			return 8;
 		case ARG_TYPE:
 			return 5;
+		case ARG_BRANCH:
+			return 4;
 	}
 }
 

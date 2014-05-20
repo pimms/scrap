@@ -169,6 +169,18 @@
 #define OP_LOADSTATIC		0xCF // LIT				Push static member with id LIT
 #define OP_STOREFIELD		0xD0 //	LIT				Pop into member variable
 #define OP_STORESTATIC		0xD1 // LIT				Pop into static member
+
+// Branching
+#define OP_BRANCH 			0xE0
+#define OP_BIFNULL			0xE1
+#define OP_BIFNOTNULL		0xE2
+#define OP_BIFGREATER		0xE3
+#define OP_BIFGREATEREQ		0xE4
+#define OP_BIFLESS 			0xE5
+#define OP_BIFLESSEQ		0xE6
+#define OP_BIFEQUAL			0xE7
+#define OP_BIFNOTEQUAL		0xE8
+
 #define OP_UNDEFINED		0xFF
 
 namespace scrap {
@@ -196,6 +208,9 @@ enum InstrArgType {
 	// Holds 40 bits. If the first byte is VarType::OBJECT, the
 	// next four bytes holds an ID (32 bit unsigned). 
 	ARG_TYPE,
+
+	// Holds a 32 bit unsigned, branch destination
+	ARG_BRANCH,
 };
 
 /* Map between instructions and the argument type(s) */
@@ -436,15 +451,15 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0xDD
 	g_reserved,											//0xDE
 	g_reserved,											//0xDF
-	g_reserved,											//0xE0
-	g_reserved,											//0xE1
-	g_reserved,											//0xE2
-	g_reserved,											//0xE3
-	g_reserved,											//0xE4
-	g_reserved,											//0xE5
-	g_reserved,											//0xE6
-	g_reserved,											//0xE7
-	g_reserved,											//0xE8
+	{"OP_BRANCH",	 	OP_BRANCH,			ARG_BRANCH},//0xE0
+	{"OP_BIFNULL",	 	OP_BIFNULL,			ARG_BRANCH},//0xE1
+	{"OP_BIFNOTNULL",	OP_BIFNOTNULL,		ARG_BRANCH},//0xE2
+	{"OP_BIFGREATER",	OP_BIFGREATER,		ARG_BRANCH},//0xE3
+	{"OP_BIFGREATEREQ",	OP_BIFGREATEREQ,	ARG_BRANCH},//0xE4
+	{"OP_BIFLESS",		OP_BIFLESS,			ARG_BRANCH},//0xE5
+	{"OP_BIFLESSEQ",	OP_BIFLESSEQ,		ARG_BRANCH},//0xE6
+	{"OP_BIFEQUAL",		OP_BIFEQUAL,		ARG_BRANCH},//0xE7
+	{"OP_BIFNOTEQUAL",	OP_BIFNOTEQUAL,		ARG_BRANCH},//0xE8
 	g_reserved,											//0xE9
 	g_reserved,											//0xEA
 	g_reserved,											//0xEB

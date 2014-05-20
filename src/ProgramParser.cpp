@@ -241,6 +241,8 @@ MethodBody ProgramParser::ReadMethodBody()
 				break;
 			 }
 
+			case ARG_BRANCH:
+				/* FALLTHROUGH */
 			case ARG_ID: {
 				unsigned u = _file->ReadUnsigned();
 				memcpy(body.code+read, &u, 4);

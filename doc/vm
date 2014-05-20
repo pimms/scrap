@@ -217,4 +217,18 @@ loadstatic #fieldID	Push static variable 			-> value1
 storefield #fieldID	Pop into member variable 		value1 ->
 storestatic #fieldID Pop into static variable 		value1 ->
 
+# Branch Instructions
+# The #dest argument is a 32 bit integer, pointing to the destination 
+# byte instruction. There is obviously no guarantee that the destination
+# is valid. When multiple stack variables are used, they must be of the
+# identical type.
+branch #dest 		Branch 							->
+bifnull	#dest		Branch if VALUE1 is 0 			value1 -> 
+bifnotnull #dest	Branch if VALUE1 is not 0		value1 ->
+bifgreater #dest	Branch if VALUE1 > VALUE2 		value1 value2 -> 
+bifgreatereq #dest	Branch if VALUE1 >= VALUE2		value1 value2 ->
+bifless #dest		Branch if VALUE1 < VALUE2 		value1 value2 ->
+biflesseq #dest 	Branch if VALUE1 <= VALUE2		value1 value2 ->
+bifequal #dest		Branch if VALUE1 == VALUE2 		value1 value2 ->
+bifnotequal #dest	Branch if VALUE1 != VALUE2 		value1 value2 ->
 

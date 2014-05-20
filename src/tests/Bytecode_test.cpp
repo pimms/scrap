@@ -142,6 +142,16 @@ TEST (BytecodeTest, TestInstructionMap)
 	ASSERT_EQ(g_instructionMap[OP_STOREFIELD].instr,	OP_STOREFIELD);
 	ASSERT_EQ(g_instructionMap[OP_STORESTATIC].instr,	OP_STORESTATIC);
 	ASSERT_EQ(g_instructionMap[OP_UNDEFINED].instr,		OP_UNDEFINED);
+
+	ASSERT_EQ(g_instructionMap[OP_BRANCH].instr, 		OP_BRANCH);
+    ASSERT_EQ(g_instructionMap[OP_BIFNULL].instr, 		OP_BIFNULL);
+    ASSERT_EQ(g_instructionMap[OP_BIFNOTNULL].instr, 	OP_BIFNOTNULL);
+    ASSERT_EQ(g_instructionMap[OP_BIFGREATER].instr, 	OP_BIFGREATER);
+    ASSERT_EQ(g_instructionMap[OP_BIFGREATEREQ].instr, 	OP_BIFGREATEREQ);
+    ASSERT_EQ(g_instructionMap[OP_BIFLESS].instr, 		OP_BIFLESS);
+    ASSERT_EQ(g_instructionMap[OP_BIFLESSEQ].instr, 	OP_BIFLESSEQ);
+    ASSERT_EQ(g_instructionMap[OP_BIFEQUAL].instr, 		OP_BIFEQUAL);
+    ASSERT_EQ(g_instructionMap[OP_BIFNOTEQUAL].instr, 	OP_BIFNOTEQUAL);
 }
 
 TEST (BytecodeTest, TestArglen) 
@@ -293,5 +303,17 @@ TEST (BytecodeTest, TestArglen)
 	ASSERT_EQ(arglen(&g_instructionMap[OP_LOADSTATIC]), 	4);
 	ASSERT_EQ(arglen(&g_instructionMap[OP_STOREFIELD]), 	4);
 	ASSERT_EQ(arglen(&g_instructionMap[OP_STORESTATIC]), 	4);
+
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BRANCH]),			4);
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BIFNULL]),		4);
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BIFNOTNULL]),		4);
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BIFGREATER]),		4);
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BIFGREATEREQ]),	4);
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BIFLESS]),		4);
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BIFLESSEQ]),		4);
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BIFEQUAL]),		4);
+	ASSERT_EQ(arglen(&g_instructionMap[OP_BIFNOTEQUAL]),	4);
+
+
 }
 
