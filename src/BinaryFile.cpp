@@ -88,6 +88,19 @@ string BinaryFile::ReadString()
 	return str;
 }
 
+unsigned long BinaryFile::ReadULong()
+{
+	FileReadCheck(sizeof(unsigned));
+
+	unsigned long l;
+	byte *p = (byte*)&l;
+
+	for (int i=0; i<8; i++)
+		p[i] = _file.get();
+
+	return Convert(l);
+}
+
 
 void BinaryFile::WriteByte(byte b)
 {
@@ -116,6 +129,16 @@ void BinaryFile::WriteString(string str)
 	_file.put(0);
 }
 
+void BinaryFile::WriteULong(unsigned long l)
+{
+	FileWriteCheck();
+
+	l = Convert(l);
+	byte *p = (byte*)&l;
+	for (int i=0; i<8; i++)
+		_file.put(p[i]);
+}
+
 
 unsigned BinaryFile::Convert(unsigned u) const 
 {
@@ -135,6 +158,31 @@ unsigned BinaryFile::Convert(unsigned u) const
 
  	u = *buf;
 	return u;
+}
+
+unsigned long BinaryFile::Convert(unsigned long l) const
+{
+	if (_fendian == UNDEF)
+		THROW(InvalidOperationException,
+		"The endianess of the file must be defined before reading > 1 byte");
+	if (_fendian == _endian)
+		return l;
+	
+	byte *p, buf[8];
+	p = (byte*)&l;
+
+	buf[0] = p[7];
+	buf[1] = p[6];
+	buf[2] = p[5];
+	buf[3] = p[4];
+	buf[4] = p[3];
+	buf[5] = p[2];
+	buf[6] = p[1];
+	buf[7] = p[0];
+
+ 	l = *buf;
+	return l;
+
 }
 
 void BinaryFile::FileReadCheck(unsigned count)

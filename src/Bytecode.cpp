@@ -35,7 +35,7 @@ unsigned arglen(const InstructionInfo *info)
 			return len_literal(info->instr);
 		case ARG_REGISTER:
 			return 4;
-		case ARG_LIT_OR_REG:
+		case ARG_IDX_OR_REG:
 			return 5;
 		case ARG_ID:
 			return 4;

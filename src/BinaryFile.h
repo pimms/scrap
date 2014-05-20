@@ -38,15 +38,18 @@ public:
 	byte ReadByte();
 	unsigned ReadUnsigned();
 	string ReadString();
+	unsigned long ReadULong();
 
 	void WriteByte(byte b);
 	void WriteUnsigned(unsigned u);
 	void WriteString(string s);
+	void WriteULong(unsigned long l);
 
 	static Endian SystemEndian();
 
 private:
 	unsigned Convert(unsigned u) const;
+	unsigned long Convert(unsigned long l) const;
 
 	// Ensure that there is at least "count" bytes left in the file
 	void FileReadCheck(unsigned count);

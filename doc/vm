@@ -115,7 +115,7 @@ copy 				Copy the top value and push it	value1 -> value1 value2
 Tload 	#index		Push register value with #index	-> value1
 Treturn				Return stack val from method 	value1 ->
 Tstore  #index		Pop stack into register #index 	value1 ->
-Tloadl #literal		Push literal value to stack.	-> literal
+Tpush   #literal	Push literal value to stack.	-> literal
 					Not available for (T=a).
 
 # Array instructions - arrays are FIXED SIZE and single type only. 
@@ -129,7 +129,8 @@ Tastore_X #index	Store array element				arrayref value1 ->
 		  			#array[#index] in register X
 arraylength			Push the length of the array 	arrayref -> value1
 arrayload #index	Push the array reference from	-> arrayref
-					register #index
+					register (or 32 bit index) 
+					#index
 
 # Conversion is required to allow for cross-type arithmetics. 
 a2b 				object to bool 					value1(a) -> value2(c)
@@ -184,13 +185,10 @@ Tmul 				Multiply two numbers 			value1 value2 -> result
 Tdiv 				Divide value1 by value2 		value1 value2 -> result
 
 # Integer-only operations: d and f are not valid values for T for the 
-# following instructions. SHR and SHL are implemented in a different 
-# manner than other instructions. The #count argument is 8 bits, and the
-# high order bit is enabled if the value refers to a register (0-3). The
-# register value CANNOT BE OBJECT OR ARRAY, and is casted to int before 
-# shifting.
-Tshl #count 		Shift left #count times 		value1 -> value2
-Tshr #count 		Shift right #count times 		value1 -> value2
+# following instructions. In all cases, both operands of the instructions 
+# must be of the identical type.
+Tshl				Shift left "count" times 		value1 count -> value2
+Tshr 				Shift right "count" times 		value1 count -> value2
 Tmod 				Remainder of value1/value2 		value1 value2 -> result
 Txor 				Exclusive or two numbers 		value1 value2 -> result
 Tand 				Bitwise and of two numbers 		value1 value2 -> result

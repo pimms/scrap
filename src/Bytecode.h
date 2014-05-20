@@ -183,8 +183,9 @@ enum InstrArgType {
 	ARG_REGISTER,
 
 	// Holds 40 bits. If the first byte is 0, the next
-	// bytes holds a literal value. 
-	ARG_LIT_OR_REG,
+	// 4 bytes holds an unsigned integer containing the index. Only used
+	// when accessing array elements.
+	ARG_IDX_OR_REG,
 	
 	// Holds an ID (32 bit unsigned)
 	ARG_ID, 
@@ -227,14 +228,14 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0x0d
 	g_reserved,											//0x0e
 	g_reserved,											//0x0f
-	{"A_LOAD", 	  	OP_A_LOAD, 		ARG_LIT_OR_REG	},	//0x10
+	{"A_LOAD", 	  	OP_A_LOAD, 		ARG_REGISTER 	},	//0x10
 	{"A_RETURN",   	OP_A_RETURN, 	ARG_NONE		},	//0x11
 	{"A_STORE",	  	OP_A_STORE,		ARG_REGISTER	},	//0x12
 	g_reserved,											//0x13
 	{"A_NEWARRAY", 	OP_A_NEWARRAY,	ARG_TYPE		},	//0x14
 	{"A_ARELEASE", 	OP_A_ARELEASE,	ARG_NONE		},	//0x15
-	{"A_ALOAD", 	OP_A_ALOAD, 	ARG_LIT_OR_REG	},	//0x16
-	{"A_ASTORE",   	OP_A_ASTORE, 	ARG_LIT_OR_REG	},	//0x17
+	{"A_ALOAD", 	OP_A_ALOAD, 	ARG_IDX_OR_REG	},	//0x16
+	{"A_ASTORE",   	OP_A_ASTORE, 	ARG_IDX_OR_REG	},	//0x17
 	g_reserved,											//0x18
 	g_reserved,											//0x19
 	g_reserved,											//0x1a
@@ -243,14 +244,14 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0x1d
 	g_reserved,											//0x1e
 	g_reserved,											//0x1f
-	{"I_LOAD", 	  	OP_I_LOAD,		ARG_LIT_OR_REG	},	//0x20
+	{"I_LOAD", 	  	OP_I_LOAD,		ARG_REGISTER	},	//0x20
 	{"I_RETURN",   	OP_I_RETURN,	ARG_NONE		},	//0x21
 	{"I_STORE",	  	OP_I_STORE,		ARG_REGISTER	},	//0x22
 	{"I_PUSH",	  	OP_I_PUSH,		ARG_LITERAL		},	//0x23
 	{"I_NEWARRAY", 	OP_I_NEWARRAY,	ARG_NONE		},	//0x24
 	{"I_ARELEASE", 	OP_I_ARELEASE,	ARG_NONE		},	//0x25
-	{"I_ALOAD", 	OP_I_ALOAD,		ARG_LIT_OR_REG	},	//0x26
-	{"I_ASTORE",   	OP_I_ASTORE,	ARG_LIT_OR_REG	},	//0x27
+	{"I_ALOAD", 	OP_I_ALOAD,		ARG_IDX_OR_REG	},	//0x26
+	{"I_ASTORE",   	OP_I_ASTORE,	ARG_IDX_OR_REG	},	//0x27
 	g_reserved,											//0x28
 	g_reserved,											//0x29
 	g_reserved,											//0x2a
@@ -259,14 +260,14 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0x2d
 	g_reserved,											//0x2e
 	g_reserved,											//0x2f
-	{"F_LOAD", 	  	OP_F_LOAD,		ARG_LIT_OR_REG},	//0x30
+	{"F_LOAD", 	  	OP_F_LOAD,		ARG_REGISTER  },	//0x30
 	{"F_RETURN",   	OP_F_RETURN,	ARG_NONE	  },	//0x31
 	{"F_STORE",	  	OP_F_STORE,		ARG_REGISTER  },	//0x32
 	{"F_PUSH",	  	OP_F_PUSH,		ARG_LITERAL	  },	//0x33
 	{"F_NEWARRAY", 	OP_F_NEWARRAY,	ARG_NONE	  },	//0x34
 	{"F_ARELEASE", 	OP_F_ARELEASE,	ARG_NONE	  },	//0x35
-	{"F_ALOAD", 	OP_F_ALOAD,		ARG_LIT_OR_REG},	//0x36
-	{"F_ASTORE",   	OP_F_ASTORE,	ARG_LIT_OR_REG},	//0x37
+	{"F_ALOAD", 	OP_F_ALOAD,		ARG_IDX_OR_REG},	//0x36
+	{"F_ASTORE",   	OP_F_ASTORE,	ARG_IDX_OR_REG},	//0x37
 	g_reserved,											//0x38
 	g_reserved,											//0x39
 	g_reserved,											//0x3a
@@ -275,14 +276,14 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0x3d
 	g_reserved,											//0x3e
 	g_reserved,											//0x3f
-	{"D_LOAD", 	  	OP_D_LOAD,		ARG_LIT_OR_REG},	//0x40
+	{"D_LOAD", 	  	OP_D_LOAD,		ARG_REGISTER  },	//0x40
 	{"D_RETURN",   	OP_D_RETURN,	ARG_NONE	  },	//0x41
 	{"D_STORE",	  	OP_D_STORE,		ARG_REGISTER  },	//0x42
 	{"D_PUSH",	  	OP_D_PUSH,		ARG_LITERAL	  },	//0x43
 	{"D_NEWARRAY", 	OP_D_NEWARRAY,	ARG_NONE	  },	//0x44
 	{"D_ARELEASE", 	OP_D_ARELEASE,	ARG_NONE	  },	//0x45
-	{"D_ALOAD", 	OP_D_ALOAD,		ARG_LIT_OR_REG},	//0x46
-	{"D_ASTORE",   	OP_D_ASTORE,	ARG_LIT_OR_REG},	//0x47
+	{"D_ALOAD", 	OP_D_ALOAD,		ARG_IDX_OR_REG},	//0x46
+	{"D_ASTORE",   	OP_D_ASTORE,	ARG_IDX_OR_REG},	//0x47
 	g_reserved,											//0x48
 	g_reserved,											//0x49
 	g_reserved,											//0x4a
@@ -291,14 +292,14 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0x4d
 	g_reserved,											//0x4e
 	g_reserved,											//0x4f
-	{"L_LOAD", 	  	OP_L_LOAD,		ARG_LIT_OR_REG},	//0x50
+	{"L_LOAD", 	  	OP_L_LOAD,		ARG_REGISTER  },	//0x50
 	{"L_RETURN",   	OP_L_RETURN,	ARG_NONE	  },	//0x51
 	{"L_STORE",	  	OP_L_STORE,		ARG_REGISTER  },	//0x52
 	{"L_PUSH",	  	OP_L_PUSH,		ARG_LITERAL	  },	//0x53
 	{"L_NEWARRAY", 	OP_L_NEWARRAY,	ARG_NONE	  },	//0x54
 	{"L_ARELEASE", 	OP_L_ARELEASE,	ARG_NONE	  },	//0x55
-	{"L_ALOAD", 	OP_L_ALOAD,		ARG_LIT_OR_REG},	//0x56
-	{"L_ASTORE",   	OP_L_ASTORE,	ARG_LIT_OR_REG},	//0x57
+	{"L_ALOAD", 	OP_L_ALOAD,		ARG_IDX_OR_REG},	//0x56
+	{"L_ASTORE",   	OP_L_ASTORE,	ARG_IDX_OR_REG},	//0x57
 	g_reserved,											//0x58
 	g_reserved,											//0x59
 	g_reserved,											//0x5a
@@ -307,14 +308,14 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0x5d
 	g_reserved,											//0x5e
 	g_reserved,											//0x5f
-	{"C_LOAD", 	  	OP_C_LOAD,		ARG_LIT_OR_REG},	//0x60
+	{"C_LOAD", 	  	OP_C_LOAD,		ARG_REGISTER  },	//0x60
 	{"C_RETURN",   	OP_C_RETURN,	ARG_NONE	  },	//0x61
 	{"C_STORE",	  	OP_C_STORE,		ARG_REGISTER  },	//0x62
 	{"C_PUSH",	  	OP_C_PUSH,		ARG_LITERAL	  },	//0x63
 	{"C_NEWARRAY", 	OP_C_NEWARRAY,	ARG_NONE	  },	//0x64
 	{"C_ARELEASE", 	OP_C_ARELEASE,	ARG_NONE	  },	//0x65
-	{"C_ALOAD", 	OP_C_ALOAD,		ARG_LIT_OR_REG},	//0x66
-	{"C_ASTORE",   	OP_C_ASTORE,	ARG_LIT_OR_REG},	//0x67
+	{"C_ALOAD", 	OP_C_ALOAD,		ARG_IDX_OR_REG},	//0x66
+	{"C_ASTORE",   	OP_C_ASTORE,	ARG_IDX_OR_REG},	//0x67
 	g_reserved,											//0x68
 	g_reserved,											//0x69
 	g_reserved,											//0x6a
@@ -323,14 +324,14 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0x6d
 	g_reserved,											//0x6e
 	g_reserved,											//0x6f
-	{"B_LOAD", 	  	OP_B_LOAD,		ARG_LIT_OR_REG},	//0x70
+	{"B_LOAD", 	  	OP_B_LOAD,		ARG_REGISTER  },	//0x70
 	{"B_RETURN",   	OP_B_RETURN,	ARG_NONE	  },	//0x71
 	{"B_STORE",	  	OP_B_STORE,		ARG_REGISTER  },	//0x72
 	{"B_PUSH",	  	OP_B_PUSH,		ARG_LITERAL	  },	//0x73
 	{"B_NEWARRAY", 	OP_B_NEWARRAY,	ARG_NONE	  },	//0x74
 	{"B_ARELEASE", 	OP_B_ARELEASE,	ARG_NONE	  },	//0x75
-	{"B_ALOAD", 	OP_B_ALOAD,		ARG_LIT_OR_REG},	//0x76
-	{"B_ASTORE",   	OP_B_ASTORE,	ARG_LIT_OR_REG},	//0x77
+	{"B_ALOAD", 	OP_B_ALOAD,		ARG_IDX_OR_REG},	//0x76
+	{"B_ASTORE",   	OP_B_ASTORE,	ARG_IDX_OR_REG},	//0x77
 	g_reserved,											//0x78
 	g_reserved,											//0x79
 	g_reserved,											//0x7a
@@ -391,20 +392,20 @@ const InstructionInfo g_instructionMap[] = {
 	{"C_SUB",	  	OP_C_SUB,		ARG_NONE		},	//0xB1
 	{"C_MUL",	  	OP_C_MUL,		ARG_NONE		},	//0xB2
 	{"C_DIV",	  	OP_C_DIV,		ARG_NONE		},	//0xB3
-	{"I_SHL", 	  	OP_I_SHL,		ARG_LIT_OR_REG 	},	//0xB4
-	{"I_SHR",	  	OP_I_SHR,		ARG_LIT_OR_REG	},	//0xB5
+	{"I_SHL", 	  	OP_I_SHL,		ARG_NONE 		},	//0xB4
+	{"I_SHR",	  	OP_I_SHR,		ARG_NONE 		},	//0xB5
 	{"I_MOD",	  	OP_I_MOD,		ARG_NONE		},	//0xB6
 	{"I_XOR",	  	OP_I_XOR,		ARG_NONE		},	//0xB7
 	{"I_AND",	  	OP_I_AND,		ARG_NONE		},	//0xB8
 	{"I_OR", 	  	OP_I_OR,		ARG_NONE		},	//0xB9
-	{"L_SHL", 	  	OP_L_SHL,		ARG_LIT_OR_REG	},	//0xBA
-	{"L_SHR",	  	OP_L_SHR,		ARG_LIT_OR_REG	},	//0xBB
+	{"L_SHL", 	  	OP_L_SHL,		ARG_NONE 		},	//0xBA
+	{"L_SHR",	  	OP_L_SHR,		ARG_NONE 		},	//0xBB
 	{"L_MOD",	  	OP_L_MOD,		ARG_NONE		},	//0xBC
 	{"L_XOR",	  	OP_L_XOR,		ARG_NONE		},	//0xBD
 	{"L_AND",	  	OP_L_AND,		ARG_NONE		},	//0xBE
 	{"L_OR", 	  	OP_L_OR,		ARG_NONE		},	//0xBF
-	{"C_SHL", 	  	OP_C_SHL,		ARG_LIT_OR_REG	},	//0xC0
-	{"C_SHR",	  	OP_C_SHR,		ARG_LIT_OR_REG	},	//0xC1
+	{"C_SHL", 	  	OP_C_SHL,		ARG_NONE 		},	//0xC0
+	{"C_SHR",	  	OP_C_SHR,		ARG_NONE 		},	//0xC1
 	{"C_MOD",	  	OP_C_MOD,		ARG_NONE		},	//0xC2
 	{"C_XOR",	  	OP_C_XOR,		ARG_NONE		},	//0xC3
 	{"C_AND",	  	OP_C_AND,		ARG_NONE		},	//0xC4

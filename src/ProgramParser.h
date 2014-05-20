@@ -41,6 +41,7 @@ private:
 	void ReadMethods(Class *c);
 	TypeDesc ReadField();
 	Method* ReadMethod(MethodType methodType, Class *c);
+	MethodBody ReadMethodBody();
 	TypeDesc ReadTypeDesc(bool readName);
 };
 

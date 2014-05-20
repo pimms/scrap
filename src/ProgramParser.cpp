@@ -5,6 +5,8 @@
 #include "Method.h"
 #include "Variable.h"
 #include "IndexList.h"
+#include "Bytecode.h"
+#include <cstring>
 
 namespace scrap {
 
@@ -178,22 +180,92 @@ Method* ProgramParser::ReadMethod(MethodType methodType, Class *c)
 
 	MethodType type = (isVirtual) ? METHOD_VIRTUAL : methodType;
 	MethodAttributes attrs(retType, args);
-	MethodBody body;
-
-	body.length = _file->ReadUnsigned();
-	body.code = new byte[body.length];
-		
-	// TODO
-	// Read more efficiently and take endianness of 
-	// 32 bit arguments into account
-	for (int i=0; i<body.length; i++) {
-		body.code[i] = _file->ReadByte();
-	}
+	MethodBody body = ReadMethodBody();
 
 	Method *method = new Method(type, c, &body, attrs);
 	delete[] body.code;
 
 	return method;
+}
+
+MethodBody ProgramParser::ReadMethodBody() 
+{
+	MethodBody body;
+	body.length = _file->ReadUnsigned();
+	body.code = new byte[body.length];
+
+	int read = 0;
+	while (read < body.length) {
+		byte instr = _file->ReadByte();
+		body.code[read++] = instr;
+		int len = arglen(&g_instructionMap[instr]);
+
+		// Read the arguments 
+		switch (g_instructionMap[instr].argtype) {
+			case ARG_NONE: 
+				break;
+
+			case ARG_LITERAL: {
+				unsigned u;
+				unsigned long ul;
+				switch (len) {
+					case 1:
+						body.code[read++] = _file->ReadByte();
+						break;
+					case 4:
+						u = _file->ReadUnsigned();
+						memcpy(body.code+read, &u, 4);
+						read += 4;
+						break;
+					case 8:
+						ul = _file->ReadULong();
+						memcpy(body.code+read, &ul, 8);
+						read += 8;
+						break;
+				}
+				break;
+			}
+
+			case ARG_REGISTER: {
+				body.code[read++] = _file->ReadByte();
+				break;
+			}
+							  
+			case ARG_IDX_OR_REG: {
+				body.code[read++] = _file->ReadByte();
+				unsigned u = _file->ReadUnsigned();
+				memcpy(body.code+read, &u, 4);
+				read += 4;
+				break;
+			 }
+
+			case ARG_ID: {
+				unsigned u = _file->ReadUnsigned();
+				memcpy(body.code+read, &u, 4);
+				read += 4;
+				break;
+			}
+
+			case ARG_TYPE:{
+				body.code[read++] = _file->ReadByte();
+				unsigned u = _file->ReadUnsigned();
+				memcpy(body.code+read, &u, 4);
+				read += 4;
+				break;
+		 	}
+
+			case ARG_ID_ID: {
+				for (int i=0; i<2; i++) {
+					unsigned u = _file->ReadUnsigned();
+					memcpy(body.code+read, &u, 4);
+					read += 4;
+				}
+				break;
+			}
+		}
+	}
+
+	return body;
 }
 
 TypeDesc ProgramParser::ReadTypeDesc(bool readName)
