@@ -3,12 +3,13 @@ scrap
 
 The crappy scripting language Scrap. This is a hobby exercise for 
 compiler development, and should for the foreseeable future  be 
-disregarded on all grounds in terms of real world application.
+disregarded on all grounds in other terms of real world application.
 
-Some major design flaws in the compiler and bytecode architecture made 
-me decide to do a FULL rewrite. The new version is nothing like the 
-previous version in any way. Why not just create a new project?
-I like the name :) 
+Scrap aims to integrate easily with C++ *(potentially C as well)*. The
+syntax is not yet decided upon, but the functionality of the language
+will be similar to that of Java and C#. Unlike these languages, Scrap
+will be developed with ease of use from the command line while also
+utilizing precompiled binaries.
 
 
 **PORTABILITY**
@@ -44,13 +45,18 @@ commands:
 
 	$ make
 	
-	Alternatively:
 
-	$ make test
-
-	$ make scrap
+The tests can be run by executing the *test* binary, and you may test
+Scrap by executing the *scrap* binary.
 
 
-The tests can be run by executing the "test" binary, and you may test
-Scrap by executing the "scrap" binary.
+**State of Development**
 
+Currently, execution of manually created bytecode is being developed.
+Once this is in place, the compiler will be developed. 
+
+
+**Contribution**
+
+Check out the issue tracker *(or send me an e-mail if I've been lazy
+with updating it)*.
