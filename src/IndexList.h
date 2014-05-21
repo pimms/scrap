@@ -58,6 +58,8 @@ private:
  */
 class MethodList {
 public:
+	~MethodList();
+
 	void AddMethod(Method *method);
 	Method* GetMethod(unsigned id) const;
 
@@ -74,6 +76,8 @@ private:
  */
 class ClassList {
 public:
+	~ClassList();
+
 	void AddClass(Class *c, unsigned id);
 	Class* GetClass(unsigned id);
 	const Class* GetClass(unsigned id) const;

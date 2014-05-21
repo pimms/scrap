@@ -7,7 +7,7 @@ namespace scrap {
 class FieldList;
 class MethodList;
 class Method;
-class Field;
+struct Field;
 
 /* Class
  */

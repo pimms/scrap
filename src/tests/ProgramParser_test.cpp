@@ -122,5 +122,7 @@ TEST (ProgramParserTest, CheckCorrectParsing)
 	body = smethod->GetMethodBody();
 	ASSERT_EQ(1, body->length);
 	ASSERT_EQ(0x04, body->code[0]);		// return
+
+	delete program;
 }
 

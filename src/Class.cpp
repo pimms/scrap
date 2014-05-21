@@ -21,6 +21,7 @@ Class::~Class()
 {
 	delete _fieldTemplate;
 	delete _methods;
+	delete _stFields;
 	delete _stMethods;
 }
 

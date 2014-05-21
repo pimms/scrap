@@ -1,6 +1,8 @@
 #include "IndexList.h"
 #include "Variable.h"
 #include "Method.h"
+#include "Class.h"
+
 
 namespace scrap {
 
@@ -68,6 +70,13 @@ void FieldList::InsertFromSuperclass(const FieldList *fieldList)
 
 
 
+MethodList::~MethodList()
+{
+	for (int i=0; i<_methods.size(); i++) {
+		delete _methods[i];
+	}
+}
+
 void MethodList::AddMethod(Method *method)
 {
 	_methods.push_back(method);
@@ -93,6 +102,12 @@ void MethodList::InsertFromSuperclass(const MethodList *methodList)
 }
 
 
+ClassList::~ClassList()
+{
+	for (int i=0; i<_classes.size(); i++) {
+		delete _classes[i];
+	}
+}
 
 void ClassList::AddClass(Class *c, unsigned id)
 {
