@@ -59,9 +59,10 @@ const TypeDesc Method::GetReturnType() const
 
 
 
-MethodAttributes::MethodAttributes(TypeDesc ret, vector<TypeDesc> args)
+MethodAttributes::MethodAttributes(TypeDesc ret, vector<TypeDesc> args, string name)
 	:	_rettype(ret),
-		_args(args)
+		_args(args),
+		_name(name)
 {
 
 }
@@ -74,6 +75,11 @@ TypeDesc MethodAttributes::GetReturnType() const
 vector<TypeDesc> MethodAttributes::GetArguments() const
 {
 	return _args;
+}
+
+string MethodAttributes::GetName() const
+{
+	return _name;
 }
 
 }

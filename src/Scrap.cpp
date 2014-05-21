@@ -97,7 +97,7 @@ TypeDesc::TypeDesc(VarType t, unsigned id)
 TypeDesc::TypeDesc(VarType t, unsigned id, string name)
 	:	type(t),
 		classID(id),
-		argName(name)
+		name(name)
 { }
 
 }

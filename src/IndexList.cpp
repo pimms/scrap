@@ -107,11 +107,21 @@ void ClassList::AddClass(Class *c, unsigned id)
 Class* ClassList::GetClass(unsigned id) 
 {
 	if (_classes.count(id) == 0) {
-		THROW(IndexOutOfRangeException,
+		THROW(NullPointerException,
 		"Attempted to get class from undefined ID");
 	}
 	
 	return _classes[id];
+}
+
+const Class* ClassList::GetClass(unsigned id) const
+{
+	if (_classes.count(id) == 0) {
+		THROW(NullPointerException,
+		"Attempted to get class from undefined ID");
+	}
+	
+	return _classes.at(id);
 }
 
 unsigned ClassList::GetClassCount() const 

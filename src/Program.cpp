@@ -14,13 +14,23 @@ Program::Program()
 
 Program::~Program()
 {
-	
+	delete _classList;
 }
 
 
 void Program::SetClassList(ClassList *classList)
 {
 	_classList = classList;
+}
+
+ClassList* Program::GetClassList() 
+{
+	return _classList;
+}
+
+const ClassList* Program::GetClassList() const 
+{
+	return _classList;
 }
 
 void Program::SetMainMethod(unsigned classID, unsigned stMethodID)

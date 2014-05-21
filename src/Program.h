@@ -22,6 +22,8 @@ public:
 	 * list must be set for the main method to be found!
 	 */
 	void SetClassList(ClassList *classList);
+	ClassList* GetClassList();
+	const ClassList* GetClassList() const;
 	void SetMainMethod(unsigned classID, unsigned stMethodID);
 
 	void Execute();

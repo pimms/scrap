@@ -76,6 +76,7 @@ class ClassList {
 public:
 	void AddClass(Class *c, unsigned id);
 	Class* GetClass(unsigned id);
+	const Class* GetClass(unsigned id) const;
 	unsigned GetClassCount() const;
 
 private:

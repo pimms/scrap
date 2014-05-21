@@ -74,9 +74,8 @@ struct TypeDesc {
 	// Must contain class data in the case of "type == OBJECT".
 	unsigned classID;
 
-	// If the TypeDesc object is used for argument purposes, a name
-	// may optionally be included.
-	string argName;
+	// A name may optionally be included for fields and arguments
+	string name;
 };
 
 

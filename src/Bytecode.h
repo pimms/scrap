@@ -7,6 +7,7 @@
 #define OP_COPY 			0x01 //				Copy top value
 #define OP_ARRAYLENGTH 		0x02 //				Pops array, pushes length
 #define OP_ARRAYLOAD 		0x03 //	LIT			Pushes array from register LIT
+#define OP_RETURN 			0x04 // 			Return 
 
 // Stack management 
 #define OP_A_LOAD 			0x10 //	LIT			Pushes object in reg LIT
@@ -231,7 +232,7 @@ const InstructionInfo g_instructionMap[] = {
 	{"COPY", 	  	OP_COPY, 		ARG_NONE	},		//0x01
 	{"ARRAYLENGTH",	OP_ARRAYLENGTH, ARG_NONE	},		//0x02
 	{"ARRAYLOAD",  	OP_ARRAYLOAD, 	ARG_REGISTER},		//0x03
-	g_reserved,											//0x04
+	{"RETURN",		OP_RETURN, 		ARG_NONE},			//0x04
 	g_reserved,											//0x05
 	g_reserved,											//0x06
 	g_reserved,											//0x07

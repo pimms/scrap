@@ -1,4 +1,5 @@
 #include "BinaryFile.h"
+#include <cstring>
 
 namespace scrap {
 
@@ -156,7 +157,7 @@ unsigned BinaryFile::Convert(unsigned u) const
 	buf[2] = p[1];
 	buf[3] = p[0];
 
- 	u = *buf;
+	memcpy(&u, buf, 4);
 	return u;
 }
 
@@ -180,7 +181,7 @@ unsigned long BinaryFile::Convert(unsigned long l) const
 	buf[6] = p[1];
 	buf[7] = p[0];
 
- 	l = *buf;
+	memcpy(&l, buf, 8);
 	return l;
 
 }

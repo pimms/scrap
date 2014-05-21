@@ -79,7 +79,7 @@ TEST (BinaryFileTest, TestReadTooMuch)
 }
 
 
-TEST (BinaryFileTest, TestWriteCorrectEndian)
+TEST (BinaryFileTest, TestReadWriteSystemEndianUnsigned)
 {
 	DELETE_TEMP();
 
@@ -100,7 +100,28 @@ TEST (BinaryFileTest, TestWriteCorrectEndian)
 	DELETE_TEMP();
 }
 
-TEST (BinaryFileTest, TestWriteOtherEndian)
+TEST (BinaryFileTest, TestReadWriteSystemEndianULong)
+{
+	DELETE_TEMP();
+
+	{
+		BinaryFile out(FILE_TEMP, WRITE);
+		out.SetFileEndianess(BinaryFile::SystemEndian());
+		out.WriteULong(1);
+	}
+	
+	{
+		unsigned long ul = 0;
+		BinaryFile in(FILE_TEMP, READ);
+		in.SetFileEndianess(BinaryFile::SystemEndian());
+		ASSERT_NO_THROW(ul = in.ReadULong());
+		ASSERT_EQ(ul, 1);
+	}
+
+	DELETE_TEMP();
+}
+
+TEST (BinaryFileTest, TestReadWriteOtherEndianUnsigned)
 {
 	DELETE_TEMP();
 	Endian otherEndian = BinaryFile::SystemEndian();
@@ -129,6 +150,37 @@ TEST (BinaryFileTest, TestWriteOtherEndian)
 
 	DELETE_TEMP();
 }
+
+TEST (BinaryFileTest, TestReadWriteOtherEndianULong)
+{
+	DELETE_TEMP();
+	Endian otherEndian = BinaryFile::SystemEndian();
+	otherEndian = ((otherEndian ==LE) ? (BE) : (LE));
+
+	{
+		BinaryFile out(FILE_TEMP, WRITE);
+		out.SetFileEndianess(otherEndian);
+
+		unsigned long ul = 0;
+		byte *p = (byte*)&ul;
+		if (otherEndian == L_ENDIAN)
+			p[0] = 1;
+		else
+			p[7] = 1;
+		out.WriteULong(ul);
+	}
+	
+	{
+		unsigned long ul = 0;
+		BinaryFile in(FILE_TEMP, READ);
+		in.SetFileEndianess(BinaryFile::SystemEndian());
+		ASSERT_NO_THROW(ul = in.ReadULong());
+		ASSERT_EQ(ul, 1);
+	}
+
+	DELETE_TEMP();
+}
+
 
 TEST (BinaryFileTest, TestWriteString)
 {

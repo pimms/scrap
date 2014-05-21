@@ -102,6 +102,7 @@ Instruction with class and method IDs
 MNEMONIC 			DESCRIPTION						STACK [before -> after]
 pop 				Pop the top value from stack 	value1 -> 
 copy 				Copy the top value and push it	value1 -> value1 value2
+return				Return from current method		->
 
 # Variable and stack modification for types: replace T with any of the following:
 # Note that "astore" works for both object and array references.

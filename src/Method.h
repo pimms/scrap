@@ -29,14 +29,16 @@ enum MethodType {
 
 class MethodAttributes {
 public:
-	MethodAttributes(TypeDesc ret, vector<TypeDesc> args);
+	MethodAttributes(TypeDesc ret, vector<TypeDesc> args, string name);
 
 	TypeDesc GetReturnType() const;
 	vector<TypeDesc> GetArguments() const;
+	string GetName() const;
 
 private:
 	vector<TypeDesc> _args;
 	TypeDesc _rettype;
+	string _name;
 };
 
 

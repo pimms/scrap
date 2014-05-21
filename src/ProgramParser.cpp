@@ -40,6 +40,11 @@ Program* ProgramParser::ParseProgramFile(string fileName)
 	program->SetClassList(_classList);
 	program->SetMainMethod(_mainClassID, _mainMethodID);
 
+	if (_file->RemainingBytes() != 0) {
+		delete program;
+		THROW(FileException, "Program file has remaining bytes");
+	}
+
 	return program;
 }
 
@@ -144,12 +149,14 @@ void ProgramParser::ReadMethods(Class *c)
 	unsigned count = 0;
 
 	// Read instance methods
+	count = _file->ReadUnsigned();
 	for (int i=0; i<count; i++) {
 		Method *method = ReadMethod(METHOD_NORMAL, c);
 		c->AddMethod(method);
 	}
 
 	// Read static methods
+	count = _file->ReadUnsigned();
 	for (int i=0; i<count; i++) {
 		Method *method = ReadMethod(METHOD_STATIC, c);
 		c->AddStaticMethod(method);
@@ -179,7 +186,7 @@ Method* ProgramParser::ReadMethod(MethodType methodType, Class *c)
 	retType = ReadTypeDesc(false);
 
 	MethodType type = (isVirtual) ? METHOD_VIRTUAL : methodType;
-	MethodAttributes attrs(retType, args);
+	MethodAttributes attrs(retType, args, name);
 	MethodBody body = ReadMethodBody();
 
 	Method *method = new Method(type, c, &body, attrs);
@@ -297,9 +304,10 @@ TypeDesc ProgramParser::ReadTypeDesc(bool readName)
 	
 	if (typeDesc.type == OBJECT) {
 		typeDesc.classID = _file->ReadUnsigned();
-		if (readName) {
-			typeDesc.argName = name;
-		}
+	}
+
+	if (readName) {
+		typeDesc.name = name;
 	}
 
 	return typeDesc;

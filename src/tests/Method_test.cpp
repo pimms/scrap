@@ -6,10 +6,10 @@ Class clss(0, "TestClass");
 
 // Macro that will create a MethodAttribute object which returns void
 // and takes a single int as a parameter.
-#define DECLARE_ATTR								\
-	vector<TypeDesc> _vtdesc__;						\
-	_vtdesc__.push_back(TypeDesc(INT));				\
-	MethodAttributes attr(TypeDesc(VOID), _vtdesc__);
+#define DECLARE_ATTR												\
+	vector<TypeDesc> _vtdesc__;										\
+	_vtdesc__.push_back(TypeDesc(INT));								\
+	MethodAttributes attr(TypeDesc(VOID), _vtdesc__, "TestMethod");
 
 
 TEST (MethodTest, TestInvalidConstructorArguments)
