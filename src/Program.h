@@ -7,6 +7,7 @@ namespace scrap {
 class ClassList;
 class Method;
 class Class;
+class Heap;
 
 
 /* Program
@@ -32,6 +33,7 @@ private:
 	ClassList *_classList;
 	const Class *_mainClass;
 	Method *_mainMethod;
+	Heap *_heap;
 
 };
 

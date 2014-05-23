@@ -26,8 +26,10 @@ static unsigned len_literal(byte instruction)
 		"len_literal is only defined for the instructions OP_X_PUSH");
 }
 
-unsigned arglen(const InstructionInfo *info)
+unsigned arglen(byte instruction)
 {
+	const InstructionInfo *info = &g_instructionMap[instruction];
+
 	switch (info->argtype) {
 		case ARG_NONE:
 			return 0;

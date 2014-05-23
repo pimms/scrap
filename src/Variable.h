@@ -40,6 +40,8 @@ public:
 	Variable();
 	~Variable();
 
+	Variable* Copy();
+
 	// Attempt to cast the current value to the specified type.
 	bool Cast(VarType type);
 

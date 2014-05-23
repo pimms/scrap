@@ -3,17 +3,22 @@
 #include "Method.h"
 #include "MethodInvocation.h"
 #include "Class.h"
+#include "Heap.h"
 
 namespace scrap {
 
 Program::Program()
 	:	_classList(NULL),
 		_mainMethod(NULL),
-		_mainClass(NULL)
+		_mainClass(NULL),
+		_heap(new Heap())
 { }
 
 Program::~Program()
 {
+	_heap->KillOrphans();
+	delete _heap;
+
 	delete _classList;
 }
 
@@ -47,7 +52,7 @@ void Program::SetMainMethod(unsigned classID, unsigned stMethodID)
 
 void Program::Execute()
 {
-	MethodInvocation main(_mainMethod, _mainClass, NULL);
+	MethodInvocation main(_heap, _mainMethod, _mainClass, NULL);
 	main.Execute();
 }
 

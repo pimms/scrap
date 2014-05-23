@@ -16,12 +16,12 @@ TEST (MethodInvocationTest, TestValidConstructors)
 	MethodInvocation *inv = NULL;
 
 	// The "this" argument must be popped and deleted
-	ASSERT_NO_THROW(inv = new MethodInvocation(methodNormal, obj, NULL));
+	ASSERT_NO_THROW(inv = new MethodInvocation(&heap, methodNormal, obj, NULL));
 	delete inv->GetStack()->Pop();
 	delete inv;
 	
 	// No implicit arguments on static methods
-	ASSERT_NO_THROW(inv = new MethodInvocation(methodStatic, &class0, NULL));
+	ASSERT_NO_THROW(inv = new MethodInvocation(&heap, methodStatic, &class0, NULL));
 	delete inv;
 	
 	delete methodNormal;
@@ -39,13 +39,13 @@ TEST (MethodInvocationTest, TestInvalidConstructors)
 	obj->Release();
 
 	// Call a static method on an object
-	ASSERT_ANY_THROW(MethodInvocation(methodStatic, obj, NULL));
+	ASSERT_ANY_THROW(MethodInvocation(&heap, methodStatic, obj, NULL));
 
 	// Call a normal method on a class
-	ASSERT_ANY_THROW(MethodInvocation(methodNormal, &class0, NULL));
+	ASSERT_ANY_THROW(MethodInvocation(&heap, methodNormal, &class0, NULL));
 
 	// Call Class0::mthd on Class1
-	ASSERT_ANY_THROW(MethodInvocation(methodStatic, &class1, NULL));
+	ASSERT_ANY_THROW(MethodInvocation(&heap, methodStatic, &class1, NULL));
 
 	heap.KillOrphans();
 
@@ -64,7 +64,7 @@ TEST (MethodInvocationTest, AssertArgumentRequirement)
 	// The invocation has no caller and is thus unable to get it's
 	// DOUBLE-argument from anywhere. 
 	MethodInvocation *inv = NULL;
-	ASSERT_ANY_THROW(inv = new MethodInvocation(method, obj, NULL));
+	ASSERT_ANY_THROW(inv = new MethodInvocation(&heap, method, obj, NULL));
 
 	delete method;
 	heap.KillOrphans();
@@ -80,7 +80,7 @@ TEST (MethodInvocationTest, TestArgumentAndReturnTransfer)
 	obj->Release();
 
 	// The "this" argument should be pushed onto the stack
-	MethodInvocation invA(methodA, obj, NULL);
+	MethodInvocation invA(&heap, methodA, obj, NULL);
 	Stack *stackA = invA.GetStack();
 	ASSERT_EQ(stackA->Count(), 1);
 
@@ -88,7 +88,7 @@ TEST (MethodInvocationTest, TestArgumentAndReturnTransfer)
 	Variable *var = new Variable(VarType::DOUBLE);
 	stackA->Push(var);
 
-	MethodInvocation invB(methodB, obj, &invA);
+	MethodInvocation invB(&heap, methodB, obj, &invA);
 	Stack *stackB = invB.GetStack();
 	ASSERT_EQ(stackB->Count(), 2);
 	

@@ -10,14 +10,17 @@
 
 namespace scrap {
 
-MethodInvocation::MethodInvocation(Method *method, Object *object, 
+MethodInvocation::MethodInvocation(Heap *heap, Method *method, Object *object, 
 									MethodInvocation *caller)
 	:	_object(object),
 		_class(object->GetClass()),
 		_method(method),
-		_caller(caller)
+		_caller(caller),
+		_pc(0),
+		_heap(heap),
+		_executor(this, &_stack, _heap)
 {
-	if (!method || !object) {
+	if (!_heap || !_method || !_object) {
 		THROW(NullPointerException, "NULL-argument to MethodInvocation()");
 	}
 
@@ -34,14 +37,17 @@ MethodInvocation::MethodInvocation(Method *method, Object *object,
 	TransferArguments();
 }
 
-MethodInvocation::MethodInvocation(Method *method, const Class *c,
+MethodInvocation::MethodInvocation(Heap *heap, Method *method, const Class *c,
 									MethodInvocation *caller)
 	:	_object(NULL),
 		_class(c),
 		_method(method),
-		_caller(caller)
+		_caller(caller),
+		_pc(0),
+		_heap(heap),
+		_executor(this, &_stack, _heap)
 {
-	if (!method || !c) {
+	if (!_heap || !_method || !_class) {
 		THROW(NullPointerException, "NULL-argument to MethodInvocation()");
 	}
 
@@ -66,8 +72,33 @@ MethodInvocation::~MethodInvocation()
 
 void MethodInvocation::Execute()
 {
-	
+	_pc = 0;
+	const MethodBody *body = _method->GetMethodBody();
+
+	while (_pc < body->length) {
+		_pc += _executor.Execute(body->code + _pc);
+	}
 }
+
+
+void MethodInvocation::PerformMethodCall(Object *object, Method *method)
+{
+	MethodInvocation invocation(_heap, method, object, this);
+	invocation.Execute();
+}
+
+void MethodInvocation::PerformMethodCall(Class *c, Method *method)
+{
+	MethodInvocation invocation(_heap, method, c, this);
+	invocation.Execute();
+}
+
+void MethodInvocation::ReturnToCaller()
+{
+	ReturnValue();
+	_pc = unsigned(~0);
+}
+
 
 #ifdef _SCRAP_TEST_
 Stack* MethodInvocation::GetStack() 

@@ -151,6 +151,19 @@ Variable::~Variable()
 }
 
 
+Variable* Variable::Copy()
+{
+	Variable *cpy = new Variable();
+	cpy->_type = _type;
+	cpy->_value = _value;
+
+	// Field variable status is not copied
+	cpy->_fieldVar = false;
+
+	return cpy;
+}
+
+
 bool Variable::Cast(VarType type)
 {
 	if (!VarValue::CastAvailable(_type, type))

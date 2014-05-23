@@ -221,7 +221,7 @@ struct InstructionInfo {
 	const InstrArgType argtype;
 };
 
-unsigned arglen(const InstructionInfo *info);
+unsigned arglen(byte instruction);
 
 static const InstructionInfo g_reserved {
 	"RESERVED", 0xFF, ARG_NONE
@@ -331,8 +331,7 @@ const InstructionInfo g_instructionMap[] = {
 	{"C_NEWARRAY", 	OP_C_NEWARRAY,	ARG_NONE	  },	//0x64
 	{"C_ARELEASE", 	OP_C_ARELEASE,	ARG_NONE	  },	//0x65
 	{"C_ALOAD", 	OP_C_ALOAD,		ARG_IDX_OR_REG},	//0x66
-	{"C_ASTORE",   	OP_C_ASTORE,	ARG_IDX_OR_REG},	//0x67
-	g_reserved,											//0x68
+	{"C_ASTORE",	OP_C_ASTORE,	ARG_IDX_OR_REG},	//0x68
 	g_reserved,											//0x69
 	g_reserved,											//0x6a
 	g_reserved,											//0x6b
@@ -348,7 +347,7 @@ const InstructionInfo g_instructionMap[] = {
 	{"B_ARELEASE", 	OP_B_ARELEASE,	ARG_NONE	  },	//0x75
 	{"B_ALOAD", 	OP_B_ALOAD,		ARG_IDX_OR_REG},	//0x76
 	{"B_ASTORE",   	OP_B_ASTORE,	ARG_IDX_OR_REG},	//0x77
-	g_reserved,											//0x78
+	{"B_ASTORE",	OP_B_ASTORE,	ARG_IDX_OR_REG},	//0x78
 	g_reserved,											//0x79
 	g_reserved,											//0x7a
 	g_reserved,											//0x7b

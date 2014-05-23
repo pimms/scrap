@@ -2,6 +2,8 @@
 
 #include "Scrap.h"
 #include "Stack.h"
+#include "Executor.h"
+
 
 namespace scrap {
 
@@ -9,6 +11,7 @@ class Method;
 class Object;
 class Class;
 class Stack;
+class Heap;
 
 
 /* Method Invocation
@@ -17,13 +20,19 @@ class Stack;
  * When calling an instance method, the Object-instance is wrapped in a Variable
  * and pushed FIRST onto the stack as the "this" parameter.
  */
-class MethodInvocation {
+class MethodInvocation : public ExecutionDelegate {
 public:
-	MethodInvocation(Method *method, Object *object, MethodInvocation *caller);
-	MethodInvocation(Method *method, const Class *c, MethodInvocation *caller);
+	MethodInvocation(Heap *heap, Method *method, Object *object, 
+					 MethodInvocation *caller);
+	MethodInvocation(Heap *heap, Method *method, const Class *c, 
+					 MethodInvocation *caller);
 	~MethodInvocation();
 
 	void Execute();
+
+	void PerformMethodCall(Object *object, Method *method);
+	void PerformMethodCall(Class *c, Method *method);
+	void ReturnToCaller();
 
 #ifdef _SCRAP_TEST_		
 	// Allow modification in test environments
@@ -42,6 +51,10 @@ private:
 	MethodInvocation *_caller;
 
 	Stack _stack;
+	Heap *_heap;
+	Executor _executor;
+
+	unsigned _pc;
 
 	// Pop the required arguments from the caller stack and push them to own stack
 	void TransferArguments();

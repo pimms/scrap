@@ -4,6 +4,11 @@
 #include "Class.h"
 #include "Method.h"
 #include "Variable.h"
+
+
+
+
+
 #include "IndexList.h"
 #include "Bytecode.h"
 #include <cstring>
@@ -205,7 +210,7 @@ MethodBody ProgramParser::ReadMethodBody()
 	while (read < body.length) {
 		byte instr = _file->ReadByte();
 		body.code[read++] = instr;
-		int len = arglen(&g_instructionMap[instr]);
+		int len = arglen(instr);
 
 		// Read the arguments. The BinaryFile will make sure that the
 		// byte order in whatever arbitrary argument is correct, and they
