@@ -21,9 +21,13 @@ MethodInvocation::MethodInvocation(Method *method, Object *object,
 		THROW(InvalidOperationException, "Cannot call static methods on objects");
 	}
 
+	// TODO
+	// Consider superclasses
 	if (_method->GetClass()->GetClassID() != object->GetClass()->GetClassID()) {
 		THROW(InvalidClassException, "Method called on object of wrong class");
 	}
+
+	TransferArguments();
 }
 
 MethodInvocation::MethodInvocation(Method *method, const Class *c,
@@ -37,9 +41,13 @@ MethodInvocation::MethodInvocation(Method *method, const Class *c,
 		THROW(InvalidOperationException, "Cannot call non-static method on class");
 	}
 	
+	// TODO
+	// Consider superclasses
 	if (_method->GetClass()->GetClassID() != c->GetClassID()) {
 		THROW(InvalidClassException, "Static method called on wrong class");
 	}
+
+	TransferArguments();
 }
 
 MethodInvocation::~MethodInvocation()
@@ -48,8 +56,47 @@ MethodInvocation::~MethodInvocation()
 }
 
 
+void MethodInvocation::Execute()
+{
+	
+}
+
+#ifdef _SCRAP_TEST_
+Stack* MethodInvocation::GetStack() 
+#else
+const Stack* MethodInvocation::GetStack() const 
+#endif
+{
+	return &_stack;
+}
+	
+void MethodInvocation::ReturnValue()
+{
+	if (!_caller)
+		return;
+
+	Variable *var = _stack.Pop();
+
+	if (var->Type() != _method->GetReturnType().type) {
+		string err = "Attempted to return value of type " 
+			+ VarTypeToString(var->Type())
+			+ " from method with return type " 
+			+ VarTypeToString(_method->GetReturnType().type);
+		THROW(InvalidOperationException, err);
+	}
+
+	_caller->_stack.Push(var);
+}
+
+
 void MethodInvocation::TransferArguments()
 {
+	if (_object) {
+		Variable *var = new Variable(VarType::OBJECT);
+		var->Set(_object);
+		_stack.Push(var);
+	}
+
 	if (!_caller)
 		return;
 
@@ -71,38 +118,4 @@ void MethodInvocation::TransferArguments()
 		_stack.Push(var);
 	}
 }
-
-void MethodInvocation::ReturnValue()
-{
-	if (!_caller)
-		return;
-
-	Variable *var = _stack.Pop();
-
-	if (var->Type() != _method->GetReturnType().type) {
-		string err = "Attempted to return value of type " 
-			+ VarTypeToString(var->Type())
-			+ " from method with return type " 
-			+ VarTypeToString(_method->GetReturnType().type);
-		THROW(InvalidOperationException, err);
-	}
-
-	_caller->_stack.Push(var);
-}
-
-
-void MethodInvocation::Execute()
-{
-	printf("[WARNING]: MethodInvocation::Execute() not implemented\n");
-}
-
-#ifdef _SCRAP_TEST_
-Stack* MethodInvocation::GetStack() 
-#else
-const Stack* MethodInvocation::GetStack() const 
-#endif
-{
-	return &_stack;
-}
-	
 }

@@ -1,6 +1,6 @@
 #include "ScrapTest.h"
 
-Method CreateMethod(Class *c, MethodType type) 
+Method* CreateMethod(Class *c, MethodType type) 
 {
 	MethodBody body;
 	body.length = 10;
@@ -10,7 +10,22 @@ Method CreateMethod(Class *c, MethodType type)
 	args.push_back(TypeDesc{DOUBLE});
 
 	MethodAttributes attr(TypeDesc{INT}, args, "GenericTestMethod");
-	Method m(type, c, &body, attr);
+	Method *m = new Method(type, c, &body, attr);
+
+	delete[] body.code;
+	return m;
+}
+
+Method* CreateVoidMethod(Class *c, MethodType type) 
+{
+	MethodBody body;
+	body.length = 10;
+	body.code = new byte[10];
+
+	vector<TypeDesc> args;
+
+	MethodAttributes attr(TypeDesc{VOID}, args, "GenericTestMethodVoid");
+	Method *m = new Method(type, c, &body, attr);
 
 	delete[] body.code;
 	return m;

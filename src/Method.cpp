@@ -26,8 +26,7 @@ Method::Method(MethodType type, Class *c, MethodBody *body, MethodAttributes att
 
 Method::~Method()
 {
-	if (_body.code != NULL) 
-		delete[] _body.code;
+	delete[] _body.code;
 }
 
 

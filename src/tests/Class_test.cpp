@@ -58,11 +58,11 @@ TEST (ClassTest, TestValidMemberAssignment)
 	Class c(0, "Class");
 	
 	// Method addition
-	Method norm = CreateMethod(&c, METHOD_NORMAL);
-	Method stat = CreateMethod(&c, METHOD_STATIC);
+	Method *norm = CreateMethod(&c, METHOD_NORMAL);
+	Method *stat = CreateMethod(&c, METHOD_STATIC);
 
-	ASSERT_NO_THROW(c.AddMethod(&norm));
-	ASSERT_NO_THROW(c.AddStaticMethod(&stat));
+	ASSERT_NO_THROW(c.AddMethod(norm));
+	ASSERT_NO_THROW(c.AddStaticMethod(stat));
 	ASSERT_NO_THROW(c.AddFieldTemplate(TypeDesc{INT}));
 	ASSERT_NO_THROW(c.AddStaticField(TypeDesc{INT}));
 }
@@ -71,11 +71,11 @@ TEST (ClassTest, TestInvalidMemberAssignment)
 {
 	Class c(0, "Class");
 
-	Method norm = CreateMethod(&c, METHOD_NORMAL);
-	Method stat = CreateMethod(&c, METHOD_STATIC);
+	Method *norm = CreateMethod(&c, METHOD_NORMAL);
+	Method *stat = CreateMethod(&c, METHOD_STATIC);
 
-	ASSERT_ANY_THROW(c.AddMethod(&stat));
-	ASSERT_ANY_THROW(c.AddStaticMethod(&norm));
+	ASSERT_ANY_THROW(c.AddMethod(stat));
+	ASSERT_ANY_THROW(c.AddStaticMethod(norm));
 	ASSERT_ANY_THROW(c.AddMethod(NULL));
 	ASSERT_ANY_THROW(c.AddStaticMethod(NULL));
 }
@@ -86,13 +86,13 @@ TEST (ClassTest, TestLockedMemberAssignment)
 	// class-object is locked. 
 	Class c(0, "Class");
 	
-	Method norm = CreateMethod(&c, METHOD_NORMAL);
-	Method stat = CreateMethod(&c, METHOD_STATIC);
+	Method *norm = CreateMethod(&c, METHOD_NORMAL);
+	Method *stat = CreateMethod(&c, METHOD_STATIC);
 
 	c.LockMembers();
 
-	ASSERT_ANY_THROW(c.AddMethod(&norm));
-	ASSERT_ANY_THROW(c.AddStaticMethod(&stat));
+	ASSERT_ANY_THROW(c.AddMethod(norm));
+	ASSERT_ANY_THROW(c.AddStaticMethod(stat));
 	ASSERT_ANY_THROW(c.AddFieldTemplate(TypeDesc{INT}));
 	ASSERT_ANY_THROW(c.AddStaticField(TypeDesc{INT}));
 }
@@ -102,11 +102,11 @@ TEST (ClassTest, TestSuperInheritance)
 	Class super(0, "Super");
 	Class sub(1, "Sub");
 	const Field* field;
-	Method method = CreateMethod(&super, METHOD_NORMAL);
+	Method *method = CreateMethod(&super, METHOD_NORMAL);
 
 	// Add an INT field and a method to super and a FLOAT field to sub
 	super.AddFieldTemplate(TypeDesc{INT});
-	super.AddMethod(&method);
+	super.AddMethod(method);
 	sub.SetSuper(&super);
 	sub.AddFieldTemplate(TypeDesc{FLOAT});
 

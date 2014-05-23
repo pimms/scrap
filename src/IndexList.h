@@ -49,6 +49,7 @@ public:
 
 private:
 	vector<Field> _fields;
+	unsigned _inheritCount;
 	bool _instantiated;
 };
 
@@ -58,6 +59,7 @@ private:
  */
 class MethodList {
 public:
+	MethodList();
 	~MethodList();
 
 	void AddMethod(Method *method);
@@ -67,6 +69,7 @@ public:
 	void InsertFromSuperclass(const MethodList *methodList);
 
 private:
+	unsigned _inheritCount;
 	vector<Method*> _methods;
 };
 

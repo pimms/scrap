@@ -20,12 +20,6 @@ public:
 	MethodInvocation(Method *method, const Class *c, MethodInvocation *caller);
 	~MethodInvocation();
 
-	// Pop the required arguments from the caller stack and push them to own stack
-	void TransferArguments();
-
-	// Push return value (top stack value) onto the calling stack
-	void ReturnValue();
-
 	void Execute();
 
 #ifdef _SCRAP_TEST_		
@@ -35,6 +29,9 @@ public:
 	const Stack* GetStack() const;
 #endif
 
+	// Push return value (top stack value) onto the calling stack
+	void ReturnValue();
+
 private:
 	const Class *_class;
 	Object *_object;
@@ -42,6 +39,10 @@ private:
 	MethodInvocation *_caller;
 
 	Stack _stack;
+
+	// Pop the required arguments from the caller stack and push them to own stack
+	void TransferArguments();
+
 };
 
 }

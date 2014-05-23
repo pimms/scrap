@@ -7,7 +7,8 @@
 namespace scrap {
 
 FieldList::FieldList()
-	:	_instantiated(false)
+	:	_instantiated(false),
+		_inheritCount(0)
 { }
 
 FieldList::~FieldList()
@@ -51,7 +52,7 @@ void FieldList::DeleteVariables()
 	if (_instantiated) {
 		_instantiated = false;
 
-		for (int i=0; i<_fields.size(); i++) {
+		for (int i=_inheritCount; i<_fields.size(); i++) {
 			delete _fields[i].variable;
 			_fields[i].variable = NULL;
 		}
@@ -64,6 +65,7 @@ void FieldList::InsertFromSuperclass(const FieldList *fieldList)
 		THROW(InvalidOperationException,
 		"Superclass insertion must occur before any subclass additions");
 
+	_inheritCount = fieldList->_fields.size();
 	for (int i=0; i<fieldList->_fields.size(); i++) {
 		_fields.push_back(fieldList->_fields[i]);
 	}
@@ -71,9 +73,15 @@ void FieldList::InsertFromSuperclass(const FieldList *fieldList)
 
 
 
+MethodList::MethodList()
+	:	_inheritCount(0)
+{
+
+}
+
 MethodList::~MethodList()
 {
-	for (int i=0; i<_methods.size(); i++) {
+	for (int i=_inheritCount; i<_methods.size(); i++) {
 		delete _methods[i];
 	}
 }
@@ -97,6 +105,7 @@ void MethodList::InsertFromSuperclass(const MethodList *methodList)
 		THROW(InvalidOperationException,
 		"Superclass insertion must occur before any subclass additions");
 
+	_inheritCount = methodList->_methods.size();
 	for (int i=0; i<methodList->_methods.size(); i++) {
 		_methods.push_back(methodList->_methods[i]);
 	}

@@ -17,6 +17,8 @@
 
 using namespace scrap;
 
-// All methods created take a single DOUBLE as an argument, and returns an INT. 
-Method CreateMethod(Class *c, MethodType type = METHOD_NORMAL);
+// Creates a method which take a single DOUBLE as an argument, and returns an INT. 
+Method* CreateMethod(Class *c, MethodType type = METHOD_NORMAL);
 
+// No arguments, returns void
+Method* CreateVoidMethod(Class *c, MethodType type = METHOD_NORMAL);
