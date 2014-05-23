@@ -411,7 +411,7 @@ TEST (VariableTest, CastToBool)
 		Variable b(VarType::_T);					\
 		a.Set((_TYPE) va);							\
 		b.Set((_TYPE) vb);							\
-		a._OPFUNC(b);								\
+		a._OPFUNC(&b);								\
 		ASSERT_EQ(a.TM_VALUE_T(_T), r);				\
 	}
 
@@ -442,7 +442,7 @@ TEST (VariableTest, CastToBool)
 	{												\
 		Variable a(VarType::_T);					\
 		Variable b(VarType::_T);					\
-		ASSERT_ANY_THROW(a._OPFUNC(b));				\
+		ASSERT_ANY_THROW(a._OPFUNC(&b));				\
 	}
 
 TEST (VariableTest, TestAdd)

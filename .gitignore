@@ -30,6 +30,9 @@ cscope.out
 
 # KDevelop 
 Project.kdev*
+.kdev4
+scrap.kdev4
+test.kdev4
 
 # Built executable
 scrap

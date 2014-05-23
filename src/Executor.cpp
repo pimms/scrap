@@ -225,16 +225,6 @@ Variable*& Executor::GetRegister(byte reg)
 }
 
 
-
-
-// Asserts that a variable (_VAR) is of type _T (short hand notation, i,a,
-// d,f etc). 
-#define ASSERT_TYPE(_VAR, _T) 							\
-	if (_VAR->Type() != VarType::_T) 					\
-		THROW(InvalidTypeException, "Type assertion "	\
-		"failed. Expected " + VarTypeToString(_T) +		\
-		", got " + VarTypeToString(_VAR->Type()));
-
 unsigned Executor::Pop(const byte *instr) 
 {
 	Variable *var = _stack->Pop();
@@ -274,10 +264,7 @@ unsigned Executor::Return(const byte *instr)
 
 unsigned Executor::ALoad(const byte *instr) 
 {
-	Variable *reg = GetRegister(instr[1]);
-	ASSERT_TYPE(reg, a);
-	_stack->Push(reg);
-
+	GenericLoad(VarType::a, instr[1]);
 	return 2;
 }
 
@@ -289,7 +276,8 @@ unsigned Executor::AReturn(const byte *instr)
 
 unsigned Executor::AStore(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericStore(VarType::a, instr[1]);
+	return 2;
 }
 
 unsigned Executor::ANewarray(const byte *instr) 
@@ -314,17 +302,20 @@ unsigned Executor::AAstore(const byte *instr)
 
 unsigned Executor::ILoad(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericLoad(VarType::i, instr[1]);
+	return 2;
 }
 
 unsigned Executor::IReturn(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	_delegate->ReturnToCaller();
+	return 1;
 }
 
 unsigned Executor::IStore(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericStore(VarType::i, instr[1]);
+	return 2;
 }
 
 unsigned Executor::IPush(const byte *instr) 
@@ -354,17 +345,20 @@ unsigned Executor::IAstore(const byte *instr)
 
 unsigned Executor::FLoad(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericLoad(VarType::f, instr[1]);
+	return 2;
 }
 
 unsigned Executor::FReturn(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	_delegate->ReturnToCaller();
+	return 1;
 }
 
 unsigned Executor::FStore(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericStore(VarType::f, instr[1]);
+	return 2;
 }
 
 unsigned Executor::FPush(const byte *instr) 
@@ -394,17 +388,20 @@ unsigned Executor::FAstore(const byte *instr)
 
 unsigned Executor::DLoad(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericLoad(VarType::d, instr[1]);
+	return 2;
 }
 
 unsigned Executor::DReturn(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	_delegate->ReturnToCaller();
+	return 1;
 }
 
 unsigned Executor::DStore(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericStore(VarType::d, instr[1]);
+	return 2;
 }
 
 unsigned Executor::DPush(const byte *instr) 
@@ -434,17 +431,20 @@ unsigned Executor::DAstore(const byte *instr)
 
 unsigned Executor::LLoad(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericLoad(VarType::l, instr[1]);
+	return 2;
 }
 
 unsigned Executor::LReturn(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	_delegate->ReturnToCaller();
+	return 1;
 }
 
 unsigned Executor::LStore(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericStore(VarType::l, instr[1]);
+	return 2;
 }
 
 unsigned Executor::LPush(const byte *instr) 
@@ -474,17 +474,20 @@ unsigned Executor::LAstore(const byte *instr)
 
 unsigned Executor::CLoad(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericLoad(VarType::c, instr[1]);
+	return 2;
 }
 
 unsigned Executor::CReturn(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	_delegate->ReturnToCaller();
+	return 1;
 }
 
 unsigned Executor::CStore(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericStore(VarType::c, instr[1]);
+	return 2;
 }
 
 unsigned Executor::CPush(const byte *instr) 
@@ -514,17 +517,20 @@ unsigned Executor::CAstore(const byte *instr)
 
 unsigned Executor::BLoad(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericLoad(VarType::b, instr[1]);
+	return 2;
 }
 
 unsigned Executor::BReturn(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	_delegate->ReturnToCaller();
+	return 1;
 }
 
 unsigned Executor::BStore(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericStore(VarType::b, instr[1]);
+	return 2;
 }
 
 unsigned Executor::BPush(const byte *instr) 
@@ -707,194 +713,233 @@ unsigned Executor::B2C(const byte *instr)
 	THROW(NotImplementedException, "Instruction method not implemented");
 }
 
+
 unsigned Executor::IAdd(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericAdd(VarType::i);
+	return 1;
 }
 
 unsigned Executor::ISub(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericSub(VarType::i);
+	return 1;
 }
 
 unsigned Executor::IMul(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericMul(VarType::i);
+	return 1;
 }
 
 unsigned Executor::IDiv(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericDiv(VarType::i);
+	return 1;
 }
 
 unsigned Executor::FAdd(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericAdd(VarType::f);
+	return 1;
 }
 
 unsigned Executor::FSub(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericSub(VarType::f);
+	return 1;
 }
 
 unsigned Executor::FMul(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericMul(VarType::f);
+	return 1;
 }
 
 unsigned Executor::FDiv(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericDiv(VarType::f);
+	return 1;
 }
 
 unsigned Executor::DAdd(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericAdd(VarType::d);
+	return 1;
 }
 
 unsigned Executor::DSub(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericSub(VarType::d);
+	return 1;
 }
 
 unsigned Executor::DMul(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericMul(VarType::d);
+	return 1;
 }
 
 unsigned Executor::DDiv(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericDiv(VarType::d);
+	return 1;
 }
 
 unsigned Executor::LAdd(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericAdd(VarType::l);
+	return 1;
 }
 
 unsigned Executor::LSub(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericSub(VarType::l);
+	return 1;
 }
 
 unsigned Executor::LMul(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericMul(VarType::l);
+	return 1;
 }
 
 unsigned Executor::LDiv(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericDiv(VarType::l);
+	return 1;
 }
 
 unsigned Executor::CAdd(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericAdd(VarType::c);
+	return 1;
 }
 
 unsigned Executor::CSub(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericSub(VarType::c);
+	return 1;
 }
 
 unsigned Executor::CMul(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericMul(VarType::c);
+	return 1;
 }
 
 unsigned Executor::CDiv(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericDiv(VarType::c);
+	return 1;
 }
 
 unsigned Executor::IShl(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericShl(VarType::i);
+	return 1;
 }
 
 unsigned Executor::IShr(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericShr(VarType::i);
+	return 1;
 }
 
 unsigned Executor::IMod(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericMod(VarType::i);
+	return 1;
 }
 
 unsigned Executor::IXor(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericXor(VarType::i);
+	return 1;
 }
 
 unsigned Executor::IAnd(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericAnd(VarType::i);
+	return 1;
 }
 
 unsigned Executor::IOr(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericOr(VarType::i);
+	return 1;
 }
 
 unsigned Executor::LShl(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericShl(VarType::l);
+	return 1;
 }
 
 unsigned Executor::LShr(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericShr(VarType::l);
+	return 1;
 }
 
 unsigned Executor::LMod(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericMod(VarType::l);
+	return 1;
 }
 
 unsigned Executor::LXor(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericXor(VarType::l);
+	return 1;
 }
 
 unsigned Executor::LAnd(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericAnd(VarType::l);
+	return 1;
 }
 
 unsigned Executor::LOr(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericOr(VarType::l);
+	return 1;
 }
 
 unsigned Executor::CShl(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericShl(VarType::c);
+	return 1;
 }
 
 unsigned Executor::CShr(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericShr(VarType::c);
+	return 1;
 }
 
 unsigned Executor::CMod(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericMod(VarType::c);
+	return 1;
 }
 
 unsigned Executor::CXor(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericXor(VarType::c);
+	return 1;
 }
 
 unsigned Executor::CAnd(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericAnd(VarType::c);
+	return 1;
 }
 
 unsigned Executor::COr(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	GenericOr(VarType::c);
+	return 1;
 }
 
 unsigned Executor::New(const byte *instr) 
@@ -982,5 +1027,111 @@ unsigned Executor::BifLessEQ(const byte *instr)
 	THROW(NotImplementedException, "Instruction method not implemented");
 }
 
+
+void Executor::GenericAdd(VarType type)
+{
+	Variable *v2 = _stack->Pop();
+	Variable *v1 = _stack->Pop();
+	v1->Add(v2);
+	
+	_stack->Push(v1);
+}
+
+void Executor::GenericSub(VarType type)
+{
+	Variable *v2 = _stack->Pop();
+	Variable *v1 = _stack->Pop();
+	v1->Sub(v2);
+	
+	_stack->Push(v1);
+}
+
+void Executor::GenericMul(VarType type)
+{
+	Variable *v2 = _stack->Pop();
+	Variable *v1 = _stack->Pop();
+	v1->Mul(v2);
+	
+	_stack->Push(v1);
+}
+
+void Executor::GenericDiv(VarType type)
+{
+	Variable *v2 = _stack->Pop();
+	Variable *v1 = _stack->Pop();
+	v1->Div(v2);
+	
+	_stack->Push(v1);
+}
+
+
+
+void Executor::GenericMod(VarType type) 
+{
+	Variable *var2 = _stack->Pop();
+	Variable *var1 = _stack->Pop();
+	var1->Mod(var2);
+	
+	_stack->Push(var1);
+}
+
+void Executor::GenericAnd(VarType type) 
+{
+	Variable *var2 = _stack->Pop();
+	Variable *var1 = _stack->Pop();
+	var1->And(var2);
+	
+	_stack->Push(var1);
+}
+
+void Executor::GenericXor(VarType type)
+{
+	Variable *var2 = _stack->Pop();
+	Variable *var1 = _stack->Pop();
+	var1->Xor(var2);
+	
+	_stack->Push(var1);
+}
+
+void Executor::GenericOr(VarType type) 
+{
+	Variable *var2 = _stack->Pop();
+	Variable *var1 = _stack->Pop();
+	var1->Or(var2);
+	
+	_stack->Push(var1);
+}
+
+void Executor::GenericShl(VarType type) 
+{
+	Variable *var2 = _stack->Pop();
+	Variable *var1 = _stack->Pop();
+	var1->Shl(var2);
+	
+	_stack->Push(var1);
+}
+
+void Executor::GenericShr(VarType type) 
+{
+	Variable *var2 = _stack->Pop();
+	Variable *var1 = _stack->Pop();
+	var1->Shr(var2);
+	
+	_stack->Push(var1);
+}
+
+
+void Executor::GenericLoad(VarType type, byte regIdx)
+{
+	Variable *reg = GetRegister(regIdx);
+	Variable *var = _stack->Pop();
+	reg = var;
+}
+
+void Executor::GenericStore(VarType type, byte regIdx)
+{
+	Variable *reg = GetRegister(regIdx);
+	_stack->Push(reg);
+}
 
 }

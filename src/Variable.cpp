@@ -291,222 +291,222 @@ VarType Variable::Type() const
 			"Attempted divison by zero");
 	
 
-void Variable::Add(const Variable &var) 
+void Variable::Add(const Variable *var) 
 {
 	ValidOperationCheck(AritOp::ADD, var);
 
 	switch (_type) {
 		case INT:
-			_value.i += var._value.i;
+			_value.i += var->_value.i;
 			break;
 		case FLOAT:
-			_value.f += var._value.f;
+			_value.f += var->_value.f;
 			break;
 		case DOUBLE:
-			_value.d += var._value.d;
+			_value.d += var->_value.d;
 			break;
 		case LONG:
-			_value.l += var._value.l;
+			_value.l += var->_value.l;
 			break;
 		case CHAR:
-			_value.c += var._value.c;
+			_value.c += var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::ADD);
 	}
 }
 
-void Variable::Sub(const Variable &var) 
+void Variable::Sub(const Variable *var) 
 {
 	ValidOperationCheck(AritOp::SUB, var);
 
 	switch (_type) {
 		case INT:
-			_value.i -= var._value.i;
+			_value.i -= var->_value.i;
 			break;
 		case FLOAT:
-			_value.f -= var._value.f;
+			_value.f -= var->_value.f;
 			break;
 		case DOUBLE:
-			_value.d -= var._value.d;
+			_value.d -= var->_value.d;
 			break;
 		case LONG:
-			_value.l -= var._value.l;
+			_value.l -= var->_value.l;
 			break;
 		case CHAR:
-			_value.c -= var._value.c;
+			_value.c -= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::SUB);
 	}
 }
 
-void Variable::Mul(const Variable &var) 
+void Variable::Mul(const Variable *var) 
 {
 	ValidOperationCheck(AritOp::MUL, var);
 
 	switch (_type) {
 		case INT:
-			_value.i *= var._value.i;
+			_value.i *= var->_value.i;
 			break;
 		case FLOAT:
-			_value.f *= var._value.f;
+			_value.f *= var->_value.f;
 			break;
 		case DOUBLE:
-			_value.d *= var._value.d;
+			_value.d *= var->_value.d;
 			break;
 		case LONG:
-			_value.l *= var._value.l;
+			_value.l *= var->_value.l;
 			break;
 		case CHAR:
-			_value.c *= var._value.c;
+			_value.c *= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::MUL);
 	}
 }
 
-void Variable::Div(const Variable &var) 
+void Variable::Div(const Variable *var) 
 {
 	ValidOperationCheck(AritOp::DIV, var);
 
 	switch (_type) {
 		case INT:
-			ZERO_DIV_CHECK(var._value, i, int);
-			_value.i /= var._value.i;
+			ZERO_DIV_CHECK(var->_value, i, int);
+			_value.i /= var->_value.i;
 			break;
 		case FLOAT:
-			ZERO_DIV_CHECK(var._value, f, float);
-			_value.f /= var._value.f;
+			ZERO_DIV_CHECK(var->_value, f, float);
+			_value.f /= var->_value.f;
 			break;
 		case DOUBLE:
-			ZERO_DIV_CHECK(var._value, d, double);
-			_value.d /= var._value.d;
+			ZERO_DIV_CHECK(var->_value, d, double);
+			_value.d /= var->_value.d;
 			break;
 		case LONG:
-			ZERO_DIV_CHECK(var._value, l, long);
-			_value.l /= var._value.l;
+			ZERO_DIV_CHECK(var->_value, l, long);
+			_value.l /= var->_value.l;
 			break;
 		case CHAR:
-			ZERO_DIV_CHECK(var._value, c, char);
-			_value.c /= var._value.c;
+			ZERO_DIV_CHECK(var->_value, c, char);
+			_value.c /= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::DIV);
 	}
 }
 
-void Variable::Shr(const Variable &var)
+void Variable::Shr(const Variable *var)
 {
 	ValidOperationCheck(AritOp::SHR, var);
 
 	switch (_type) {
 		case INT:
-			_value.i >>= var._value.i;
+			_value.i >>= var->_value.i;
 			break;
 		case LONG:
-			_value.l >>= var._value.l;
+			_value.l >>= var->_value.l;
 			break;
 		case CHAR:
-			_value.c >>= var._value.c;
+			_value.c >>= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::SHR);
 	}
 }
 
-void Variable::Shl(const Variable &var)
+void Variable::Shl(const Variable *var)
 {
 	ValidOperationCheck(AritOp::SHL, var);
 
 	switch (_type) {
 		case INT:
-			_value.i <<= var._value.i;
+			_value.i <<= var->_value.i;
 			break;
 		case LONG:
-			_value.l <<= var._value.l;
+			_value.l <<= var->_value.l;
 			break;
 		case CHAR:
-			_value.c <<= var._value.c;
+			_value.c <<= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::SHL);
 	}
 }
 
-void Variable::Mod(const Variable &var)
+void Variable::Mod(const Variable *var)
 {
 	ValidOperationCheck(AritOp::MOD, var);
 
 	switch (_type) {
 		case INT:
-			ZERO_DIV_CHECK(var._value, i, int);
-			_value.i %= var._value.i;
+			ZERO_DIV_CHECK(var->_value, i, int);
+			_value.i %= var->_value.i;
 			break;
 		case LONG:
-			ZERO_DIV_CHECK(var._value, l, long);
-			_value.l %= var._value.l;
+			ZERO_DIV_CHECK(var->_value, l, long);
+			_value.l %= var->_value.l;
 			break;
 		case CHAR:
-			ZERO_DIV_CHECK(var._value, c, char);
-			_value.c %= var._value.c;
+			ZERO_DIV_CHECK(var->_value, c, char);
+			_value.c %= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::MOD);
 	}
 }
 
-void Variable::Xor(const Variable &var)
+void Variable::Xor(const Variable *var)
 {
 	ValidOperationCheck(AritOp::XOR, var);
 
 	switch (_type) {
 		case INT:
-			_value.i ^= var._value.i;
+			_value.i ^= var->_value.i;
 			break;
 		case LONG:
-			_value.l ^= var._value.l;
+			_value.l ^= var->_value.l;
 			break;
 		case CHAR:
-			_value.c ^= var._value.c;
+			_value.c ^= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::XOR);
 	}
 }
 
-void Variable::And(const Variable &var)
+void Variable::And(const Variable *var)
 {
 	ValidOperationCheck(AritOp::XOR, var);
 
 	switch (_type) {
 		case INT:
-			_value.i &= var._value.i;
+			_value.i *= var->_value.i;
 			break;
 		case LONG:
-			_value.l &= var._value.l;
+			_value.l *= var->_value.l;
 			break;
 		case CHAR:
-			_value.c &= var._value.c;
+			_value.c *= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::AND);
 	}
 }
 
-void Variable::Or(const Variable &var)
+void Variable::Or(const Variable *var)
 {
 	ValidOperationCheck(AritOp::XOR, var);
 
 	switch (_type) {
 		case INT:
-			_value.i |= var._value.i;
+			_value.i |= var->_value.i;
 			break;
 		case LONG:
-			_value.l |= var._value.l;
+			_value.l |= var->_value.l;
 			break;
 		case CHAR:
-			_value.c |= var._value.c;
+			_value.c |= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::OR);
@@ -526,20 +526,20 @@ bool Variable::IsFieldVariable() const
 
 
 
-void Variable::ValidOperationCheck(AritOp op, const Variable &var)
+void Variable::ValidOperationCheck(AritOp op, const Variable *var)
 {
-	if (_type != var.Type() || _type == VarType::OBJECT) {
+	if (_type != var->Type() || _type == VarType::OBJECT) {
 		THROW(InvalidTypeException, 
 			"Cannot perform operation " + AritOpToString(op) +
 			" with left operand of type " + VarTypeToString(_type) +
-			" and right operand of type " + VarTypeToString(var.Type()));
+			" and right operand of type " + VarTypeToString(var->Type()));
 	}
 
-	if (!IsOperationAvailable(op, var.Type())) {
+	if (!IsOperationAvailable(op, var->Type())) {
 		THROW(InvalidOperationException, 
 			"Cannot perform operation " + AritOpToString(op) +
 			" with left operand of type " + VarTypeToString(_type) +
-			" and right operand of type " + VarTypeToString(var.Type()));
+			" and right operand of type " + VarTypeToString(var->Type()));
 	}
 }
 

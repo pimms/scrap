@@ -75,16 +75,16 @@ public:
 	// 		push A		[A]
 	// 		push B		[A,B]
 	// 		add			[A]		(A is now equal to A+B)
-	void Add(const Variable &var);
-	void Sub(const Variable &var);
-	void Mul(const Variable &var);
-	void Div(const Variable &var);
-	void Shr(const Variable &var);
-	void Shl(const Variable &var);
-	void Mod(const Variable &var);
-	void Xor(const Variable &var);
-	void And(const Variable &var);
-	void Or(const Variable &var);
+	void Add(const Variable *var);
+	void Sub(const Variable *var);
+	void Mul(const Variable *var);
+	void Div(const Variable *var);
+	void Shr(const Variable *var);
+	void Shl(const Variable *var);
+	void Mod(const Variable *var);
+	void Xor(const Variable *var);
+	void And(const Variable *var);
+	void Or(const Variable *var);
 
 	void SetFieldVariableFlag(bool fieldFlag);
 	bool IsFieldVariable() const;
@@ -99,7 +99,7 @@ private:
 
 	// Throws either an InvalidOperationException 
 	// InvalidTypeException if the operation cannot be performed.
-	void ValidOperationCheck(AritOp op, const Variable &var);
+	void ValidOperationCheck(AritOp op, const Variable *var);
 
 	static bool IsOperationAvailable(AritOp op, VarType type);
 };

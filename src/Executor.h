@@ -6,6 +6,8 @@
 namespace scrap {
 
 class Variable;
+
+class Variable;
 class Stack;
 class Heap;
 class Executor;
@@ -203,6 +205,22 @@ private:
 	unsigned BifGreaterEQ(const byte *instr);
 	unsigned BifLess(const byte *instr);
 	unsigned BifLessEQ(const byte *instr);
+	
+	// Generic operations, performs typed instructions
+	// and asserts that the types match.
+	void GenericAdd(VarType type);
+	void GenericSub(VarType type);
+	void GenericMul(VarType type);
+	void GenericDiv(VarType type);
 
+	void GenericMod(VarType type);
+	void GenericAnd(VarType type);
+	void GenericXor(VarType type);
+	void GenericOr(VarType type);
+	void GenericShl(VarType type);
+	void GenericShr(VarType type);
+	
+	void GenericLoad(VarType type, byte regIdx);
+	void GenericStore(VarType type, byte regIdx);
 };
 }
