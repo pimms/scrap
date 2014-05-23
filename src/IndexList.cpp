@@ -41,6 +41,7 @@ void FieldList::InstantiateVariables()
 
 		for (int i=0; i<_fields.size(); i++) {
 			_fields[i].variable = new Variable(_fields[i].typeDesc.type);
+			_fields[i].variable->SetFieldVariableFlag(true);
 		}
 	}
 }

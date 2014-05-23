@@ -27,7 +27,9 @@ TO CastVarValue(VarValue val, VarType type)
 		case OBJECT:
 			THROW(InvalidCastException,
 				"Unable to cast to Object* from CastVarValue().");
-	
+		case VOID:
+			THROW(InvalidCastException,
+				"Unable to cast to 'void' from CastVarValue().");
 	}
 }
 
@@ -66,6 +68,9 @@ bool VarValue::CastAvailable(VarType from, VarType to)
 				default:
 					return false;
 			}
+
+		case VOID:
+			return false;
 	}
 
 	/* NEVER REACHED */
@@ -127,7 +132,8 @@ VarValue VarValue::CastTo(VarValue val, VarType from, VarType to)
 
 
 Variable::Variable(VarType type)
-	:	_type(type)
+	:	_type(type),
+		_fieldVar(false)
 {
 	// All variables are initiated with zero in some form. Booleans
 	// are false, ints 0 and objects NULL by default.
@@ -137,7 +143,6 @@ Variable::Variable(VarType type)
 Variable::Variable()
 	: 	Variable(VarType::OBJECT)
 {
-
 }
 
 Variable::~Variable()
@@ -496,6 +501,18 @@ void Variable::Or(const Variable &var)
 }
 
 
+void Variable::SetFieldVariableFlag(bool fieldFlag)
+{
+	_fieldVar = fieldFlag;
+}
+
+bool Variable::IsFieldVariable() const
+{
+	return _fieldVar;
+}
+
+
+
 void Variable::ValidOperationCheck(AritOp op, const Variable &var)
 {
 	if (_type != var.Type() || _type == VarType::OBJECT) {
@@ -523,9 +540,10 @@ bool Variable::IsOperationAvailable(AritOp op, VarType type)
 		case CHAR:
 			return true;
 
-		// No operations can be performed on bool or objects
+		// No operations can be performed on bool, void or objects
 		case BOOL:
 		case OBJECT:
+		case VOID:
 			return false;
 
 		case FLOAT:

@@ -84,9 +84,16 @@ public:
 	void And(const Variable &var);
 	void Or(const Variable &var);
 
+	void SetFieldVariableFlag(bool fieldFlag);
+	bool IsFieldVariable() const;
+
 private:
 	VarValue _value;
 	VarType _type;
+
+	// If the variable belongs to an object or class, it cannot be 
+	// deleted where normal variables would be.
+	bool _fieldVar;
 
 	// Throws either an InvalidOperationException 
 	// InvalidTypeException if the operation cannot be performed.
