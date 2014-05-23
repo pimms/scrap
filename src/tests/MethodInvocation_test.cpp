@@ -24,10 +24,9 @@ TEST (MethodInvocationTest, TestValidConstructors)
 	ASSERT_NO_THROW(inv = new MethodInvocation(methodStatic, &class0, NULL));
 	delete inv;
 	
-	heap.KillOrphans();
-
 	delete methodNormal;
 	delete methodStatic;
+	heap.KillOrphans();
 }
 
 TEST (MethodInvocationTest, TestInvalidConstructors)
@@ -52,6 +51,23 @@ TEST (MethodInvocationTest, TestInvalidConstructors)
 
 	delete methodNormal;
 	delete methodStatic;
+}
+
+TEST (MethodInvocationTest, AssertArgumentRequirement)
+{
+	Method *method = CreateMethod(&class0, METHOD_NORMAL);
+	
+	Heap heap;
+	Object *obj = heap.CreateObject(&class0);
+	obj->Release();
+
+	// The invocation has no caller and is thus unable to get it's
+	// DOUBLE-argument from anywhere. 
+	MethodInvocation *inv = NULL;
+	ASSERT_ANY_THROW(inv = new MethodInvocation(method, obj, NULL));
+
+	delete method;
+	heap.KillOrphans();
 }
 
 TEST (MethodInvocationTest, TestArgumentAndReturnTransfer)
@@ -100,3 +116,4 @@ TEST (MethodInvocationTest, TestArgumentAndReturnTransfer)
 	delete methodB;
 	heap.KillOrphans();
 }
+

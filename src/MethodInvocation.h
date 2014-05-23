@@ -12,7 +12,10 @@ class Stack;
 
 
 /* Method Invocation
- * Object that manages execution of a method.
+ * Object that manages execution of a method. 
+ *
+ * When calling an instance method, the Object-instance is wrapped in a Variable
+ * and pushed FIRST onto the stack as the "this" parameter.
  */
 class MethodInvocation {
 public:
@@ -42,7 +45,6 @@ private:
 
 	// Pop the required arguments from the caller stack and push them to own stack
 	void TransferArguments();
-
 };
 
 }

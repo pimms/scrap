@@ -17,6 +17,10 @@ MethodInvocation::MethodInvocation(Method *method, Object *object,
 		_method(method),
 		_caller(caller)
 {
+	if (!method || !object) {
+		THROW(NullPointerException, "NULL-argument to MethodInvocation()");
+	}
+
 	if (_method->GetMethodType() == METHOD_STATIC) {
 		THROW(InvalidOperationException, "Cannot call static methods on objects");
 	}
@@ -37,6 +41,10 @@ MethodInvocation::MethodInvocation(Method *method, const Class *c,
 		_method(method),
 		_caller(caller)
 {
+	if (!method || !c) {
+		THROW(NullPointerException, "NULL-argument to MethodInvocation()");
+	}
+
 	if (_method->GetMethodType() != METHOD_STATIC) {
 		THROW(InvalidOperationException, "Cannot call non-static method on class");
 	}
@@ -97,8 +105,20 @@ void MethodInvocation::TransferArguments()
 		_stack.Push(var);
 	}
 
-	if (!_caller)
+	if (!_caller) {
+		// If arguments are expected, this invocation is invalid
+		if (_method->GetMethodAttributes().GetArguments().size() != 0) {
+			// TransferArguments() is only called from the constructor, so we can
+			// guarantee at this point that the stack holds nothing more than the
+			// "this" pointer (it can also be empty for static invocations).
+			if (_stack.Count() == 1) 
+				delete _stack.Pop();
+
+			THROW(InvalidArgumentException, "Expected parameters, none given");
+		}
+
 		return;
+	}
 
 	MethodAttributes attr = _method->GetMethodAttributes();
 
