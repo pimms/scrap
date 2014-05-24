@@ -43,166 +43,165 @@ unsigned Executor::Execute(const byte *instr)
 
 void Executor::BuildInstructionMap()
 {
-	g_methodMap[OP_POP] 		= NULL;
-	g_methodMap[OP_COPY] 		= NULL;
-	g_methodMap[OP_ARRAYLENGTH]	= NULL;
-	g_methodMap[OP_ARRAYLOAD] 	= NULL;
-	g_methodMap[OP_RETURN] 		= NULL;
+	g_methodMap[OP_POP] 		= &Executor::Pop;
+	g_methodMap[OP_COPY] 		= &Executor::Copy;
+	g_methodMap[OP_ARRAYLENGTH]	= &Executor::ArrayLength;
+	g_methodMap[OP_ARRAYLOAD] 	= &Executor::ArrayLoad;
+	g_methodMap[OP_RETURN] 		= &Executor::Return;
 
-	g_methodMap[OP_A_LOAD]		= NULL;
-	g_methodMap[OP_A_RETURN]	= NULL;
-	g_methodMap[OP_A_STORE]		= NULL;
-	g_methodMap[OP_A_NEWARRAY]	= NULL;
-	g_methodMap[OP_A_ARELEASE]	= NULL;
-	g_methodMap[OP_A_ALOAD]		= NULL;
-	g_methodMap[OP_A_ASTORE]	= NULL;
+	g_methodMap[OP_A_LOAD]		= &Executor::ALoad;
+	g_methodMap[OP_A_RETURN]	= &Executor::AReturn;
+	g_methodMap[OP_A_STORE]		= &Executor::AStore;
+	g_methodMap[OP_A_NEWARRAY]	= &Executor::ANewarray;
+	g_methodMap[OP_A_ARELEASE]	= &Executor::AArelease;
+	g_methodMap[OP_A_ALOAD]		= &Executor::AAload;
+	g_methodMap[OP_A_ASTORE]	= &Executor::AAstore;
 
-	g_methodMap[OP_I_LOAD]		= NULL;
-    g_methodMap[OP_I_RETURN]	= NULL;
-    g_methodMap[OP_I_STORE]		= NULL;
-    g_methodMap[OP_I_PUSH]		= NULL;
-    g_methodMap[OP_I_NEWARRAY]	= NULL;
-    g_methodMap[OP_I_ARELEASE]	= NULL;
-    g_methodMap[OP_I_ALOAD]		= NULL;
-    g_methodMap[OP_I_ASTORE]	= NULL;
+	g_methodMap[OP_I_LOAD]		= &Executor::ILoad;
+    g_methodMap[OP_I_RETURN]	= &Executor::IReturn;
+    g_methodMap[OP_I_STORE]		= &Executor::IStore;
+    g_methodMap[OP_I_PUSH]		= &Executor::IPush;
+    g_methodMap[OP_I_NEWARRAY]	= &Executor::INewarray;
+    g_methodMap[OP_I_ARELEASE]	= &Executor::IArelease;
+    g_methodMap[OP_I_ALOAD]		= &Executor::IAload;
+    g_methodMap[OP_I_ASTORE]	= &Executor::IAstore;
 
-	g_methodMap[OP_F_LOAD]		= NULL;
-    g_methodMap[OP_F_RETURN]	= NULL;
-    g_methodMap[OP_F_STORE]		= NULL;
-    g_methodMap[OP_F_PUSH]		= NULL;
-    g_methodMap[OP_F_NEWARRAY]	= NULL;
-    g_methodMap[OP_F_ARELEASE]	= NULL;
-    g_methodMap[OP_F_ALOAD]		= NULL;
-    g_methodMap[OP_F_ASTORE]	= NULL;
+	g_methodMap[OP_F_LOAD]		= &Executor::FLoad;
+    g_methodMap[OP_F_RETURN]	= &Executor::FReturn;
+    g_methodMap[OP_F_STORE]		= &Executor::FStore;
+    g_methodMap[OP_F_PUSH]		= &Executor::FPush;
+    g_methodMap[OP_F_NEWARRAY]	= &Executor::FNewarray;
+    g_methodMap[OP_F_ARELEASE]	= &Executor::FArelease;
+    g_methodMap[OP_F_ALOAD]		= &Executor::FAload;
+    g_methodMap[OP_F_ASTORE]	= &Executor::FAstore;
 
-	g_methodMap[OP_D_LOAD]		= NULL;
-    g_methodMap[OP_D_RETURN]	= NULL;
-    g_methodMap[OP_D_STORE]		= NULL;
-    g_methodMap[OP_D_PUSH]		= NULL;
-    g_methodMap[OP_D_NEWARRAY]	= NULL;
-    g_methodMap[OP_D_ARELEASE]	= NULL;
-    g_methodMap[OP_D_ALOAD]		= NULL;
-    g_methodMap[OP_D_ASTORE]	= NULL;
+	g_methodMap[OP_D_LOAD]		= &Executor::DLoad;
+    g_methodMap[OP_D_RETURN]	= &Executor::DReturn;
+    g_methodMap[OP_D_STORE]		= &Executor::DStore;
+    g_methodMap[OP_D_PUSH]		= &Executor::DPush;
+    g_methodMap[OP_D_NEWARRAY]	= &Executor::DNewarray;
+    g_methodMap[OP_D_ARELEASE]	= &Executor::DArelease;
+    g_methodMap[OP_D_ALOAD]		= &Executor::DAload;
+    g_methodMap[OP_D_ASTORE]	= &Executor::DAstore;
 
-	g_methodMap[OP_L_LOAD]		= NULL;
-    g_methodMap[OP_L_RETURN]	= NULL;
-    g_methodMap[OP_L_STORE]		= NULL;
-    g_methodMap[OP_L_PUSH]		= NULL;
-    g_methodMap[OP_L_NEWARRAY]	= NULL;
-    g_methodMap[OP_L_ARELEASE]	= NULL;
-    g_methodMap[OP_L_ALOAD]		= NULL;
-    g_methodMap[OP_L_ASTORE]	= NULL;
+	g_methodMap[OP_L_LOAD]		= &Executor::LLoad;
+    g_methodMap[OP_L_RETURN]	= &Executor::LReturn;
+    g_methodMap[OP_L_STORE]		= &Executor::LStore;
+    g_methodMap[OP_L_PUSH]		= &Executor::LPush;
+    g_methodMap[OP_L_NEWARRAY]	= &Executor::LNewarray;
+    g_methodMap[OP_L_ARELEASE]	= &Executor::LArelease;
+    g_methodMap[OP_L_ALOAD]		= &Executor::LAload;
+    g_methodMap[OP_L_ASTORE]	= &Executor::LAstore;
 
-	g_methodMap[OP_C_LOAD]		= NULL;
-    g_methodMap[OP_C_RETURN]	= NULL;
-    g_methodMap[OP_C_STORE]		= NULL;
-    g_methodMap[OP_C_PUSH]		= NULL;
-    g_methodMap[OP_C_NEWARRAY]	= NULL;
-    g_methodMap[OP_C_ARELEASE]	= NULL;
-    g_methodMap[OP_C_ALOAD]		= NULL;
-	g_methodMap[OP_C_ASTORE] 	= NULL;
+	g_methodMap[OP_C_LOAD]		= &Executor::CLoad;
+    g_methodMap[OP_C_RETURN]	= &Executor::CReturn;
+    g_methodMap[OP_C_STORE]		= &Executor::CStore;
+    g_methodMap[OP_C_PUSH]		= &Executor::CPush;
+    g_methodMap[OP_C_NEWARRAY]	= &Executor::CNewarray;
+    g_methodMap[OP_C_ARELEASE]	= &Executor::CArelease;
+    g_methodMap[OP_C_ALOAD]		= &Executor::CAload;
+	g_methodMap[OP_C_ASTORE] 	= &Executor::CAstore;
 
-	g_methodMap[OP_B_LOAD]		= NULL;
-    g_methodMap[OP_B_RETURN]	= NULL;
-    g_methodMap[OP_B_STORE]		= NULL;
-    g_methodMap[OP_B_PUSH]		= NULL;
-    g_methodMap[OP_B_NEWARRAY]	= NULL;
-    g_methodMap[OP_B_ARELEASE]	= NULL;
-    g_methodMap[OP_B_ALOAD]		= NULL;
-    g_methodMap[OP_B_ASTORE]	= NULL;
-    g_methodMap[OP_B_ASTORE]	= NULL;
+	g_methodMap[OP_B_LOAD]		= &Executor::BLoad;
+    g_methodMap[OP_B_RETURN]	= &Executor::BReturn;
+    g_methodMap[OP_B_STORE]		= &Executor::BStore;
+    g_methodMap[OP_B_PUSH]		= &Executor::BPush;
+    g_methodMap[OP_B_NEWARRAY]	= &Executor::BNewarray;
+    g_methodMap[OP_B_ARELEASE]	= &Executor::BArelease;
+    g_methodMap[OP_B_ALOAD]		= &Executor::BAload;
+    g_methodMap[OP_B_ASTORE]	= &Executor::BAstore;
 
-	g_methodMap[OP_A2B]			= NULL;
-    g_methodMap[OP_F2D]			= NULL;
-    g_methodMap[OP_F2L]			= NULL;
-    g_methodMap[OP_F2I]			= NULL;
-    g_methodMap[OP_F2C]			= NULL;
-    g_methodMap[OP_F2B]			= NULL;
-    g_methodMap[OP_D2F]			= NULL;
-    g_methodMap[OP_D2L]			= NULL;
-    g_methodMap[OP_D2I]			= NULL;
-    g_methodMap[OP_D2C]			= NULL;
-    g_methodMap[OP_D2B]			= NULL;
-    g_methodMap[OP_L2I]			= NULL;
-    g_methodMap[OP_L2F]			= NULL;
-    g_methodMap[OP_L2D]			= NULL;
-    g_methodMap[OP_L2C]			= NULL;
-    g_methodMap[OP_L2B]			= NULL;
-    g_methodMap[OP_I2L]			= NULL;
-    g_methodMap[OP_I2F]			= NULL;
-    g_methodMap[OP_I2D]			= NULL;
-    g_methodMap[OP_I2C]			= NULL;
-    g_methodMap[OP_I2B]			= NULL;
-    g_methodMap[OP_C2I]			= NULL;
-    g_methodMap[OP_C2L]			= NULL;
-    g_methodMap[OP_C2F]			= NULL;
-    g_methodMap[OP_C2D]			= NULL;
-    g_methodMap[OP_C2B]			= NULL;
-    g_methodMap[OP_B2I]			= NULL;
-    g_methodMap[OP_B2F]			= NULL;
-    g_methodMap[OP_B2D]			= NULL;
-    g_methodMap[OP_B2L]			= NULL;
-    g_methodMap[OP_B2C]			= NULL;
+	g_methodMap[OP_A2B]			= &Executor::A2B;
+    g_methodMap[OP_F2D]			= &Executor::F2D;
+    g_methodMap[OP_F2L]			= &Executor::F2L;
+    g_methodMap[OP_F2I]			= &Executor::F2I;
+    g_methodMap[OP_F2C]			= &Executor::F2C;
+    g_methodMap[OP_F2B]			= &Executor::F2B;
+    g_methodMap[OP_D2F]			= &Executor::D2F;
+    g_methodMap[OP_D2L]			= &Executor::D2L;
+    g_methodMap[OP_D2I]			= &Executor::D2I;
+    g_methodMap[OP_D2C]			= &Executor::D2C;
+    g_methodMap[OP_D2B]			= &Executor::D2B;
+    g_methodMap[OP_L2I]			= &Executor::L2I;
+    g_methodMap[OP_L2F]			= &Executor::L2F;
+    g_methodMap[OP_L2D]			= &Executor::L2D;
+    g_methodMap[OP_L2C]			= &Executor::L2C;
+    g_methodMap[OP_L2B]			= &Executor::L2B;
+    g_methodMap[OP_I2L]			= &Executor::I2L;
+    g_methodMap[OP_I2F]			= &Executor::I2F;
+    g_methodMap[OP_I2D]			= &Executor::I2D;
+    g_methodMap[OP_I2C]			= &Executor::I2C;
+    g_methodMap[OP_I2B]			= &Executor::I2B;
+    g_methodMap[OP_C2I]			= &Executor::C2I;
+    g_methodMap[OP_C2L]			= &Executor::C2L;
+    g_methodMap[OP_C2F]			= &Executor::C2F;
+    g_methodMap[OP_C2D]			= &Executor::C2D;
+    g_methodMap[OP_C2B]			= &Executor::C2B;
+    g_methodMap[OP_B2I]			= &Executor::B2I;
+    g_methodMap[OP_B2F]			= &Executor::B2F;
+    g_methodMap[OP_B2D]			= &Executor::B2D;
+    g_methodMap[OP_B2L]			= &Executor::B2L;
+    g_methodMap[OP_B2C]			= &Executor::B2C;
 
-	g_methodMap[OP_I_ADD]		= NULL;
-    g_methodMap[OP_I_SUB]		= NULL;
-    g_methodMap[OP_I_MUL]		= NULL;
-    g_methodMap[OP_I_DIV]		= NULL;
-    g_methodMap[OP_F_ADD]		= NULL;
-    g_methodMap[OP_F_SUB]		= NULL;
-    g_methodMap[OP_F_MUL]		= NULL;
-    g_methodMap[OP_F_DIV]		= NULL;
-    g_methodMap[OP_D_ADD]		= NULL;
-    g_methodMap[OP_D_SUB]		= NULL;
-    g_methodMap[OP_D_MUL]		= NULL;
-    g_methodMap[OP_D_DIV]		= NULL;
-    g_methodMap[OP_L_ADD]		= NULL;
-    g_methodMap[OP_L_SUB]		= NULL;
-    g_methodMap[OP_L_MUL]		= NULL;
-    g_methodMap[OP_L_DIV]		= NULL;
-    g_methodMap[OP_C_ADD]		= NULL;
-    g_methodMap[OP_C_SUB]		= NULL;
-    g_methodMap[OP_C_MUL]		= NULL;
-    g_methodMap[OP_C_DIV]		= NULL;
-    g_methodMap[OP_I_SHL]		= NULL;
-    g_methodMap[OP_I_SHR]		= NULL;
-    g_methodMap[OP_I_MOD]		= NULL;
-    g_methodMap[OP_I_XOR]		= NULL;
-    g_methodMap[OP_I_AND]		= NULL;
-    g_methodMap[OP_I_OR]		= NULL;
-    g_methodMap[OP_L_SHL]		= NULL;
-    g_methodMap[OP_L_SHR]		= NULL;
-    g_methodMap[OP_L_MOD]		= NULL;
-    g_methodMap[OP_L_XOR]		= NULL;
-    g_methodMap[OP_L_AND]		= NULL;
-    g_methodMap[OP_L_OR]		= NULL;
-    g_methodMap[OP_C_SHL]		= NULL;
-    g_methodMap[OP_C_SHR]		= NULL;
-    g_methodMap[OP_C_MOD]		= NULL;
-    g_methodMap[OP_C_XOR]		= NULL;
-    g_methodMap[OP_C_AND]		= NULL;
-    g_methodMap[OP_C_OR]		= NULL;
+	g_methodMap[OP_I_ADD]		= &Executor::IAdd;
+    g_methodMap[OP_I_SUB]		= &Executor::ISub;
+    g_methodMap[OP_I_MUL]		= &Executor::IMul;
+    g_methodMap[OP_I_DIV]		= &Executor::IDiv;
+    g_methodMap[OP_F_ADD]		= &Executor::FAdd;
+    g_methodMap[OP_F_SUB]		= &Executor::FSub;
+    g_methodMap[OP_F_MUL]		= &Executor::FMul;
+    g_methodMap[OP_F_DIV]		= &Executor::FDiv;
+    g_methodMap[OP_D_ADD]		= &Executor::DAdd;
+    g_methodMap[OP_D_SUB]		= &Executor::DSub;
+    g_methodMap[OP_D_MUL]		= &Executor::DMul;
+    g_methodMap[OP_D_DIV]		= &Executor::DDiv;
+    g_methodMap[OP_L_ADD]		= &Executor::LAdd;
+    g_methodMap[OP_L_SUB]		= &Executor::LSub;
+    g_methodMap[OP_L_MUL]		= &Executor::LMul;
+    g_methodMap[OP_L_DIV]		= &Executor::LDiv;
+    g_methodMap[OP_C_ADD]		= &Executor::CAdd;
+    g_methodMap[OP_C_SUB]		= &Executor::CSub;
+    g_methodMap[OP_C_MUL]		= &Executor::CMul;
+    g_methodMap[OP_C_DIV]		= &Executor::CDiv;
+    g_methodMap[OP_I_SHL]		= &Executor::IShl;
+    g_methodMap[OP_I_SHR]		= &Executor::IShr;
+    g_methodMap[OP_I_MOD]		= &Executor::IMod;
+    g_methodMap[OP_I_XOR]		= &Executor::IXor;
+    g_methodMap[OP_I_AND]		= &Executor::IAnd;
+    g_methodMap[OP_I_OR]		= &Executor::IOr;
+    g_methodMap[OP_L_SHL]		= &Executor::LShl;
+    g_methodMap[OP_L_SHR]		= &Executor::LShr;
+    g_methodMap[OP_L_MOD]		= &Executor::LMod;
+    g_methodMap[OP_L_XOR]		= &Executor::LXor;
+    g_methodMap[OP_L_AND]		= &Executor::LAnd;
+    g_methodMap[OP_L_OR]		= &Executor::LOr;
+    g_methodMap[OP_C_SHL]		= &Executor::CShl;
+    g_methodMap[OP_C_SHR]		= &Executor::CShr;
+    g_methodMap[OP_C_MOD]		= &Executor::CMod;
+    g_methodMap[OP_C_XOR]		= &Executor::CXor;
+    g_methodMap[OP_C_AND]		= &Executor::CAnd;
+    g_methodMap[OP_C_OR]		= &Executor::COr;
 
-	g_methodMap[OP_NEW] 		= NULL;
-	g_methodMap[OP_RETAIN] 		= NULL;
-	g_methodMap[OP_RELEASE] 	= NULL;
-	g_methodMap[OP_INVOKE] 		= NULL;
-	g_methodMap[OP_VINVOKE] 	= NULL;
-	g_methodMap[OP_STINVOKE] 	= NULL;
-	g_methodMap[OP_LOADFIELD] 	= NULL;
-	g_methodMap[OP_LOADSTATIC] 	= NULL;
-	g_methodMap[OP_STOREFIELD] 	= NULL;
-	g_methodMap[OP_STORESTATIC]	= NULL;
+	g_methodMap[OP_NEW] 		= &Executor::New;	
+	g_methodMap[OP_RETAIN] 		= &Executor::Retain;
+	g_methodMap[OP_RELEASE] 	= &Executor::Release;
+	g_methodMap[OP_INVOKE] 		= &Executor::Invoke;
+	g_methodMap[OP_VINVOKE] 	= &Executor::VInvoke;
+	g_methodMap[OP_STINVOKE] 	= &Executor::STInvoke;
+	g_methodMap[OP_LOADFIELD] 	= &Executor::LoadField;
+	g_methodMap[OP_LOADSTATIC] 	= &Executor::LoadStatic;
+	g_methodMap[OP_STOREFIELD] 	= &Executor::StoreField;
+	g_methodMap[OP_STORESTATIC]	= &Executor::StoreStatic;
 
-	g_methodMap[OP_BRANCH] 		= NULL;
-	g_methodMap[OP_BIFNULL] 	= NULL;
-	g_methodMap[OP_BIFNOTNULL] 	= NULL;
-	g_methodMap[OP_BIFGREATER] 	= NULL;
-	g_methodMap[OP_BIFGREATEREQ]= NULL;
-	g_methodMap[OP_BIFLESS] 	= NULL;
-	g_methodMap[OP_BIFLESSEQ] 	= NULL;
-	g_methodMap[OP_BIFEQUAL] 	= NULL;
-	g_methodMap[OP_BIFNOTEQUAL] = NULL;
+	g_methodMap[OP_BRANCH] 		= &Executor::Branch;
+	g_methodMap[OP_BIFNULL] 	= &Executor::BifNull;
+	g_methodMap[OP_BIFNOTNULL] 	= &Executor::BifNotNull;
+	g_methodMap[OP_BIFGREATER] 	= &Executor::BifGreater;
+	g_methodMap[OP_BIFGREATEREQ]= &Executor::BifGreaterEQ;
+	g_methodMap[OP_BIFLESS] 	= &Executor::BifLess;
+	g_methodMap[OP_BIFLESSEQ] 	= &Executor::BifLessEQ;
+	g_methodMap[OP_BIFEQUAL] 	= &Executor::BifEqual;
+	g_methodMap[OP_BIFNOTEQUAL] = &Executor::BifNotEqual;
 }
 
 ExecutorMethod Executor::GetMethod(byte instr)
@@ -320,7 +319,11 @@ unsigned Executor::IStore(const byte *instr)
 
 unsigned Executor::IPush(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	int ival = *((int*)(instr + 1));
+	Variable *var = new Variable(VarType::i);
+	var->Set((int)ival);
+	_stack->Push(var);
+	return 5;
 }
 
 unsigned Executor::INewarray(const byte *instr) 
@@ -363,7 +366,11 @@ unsigned Executor::FStore(const byte *instr)
 
 unsigned Executor::FPush(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	float fval = *((float*)(instr + 1));
+	Variable *var = new Variable(VarType::f);
+	var->Set((float)fval);
+	_stack->Push(var);
+	return 5;
 }
 
 unsigned Executor::FNewarray(const byte *instr) 
@@ -406,7 +413,11 @@ unsigned Executor::DStore(const byte *instr)
 
 unsigned Executor::DPush(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	double dval = *((double*)(instr + 1));
+	Variable *var = new Variable(VarType::d);
+	var->Set((double)dval);
+	_stack->Push(var);
+	return 9;
 }
 
 unsigned Executor::DNewarray(const byte *instr) 
@@ -449,7 +460,11 @@ unsigned Executor::LStore(const byte *instr)
 
 unsigned Executor::LPush(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	long lval = *((long*)(instr + 1));
+	Variable *var = new Variable(VarType::l);
+	var->Set((long)lval);
+	_stack->Push(var);
+	return 9;
 }
 
 unsigned Executor::LNewarray(const byte *instr) 
@@ -492,7 +507,11 @@ unsigned Executor::CStore(const byte *instr)
 
 unsigned Executor::CPush(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	char cval = *((char*)(instr + 1));
+	Variable *var = new Variable(VarType::c);
+	var->Set((char)cval);
+	_stack->Push(var);
+	return 2;
 }
 
 unsigned Executor::CNewarray(const byte *instr) 
@@ -535,7 +554,11 @@ unsigned Executor::BStore(const byte *instr)
 
 unsigned Executor::BPush(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	bool bval = *((bool*)(instr + 1));
+	Variable *var = new Variable(VarType::b);
+	var->Set((bool)bval);
+	_stack->Push(var);
+	return 2;
 }
 
 unsigned Executor::BNewarray(const byte *instr) 
@@ -1085,6 +1108,16 @@ unsigned Executor::BifLess(const byte *instr)
 }
 
 unsigned Executor::BifLessEQ(const byte *instr) 
+{
+	THROW(NotImplementedException, "Instruction method not implemented");
+}
+
+unsigned Executor::BifEqual(const byte *instr) 
+{
+	THROW(NotImplementedException, "Instruction method not implemented");
+}
+
+unsigned Executor::BifNotEqual(const byte *instr) 
 {
 	THROW(NotImplementedException, "Instruction method not implemented");
 }

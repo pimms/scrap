@@ -30,19 +30,19 @@ private:
 	unsigned _mainClassID;
 	unsigned _mainMethodID;
 
-	void ReadMagicNumber();
-	void ReadVersionNumber();
-	void ReadEndian();
-	void ReadMain();
+	virtual void ReadMagicNumber();
+	virtual void ReadVersionNumber();
+	virtual void ReadEndian();
+	virtual void ReadMain();
 
-	void ReadClassList();
-	void ReadClass();
-	void ReadFields(Class *c);
-	void ReadMethods(Class *c);
-	TypeDesc ReadField();
-	Method* ReadMethod(MethodType methodType, Class *c);
-	MethodBody ReadMethodBody();
-	TypeDesc ReadTypeDesc(bool readName);
+	virtual void ReadClassList();
+	virtual void ReadClass();
+	virtual void ReadFields(Class *c);
+	virtual void ReadMethods(Class *c);
+	virtual TypeDesc ReadField();
+	virtual Method* ReadMethod(MethodType methodType, Class *c);
+	virtual MethodBody ReadMethodBody();
+	virtual TypeDesc ReadTypeDesc(bool readName);
 };
 
 }

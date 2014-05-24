@@ -48,4 +48,14 @@ int Stack::MaxStackSize()
 	return STACK_MAX_SIZE;
 }
 
+
+#ifdef _SCRAP_TEST_
+Stack* Stack::Copy() const
+{
+	Stack *copy = new Stack;
+	copy->_deque = _deque;
+	return copy;
+}
+#endif
+
 }

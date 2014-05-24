@@ -21,6 +21,7 @@ public:
 	Stack();
 	~Stack();
 
+
 	// Push a variable onto the stack
 	void Push(Variable *var);
 
@@ -32,6 +33,10 @@ public:
 	// TODO: Consider setting the stack dynamically
 	// Returns STACK_MAX_SIZE for now.
 	static int MaxStackSize();
+
+#ifdef _SCRAP_TEST_
+	Stack* Copy() const;
+#endif
 
 private:
 	// All Variables managed by a stack are deleted by the stack

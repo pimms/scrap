@@ -205,6 +205,8 @@ private:
 	unsigned BifGreaterEQ(const byte *instr);
 	unsigned BifLess(const byte *instr);
 	unsigned BifLessEQ(const byte *instr);
+	unsigned BifEqual(const byte *instr);
+	unsigned BifNotEqual(const byte *instr);
 	
 	// Generic operations, performs typed instructions
 	// and asserts that the types match.
