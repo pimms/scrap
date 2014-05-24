@@ -222,5 +222,7 @@ private:
 	
 	void GenericLoad(VarType type, byte regIdx);
 	void GenericStore(VarType type, byte regIdx);
+
+	void GenericConvert(Variable *var, VarType from, VarType to);
 };
 }

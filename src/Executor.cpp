@@ -560,157 +560,219 @@ unsigned Executor::BAstore(const byte *instr)
 
 unsigned Executor::A2B(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::a, VarType::b);
+	return 1;
 }
 
 unsigned Executor::F2D(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::f, VarType::d);
+	return 1;
 }
 
 unsigned Executor::F2L(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::f, VarType::l);
+	return 1;
 }
 
 unsigned Executor::F2I(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::f, VarType::i);
+	return 1;
 }
 
 unsigned Executor::F2C(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::f, VarType::c);
+	return 1;
 }
 
 unsigned Executor::F2B(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::f, VarType::b);
+	return 1;
 }
 
 unsigned Executor::D2F(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::d, VarType::f);
+	return 1;
 }
 
 unsigned Executor::D2L(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::d, VarType::l);
+	return 1;
 }
 
 unsigned Executor::D2I(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::d, VarType::i);
+	return 1;
 }
 
 unsigned Executor::D2C(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::d, VarType::c);
+	return 1;
 }
 
 unsigned Executor::D2B(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::d, VarType::b);
+	return 1;
 }
 
 unsigned Executor::L2I(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::l, VarType::i);
+	return 1;
 }
 
 unsigned Executor::L2F(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::l, VarType::f);
+	return 1;
 }
 
 unsigned Executor::L2D(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::l, VarType::d);
+	return 1;
 }
 
 unsigned Executor::L2C(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::l, VarType::c);
+	return 1;
 }
 
 unsigned Executor::L2B(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::l, VarType::b);
+	return 1;
 }
 
 unsigned Executor::I2L(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::i, VarType::l);
+	return 1;
 }
 
 unsigned Executor::I2F(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::i, VarType::f);
+	return 1;
 }
 
 unsigned Executor::I2D(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::i, VarType::d);
+	return 1;
 }
 
 unsigned Executor::I2C(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::i, VarType::c);
+	return 1;
 }
 
 unsigned Executor::I2B(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::i, VarType::b);
+	return 1;
 }
 
 unsigned Executor::C2I(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::c, VarType::i);
+	return 1;
 }
 
 unsigned Executor::C2L(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::c, VarType::l);
+	return 1;
 }
 
 unsigned Executor::C2F(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::c, VarType::f);
+	return 1;
 }
 
 unsigned Executor::C2D(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::c, VarType::d);
+	return 1;
 }
 
 unsigned Executor::C2B(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::c, VarType::b);
+	return 1;
 }
 
 unsigned Executor::B2I(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::b, VarType::i);
+	return 1;
 }
 
 unsigned Executor::B2F(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::b, VarType::f);
+	return 1;
 }
 
 unsigned Executor::B2D(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::b, VarType::d);
+	return 1;
 }
 
 unsigned Executor::B2L(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::b, VarType::l);
+	return 1;
 }
 
 unsigned Executor::B2C(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	GenericConvert(var, VarType::b, VarType::c);
+	return 1;
 }
 
 
@@ -1132,6 +1194,19 @@ void Executor::GenericStore(VarType type, byte regIdx)
 {
 	Variable *reg = GetRegister(regIdx);
 	_stack->Push(reg);
+}
+
+
+void Executor::GenericConvert(Variable *var, VarType from, VarType to)
+{
+	if (var->Type() != from) {
+		THROW(InvalidTypeException, "Conversion expected top value of "
+			+ VarTypeToString(from) + " but received variable of type "
+			+ VarTypeToString(var->Type()) + " (attempted to convert to "
+			+ VarTypeToString(to));
+	}
+
+	var->Cast(to);
 }
 
 }
