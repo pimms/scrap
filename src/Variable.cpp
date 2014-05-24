@@ -481,13 +481,13 @@ void Variable::And(const Variable *var)
 
 	switch (_type) {
 		case INT:
-			_value.i *= var->_value.i;
+			_value.i &= var->_value.i;
 			break;
 		case LONG:
-			_value.l *= var->_value.l;
+			_value.l &= var->_value.l;
 			break;
 		case CHAR:
-			_value.c *= var->_value.c;
+			_value.c &= var->_value.c;
 			break;
 		default:
 			THROW_UNIMPLEMENTED_OP(AritOp::AND);

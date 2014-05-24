@@ -331,7 +331,8 @@ const InstructionInfo g_instructionMap[] = {
 	{"C_NEWARRAY", 	OP_C_NEWARRAY,	ARG_NONE	  },	//0x64
 	{"C_ARELEASE", 	OP_C_ARELEASE,	ARG_NONE	  },	//0x65
 	{"C_ALOAD", 	OP_C_ALOAD,		ARG_IDX_OR_REG},	//0x66
-	{"C_ASTORE",	OP_C_ASTORE,	ARG_IDX_OR_REG},	//0x68
+	{"C_ASTORE",	OP_C_ASTORE,	ARG_IDX_OR_REG},	//0x67
+	g_reserved,											//0x68
 	g_reserved,											//0x69
 	g_reserved,											//0x6a
 	g_reserved,											//0x6b
