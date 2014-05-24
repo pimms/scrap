@@ -32,6 +32,7 @@ public:
 
 	void PerformMethodCall(Object *object, Method *method);
 	void PerformMethodCall(Class *c, Method *method);
+	void BranchToInstruction(unsigned index);
 	void ReturnToCaller();
 
 #ifdef _SCRAP_TEST_		

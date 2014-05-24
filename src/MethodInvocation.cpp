@@ -93,6 +93,15 @@ void MethodInvocation::PerformMethodCall(Class *c, Method *method)
 	invocation.Execute();
 }
 
+void MethodInvocation::BranchToInstruction(unsigned index)
+{
+	if (index >= _method->GetMethodBody()->length) {
+		THROW(IndexOutOfRangeException, "Attempted to branch to undefined index");
+	}
+
+	_pc = index;
+}
+
 void MethodInvocation::ReturnToCaller()
 {
 	ReturnValue();
