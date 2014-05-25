@@ -41,6 +41,7 @@ public:
 class Executor {
 public:
 	Executor(ExecutionDelegate *delegate, Stack *stack, Heap *heap);
+	~Executor();
 	
 	/* The instr-pointer points to an arbitrary location inside the method's
 	 * body. The method returns the number of bytes consumed by the instruction.
@@ -52,13 +53,12 @@ private:
 	Stack *_stack;
 	Heap *_heap;
 
-	Variable *_reg[4];
+	Variable *_reg[NUM_REGISTERS];
 
 	void BuildInstructionMap();
 	ExecutorMethod GetMethod(byte instr);
 
 	Variable*& GetRegister(byte reg);
-
 
 	unsigned Pop(const byte *instr);
 	unsigned Copy(const byte *instr);

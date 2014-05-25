@@ -23,6 +23,20 @@ Executor::Executor(ExecutionDelegate *delegate, Stack *stack, Heap *heap)
 	if (g_methodMap.size() == 0) {
 		BuildInstructionMap();
 	}
+
+	for (int i=0; i<NUM_REGISTERS; i++)
+		_reg[i] = NULL;
+}
+
+Executor::~Executor()
+{
+	for (int i=0; i<NUM_REGISTERS; i++) {
+		if (_reg[i] != NULL) {
+			if (!_reg[i]->IsFieldVariable()) {
+				delete _reg[i];
+			}
+		}
+	}
 }
 
 
@@ -1217,15 +1231,16 @@ void Executor::GenericShr(VarType type)
 
 void Executor::GenericLoad(VarType type, byte regIdx)
 {
-	Variable *reg = GetRegister(regIdx);
-	Variable *var = _stack->Pop();
-	reg = var;
+	Variable *&reg = GetRegister(regIdx);
+	_stack->Push(reg);
+	reg = NULL;
 }
 
 void Executor::GenericStore(VarType type, byte regIdx)
 {
-	Variable *reg = GetRegister(regIdx);
-	_stack->Push(reg);
+	Variable *&reg = GetRegister(regIdx);
+	Variable *var = _stack->Pop();
+	reg = var;
 }
 
 

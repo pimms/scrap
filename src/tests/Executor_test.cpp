@@ -255,6 +255,69 @@ void TestConversion(byte pushInstr, byte convInstr, FROM val,
 	delete program;
 }
 
+/* Pushes a variable, stores it in a register and pops it back onto the stack.
+ * Unfortunately, getting access directly to the registers is hard as the
+ * Executor class managing the registers is managed by the MethodInvocation,
+ * so testing that storing and loading works simultaneously is a good 
+ * secondary solution.
+ * 		pushInstr		The instruction pushing a value
+ * 		storeInstr		Instruction storing a value in a register
+ * 		loadInstr		Instruction loading a value from a register
+ * 		val				The value of the variable to be jellied around
+ */
+template<typename T>
+void TestLoadAndStore(byte pushInstr, byte storeInstr, byte loadInstr, T val)
+{
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	Variable *var = NULL;
+	MethodBody body;
+
+	
+	// Tpush <val>
+	// Tstore N
+	for (int i=0; i<NUM_REGISTERS; i++) {
+		body.length = 3 + sizeof(T);
+		body.code = new byte[body.length];
+		body.code[0] = pushInstr;
+		memcpy(body.code+1, &val, sizeof(T));
+		body.code[1+sizeof(T)] = storeInstr;
+		body.code[2+sizeof(T)] = (byte)i;
+
+		program = CreateProgram(body);
+		stack = ExecuteProgram(program, &heap);
+
+		ASSERT_EQ(stack->Count(), 0);
+
+		delete stack; 
+		delete program;
+	}
+
+	// Tpush<val>
+	// Tstore N
+	// Tload N
+	for (int i=0; i<NUM_REGISTERS; i++) {
+		body.length = 5 + sizeof(T);
+		body.code = new byte[body.length];
+		body.code[0] = pushInstr;
+		memcpy(body.code+1, &val, sizeof(T));
+		body.code[1+sizeof(T)] = storeInstr;
+		body.code[2+sizeof(T)] = (byte)i;
+		body.code[3+sizeof(T)] = loadInstr;
+		body.code[4+sizeof(T)] = (byte)i;
+
+		program = CreateProgram(body);
+		stack = ExecuteProgram(program, &heap);
+
+		ASSERT_EQ(stack->Count(), 1);
+		var = stack->Pop();
+
+		delete var;
+		delete stack;
+		delete program;
+	}
+}
 
 TEST (ExecutorTest, TestPushLiteral)
 {
@@ -596,4 +659,14 @@ TEST (ExecutorTest, TestBoolConversion)
 							VarType::l, &Variable::Value_l);
 	TestConversion<bool,char>(OP_B_PUSH, OP_B2C, false, 0, 
 							VarType::c, &Variable::Value_c);
+}
+
+TEST (ExecutorTest, TestLoadAndStore)
+{
+	TestLoadAndStore<int>(OP_I_PUSH, OP_I_STORE, OP_I_LOAD, 45958);
+	TestLoadAndStore<float>(OP_F_PUSH, OP_F_STORE, OP_F_LOAD, 45958.f);
+	TestLoadAndStore<double>(OP_D_PUSH, OP_D_STORE, OP_D_LOAD, 45958.0);
+	TestLoadAndStore<long>(OP_L_PUSH, OP_L_STORE, OP_L_LOAD, 45958);
+	TestLoadAndStore<bool>(OP_B_PUSH, OP_B_STORE, OP_B_LOAD, true);
+	TestLoadAndStore<char>(OP_C_PUSH, OP_C_STORE, OP_C_LOAD, 243);
 }
