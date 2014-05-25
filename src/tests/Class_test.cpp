@@ -65,9 +65,6 @@ TEST (ClassTest, TestValidMemberAssignment)
 	ASSERT_NO_THROW(c.AddStaticMethod(stat));
 	ASSERT_NO_THROW(c.AddFieldTemplate(TypeDesc{INT}));
 	ASSERT_NO_THROW(c.AddStaticField(TypeDesc{INT}));
-
-	delete norm;
-	delete stat;
 }
 
 TEST (ClassTest, TestInvalidMemberAssignment)

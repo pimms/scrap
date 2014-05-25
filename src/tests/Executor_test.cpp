@@ -2,7 +2,7 @@
 
 /* Testing Implementation Overview
  *
- * [ ] Pop
+ * [X] Pop
  * [ ] Copy
  * [ ] ArrayLength
  * [ ] ArrayLoad
@@ -179,6 +179,39 @@ TEST (ExecutorTest, TestPop)
 
 	ASSERT_EQ(stack->Count(), 0);
 	
+	delete stack;
+	delete program;
+}
+
+TEST (ExecutorTest, TestCopy)
+{
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	MethodBody body;
+	int ival = 1337;
+
+	body.length = 2 + sizeof(int);
+	body.code = new byte[body.length];
+	body.code[0] = OP_I_PUSH;
+	memcpy(body.code+1, &ival, sizeof(int));
+	body.code[1+sizeof(int)] = OP_COPY;
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+	ASSERT_EQ(stack->Count(), 2);
+
+	Variable *v1, *v2;
+	v1 = stack->Pop();
+	v2 = stack->Pop();
+
+	ASSERT_EQ(v1->Type(), VarType::INT);
+	ASSERT_EQ(v2->Type(), VarType::INT);
+	ASSERT_EQ(v1->Value_i(), v2->Value_i());
+
+	delete v1;
+	delete v2;
 	delete stack;
 	delete program;
 }
