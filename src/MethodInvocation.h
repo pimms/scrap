@@ -56,6 +56,7 @@ private:
 	Executor _executor;
 
 	unsigned _pc;
+	bool _return;
 
 	// Pop the required arguments from the caller stack and push them to own stack
 	void TransferArguments();

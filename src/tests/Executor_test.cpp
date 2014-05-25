@@ -3,10 +3,10 @@
 /* Testing Implementation Overview
  *
  * [X] Pop
- * [ ] Copy
+ * [X] Copy
  * [ ] ArrayLength
  * [ ] ArrayLoad
- * [ ] Return
+ * [X] Return
  * [ ] T Load
  * [ ] T Return
  * [ ] T Store
@@ -125,6 +125,11 @@ Stack* ExecuteProgram(Program *program, Heap *heap)
 template<typename T>
 void TestPushLiteral(byte instr, T val, T(Variable::*method)()const)
 {
+	/* Push a single literal T. The stack should contain a single variable
+	 * holding the value "T val".
+	 *
+	 * 		Tpush <val>
+	 */
 	Stack *stack = NULL;
 	Heap heap;
 	Program *program = NULL;
@@ -162,6 +167,11 @@ TEST (ExecutorTest, TestPushLiteral)
 
 TEST (ExecutorTest, TestPop)
 {
+	/* Push a value and pop it. The stack should be empty after execution.
+	 *
+	 * 		ipush 1337
+	 * 		pop
+	 */
 	Stack *stack = NULL;
 	Heap heap;
 	Program *program = NULL;
@@ -185,6 +195,12 @@ TEST (ExecutorTest, TestPop)
 
 TEST (ExecutorTest, TestCopy)
 {
+	/* Push an int-value and copy it. The stack should after execution
+	 * contain two Variable objects with the same type and value.
+	 *
+	 * 		ipush 1337
+	 * 		copy
+	 */
 	Stack *stack = NULL;
 	Heap heap;
 	Program *program = NULL;
@@ -212,6 +228,35 @@ TEST (ExecutorTest, TestCopy)
 
 	delete v1;
 	delete v2;
+	delete stack;
+	delete program;
+}
+
+TEST (ExecutorTest, TestVoidReturn)
+{
+	/* Return and THEN push a float value. The float should therefore never 
+	 * be pushed, and the stack should be empty post-execution.
+	 *
+	 * 		return
+	 * 		fpush 	3.14
+	 */
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	MethodBody body;
+	float fval = 3.14;
+
+	body.length = 2 + sizeof(float);
+	body.code = new byte[body.length];
+	body.code[0] = OP_RETURN;
+	body.code[1] = OP_F_PUSH;
+	memcpy(body.code+2, &fval, sizeof(float));
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+	ASSERT_EQ(stack->Count(), 0);
+
 	delete stack;
 	delete program;
 }

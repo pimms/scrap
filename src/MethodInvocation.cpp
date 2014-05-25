@@ -17,6 +17,7 @@ MethodInvocation::MethodInvocation(Heap *heap, Method *method, Object *object,
 		_method(method),
 		_caller(caller),
 		_pc(0),
+		_return(false),
 		_heap(heap),
 		_executor(this, &_stack, _heap)
 {
@@ -44,6 +45,7 @@ MethodInvocation::MethodInvocation(Heap *heap, Method *method, const Class *c,
 		_method(method),
 		_caller(caller),
 		_pc(0),
+		_return(false),
 		_heap(heap),
 		_executor(this, &_stack, _heap)
 {
@@ -75,7 +77,7 @@ void MethodInvocation::Execute()
 	_pc = 0;
 	const MethodBody *body = _method->GetMethodBody();
 
-	while (_pc < body->length) {
+	while (_pc < body->length && !_return) {
 		_pc += _executor.Execute(body->code + _pc);
 	}
 }
@@ -105,7 +107,7 @@ void MethodInvocation::BranchToInstruction(unsigned index)
 void MethodInvocation::ReturnToCaller()
 {
 	ReturnValue();
-	_pc = unsigned(~0);
+	_return = true;
 }
 
 
