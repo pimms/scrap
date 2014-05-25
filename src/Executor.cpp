@@ -1128,8 +1128,11 @@ void Executor::GenericAdd(VarType type)
 	Variable *v2 = _stack->Pop();
 	Variable *v1 = _stack->Pop();
 	v1->Add(v2);
-	
+
 	_stack->Push(v1);
+	
+	if (!v2->IsFieldVariable())
+		delete v2;
 }
 
 void Executor::GenericSub(VarType type)
@@ -1139,6 +1142,9 @@ void Executor::GenericSub(VarType type)
 	v1->Sub(v2);
 	
 	_stack->Push(v1);
+	
+	if (!v2->IsFieldVariable())
+		delete v2;
 }
 
 void Executor::GenericMul(VarType type)
@@ -1148,6 +1154,9 @@ void Executor::GenericMul(VarType type)
 	v1->Mul(v2);
 	
 	_stack->Push(v1);
+	
+	if (!v2->IsFieldVariable())
+		delete v2;
 }
 
 void Executor::GenericDiv(VarType type)
@@ -1157,6 +1166,9 @@ void Executor::GenericDiv(VarType type)
 	v1->Div(v2);
 	
 	_stack->Push(v1);
+	
+	if (!v2->IsFieldVariable())
+		delete v2;
 }
 
 
@@ -1168,6 +1180,9 @@ void Executor::GenericMod(VarType type)
 	var1->Mod(var2);
 	
 	_stack->Push(var1);
+	
+	if (!var2->IsFieldVariable())
+		delete var2;
 }
 
 void Executor::GenericAnd(VarType type) 
@@ -1177,6 +1192,9 @@ void Executor::GenericAnd(VarType type)
 	var1->And(var2);
 	
 	_stack->Push(var1);
+	
+	if (!var2->IsFieldVariable())
+		delete var2;
 }
 
 void Executor::GenericXor(VarType type)
@@ -1186,6 +1204,9 @@ void Executor::GenericXor(VarType type)
 	var1->Xor(var2);
 	
 	_stack->Push(var1);
+	
+	if (!var2->IsFieldVariable())
+		delete var2;
 }
 
 void Executor::GenericOr(VarType type) 
@@ -1195,6 +1216,9 @@ void Executor::GenericOr(VarType type)
 	var1->Or(var2);
 	
 	_stack->Push(var1);
+	
+	if (!var2->IsFieldVariable())
+		delete var2;
 }
 
 void Executor::GenericShl(VarType type) 
@@ -1204,6 +1228,9 @@ void Executor::GenericShl(VarType type)
 	var1->Shl(var2);
 	
 	_stack->Push(var1);
+	
+	if (!var2->IsFieldVariable())
+		delete var2;
 }
 
 void Executor::GenericShr(VarType type) 
@@ -1213,6 +1240,9 @@ void Executor::GenericShr(VarType type)
 	var1->Shr(var2);
 	
 	_stack->Push(var1);
+	
+	if (!var2->IsFieldVariable())
+		delete var2;
 }
 
 
