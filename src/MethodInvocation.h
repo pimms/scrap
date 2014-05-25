@@ -10,6 +10,7 @@ namespace scrap {
 class Method;
 class Object;
 class Class;
+class ClassList;
 class Stack;
 class Heap;
 
@@ -28,11 +29,19 @@ public:
 					 MethodInvocation *caller);
 	~MethodInvocation();
 
+	/* The ClassList must be defined for the MethodInvocation to be able to
+	 * instantiate objects. In test environments, the CL is optional but it
+	 * is required in non-test environments.
+	 */
+	void SetClassList(ClassList *classList);
+
 	void Execute();
+
 
 	void PerformMethodCall(Object *object, Method *method);
 	void PerformMethodCall(Class *c, Method *method);
 	void BranchToInstruction(unsigned index);
+	Object* InstantiateObject(unsigned classID);
 	void ReturnToCaller();
 
 #ifdef _SCRAP_TEST_		
@@ -47,6 +56,7 @@ public:
 
 private:
 	const Class *_class;
+	ClassList *_classList;
 	Object *_object;
 	Method *_method;
 	MethodInvocation *_caller;

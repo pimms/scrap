@@ -7,9 +7,9 @@
  * [ ] ArrayLength
  * [ ] ArrayLoad
  * [X] Return
- * [ ] T Load
+ * [X] T Load
  * [ ] T Return
- * [ ] T Store
+ * [X] T Store
  * [X] T Push
  * [ ] T NewArray
  * [ ] T ARelease
@@ -32,9 +32,9 @@
  * [X] T Xor
  * [X] T And
  * [X] T Or
- * [ ] New
- * [ ] Retain
- * [ ] Release
+ * [X] New
+ * [X] Retain
+ * [X] Release
  * [ ] Invoke
  * [ ] VInvoke
  * [ ] STInvoke
@@ -103,6 +103,7 @@ Stack* ExecuteProgram(Program *program, Heap *heap)
 	Method *mainMethod = mainClass->GetStaticMethod(0);
 
 	MethodInvocation invocation(heap, mainMethod, mainClass, NULL);
+	invocation.SetClassList(clist);
 	invocation.Execute();
 
 	// Copy the stack
@@ -670,3 +671,111 @@ TEST (ExecutorTest, TestLoadAndStore)
 	TestLoadAndStore<bool>(OP_B_PUSH, OP_B_STORE, OP_B_LOAD, true);
 	TestLoadAndStore<char>(OP_C_PUSH, OP_C_STORE, OP_C_LOAD, 243);
 }
+
+TEST (ExecutorTest, TestNew)
+{
+	/* After the new-instruction, the object should exist on the stack as a 
+	 * Variable and on the Heap.
+	 * 		new 0
+	 */
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	MethodBody body;
+	unsigned classID = 0;
+
+	body.length = 1 + sizeof(classID);
+	body.code = new byte[body.length];
+	body.code[0] = OP_NEW;
+	memcpy(body.code+1, &classID, sizeof(unsigned));
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+	ASSERT_EQ(stack->Count(), 1);
+	Variable *var = stack->Pop();
+	ASSERT_EQ(var->Type(), VarType::a);
+
+	Object *obj = var->Value_a();
+	ASSERT_EQ(obj->GetClass()->GetClassName(), "MainClass");
+	ASSERT_EQ(obj->GetClass()->GetClassID(), 0);
+
+	ASSERT_EQ(heap.Size(), 1);
+
+	obj->Release();
+	heap.KillOrphans();
+	
+	delete var;
+	delete stack;
+	delete program;
+}
+
+TEST (ExecutorTest, TestRetain)
+{
+	/* After retaining the object, a call to Heap::KillOrphans() should NOT 
+	 * delete the object. OP_RETAIN pops the object from the stack.
+	 * 		new 0
+	 * 		retain
+	 */
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	MethodBody body;
+	unsigned classID = 0;
+
+	body.length = 2 + sizeof(classID);
+	body.code = new byte[body.length];
+	body.code[0] = OP_NEW;
+	memcpy(body.code+1, &classID, sizeof(unsigned));
+	body.code[1+sizeof(unsigned)] = OP_RETAIN;
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+	ASSERT_EQ(stack->Count(), 0);
+	ASSERT_EQ(heap.Size(), 1);
+
+	heap.GetObject(0)->Release();
+	heap.KillOrphans();
+	ASSERT_EQ(heap.Size(), 1);
+
+	heap.GetObject(0)->Release();
+	heap.KillOrphans();
+	ASSERT_EQ(heap.Size(), 0);
+	
+	delete stack;
+	delete program;
+}
+
+TEST (ExecutorTest, TestRelease)
+{
+	/* After releasing the object, the heap-instance should cleared after a
+	 * call to Heap::KillOrphans().
+	 * 		new 0
+	 * 		release
+	 */
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	MethodBody body;
+	unsigned classID = 0;
+
+	body.length = 2 + sizeof(classID);
+	body.code = new byte[body.length];
+	body.code[0] = OP_NEW;
+	memcpy(body.code+1, &classID, sizeof(unsigned));
+	body.code[1+sizeof(unsigned)] = OP_RELEASE;
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+	ASSERT_EQ(stack->Count(), 0);
+	ASSERT_EQ(heap.Size(), 1);
+
+	heap.KillOrphans();
+	ASSERT_EQ(heap.Size(), 0);
+
+	delete stack;
+	delete program;
+}
+

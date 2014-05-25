@@ -166,6 +166,10 @@ Variable* Variable::Copy()
 
 bool Variable::Cast(VarType type)
 {
+	if (IsFieldVariable()) {
+		THROW(InvalidOperationException, "Unable to convert Field variables");
+	}
+
 	if (!VarValue::CastAvailable(_type, type))
 		return false;
 

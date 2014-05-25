@@ -30,6 +30,7 @@ public:
 	virtual void PerformMethodCall(Object *object, Method *method) = 0;
 	virtual void PerformMethodCall(Class *cc, Method *method) = 0;
 	virtual void BranchToInstruction(unsigned index) = 0;
+	virtual Object* InstantiateObject(unsigned classID) = 0;
 	virtual void ReturnToCaller() = 0;
 };
 

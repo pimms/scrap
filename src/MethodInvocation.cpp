@@ -6,6 +6,7 @@
 #include "Heap.h"
 #include "Variable.h"
 #include "Bytecode.h"
+#include "IndexList.h"
 
 
 namespace scrap {
@@ -14,6 +15,7 @@ MethodInvocation::MethodInvocation(Heap *heap, Method *method, Object *object,
 									MethodInvocation *caller)
 	:	_object(object),
 		_class(object->GetClass()),
+		_classList(NULL),
 		_method(method),
 		_caller(caller),
 		_pc(0),
@@ -42,6 +44,7 @@ MethodInvocation::MethodInvocation(Heap *heap, Method *method, const Class *c,
 									MethodInvocation *caller)
 	:	_object(NULL),
 		_class(c),
+		_classList(NULL),
 		_method(method),
 		_caller(caller),
 		_pc(0),
@@ -72,8 +75,23 @@ MethodInvocation::~MethodInvocation()
 }
 
 
+void MethodInvocation::SetClassList(ClassList *clist)
+{
+	if (clist)
+		_classList = clist;
+}
+
+
 void MethodInvocation::Execute()
 {
+#ifndef _SCRAP_TEST_
+	// The ClassList must be defined in non-testing environments
+	if (!_classList) {
+		THROW(NullPointerException, "The ClassList must be defined in the "
+			"executing MethodInvocation instance.");
+	}
+#endif
+
 	_pc = 0;
 	const MethodBody *body = _method->GetMethodBody();
 
@@ -102,6 +120,21 @@ void MethodInvocation::BranchToInstruction(unsigned index)
 	}
 
 	_pc = index;
+}
+
+Object* MethodInvocation::InstantiateObject(unsigned classID)
+{
+#ifdef _SCRAP_TEST_
+	// The ClassList may be undefined in testing environments
+	if (!_classList) {
+		THROW(NullPointerException, 
+			"Cannot instantiate objects without a ClassList");
+	}
+#endif
+
+	Class *c = _classList->GetClass(classID);
+	Object *object = _heap->CreateObject(c);
+	return object;
 }
 
 void MethodInvocation::ReturnToCaller()

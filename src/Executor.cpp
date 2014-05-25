@@ -1012,17 +1012,52 @@ unsigned Executor::COr(const byte *instr)
 
 unsigned Executor::New(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	unsigned classID = *((unsigned*)(instr+1));
+	Object *object = _delegate->InstantiateObject(classID);
+	Variable *variable = new Variable(VarType::a);
+	variable->Set(object);
+	_stack->Push(variable);
+	return 5;
 }
 
 unsigned Executor::Retain(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	
+	// TODO
+	// Use run time exceptions
+	if (var->Type() != VarType::a) {
+		THROW(InvalidTypeException, "Unable to retain non-Object variables");
+	}
+
+	if (var->Value_a() == NULL) {
+		THROW(NullPointerException, "Cannot retain NULL-objects");
+	}
+
+	var->Value_a()->Retain();
+	if (!var->IsFieldVariable())
+		delete var;
+	return 1;
 }
 
 unsigned Executor::Release(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	
+	// TODO
+	// Use run time exceptions
+	if (var->Type() != VarType::a) {
+		THROW(InvalidTypeException, "Unable to release non-Object variables");
+	}
+
+	if (var->Value_a() == NULL) {
+		THROW(NullPointerException, "Cannot release NULL-objects");
+	}
+
+	var->Value_a()->Release();
+	if (!var->IsFieldVariable())
+		delete var;
+	return 1;
 }
 
 unsigned Executor::Invoke(const byte *instr) 

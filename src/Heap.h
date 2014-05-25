@@ -26,6 +26,8 @@ public:
 
 	int Size() const;
 
+	Object* GetObject(unsigned index);
+
 private:
 	vector<Object*> _objs;
 };

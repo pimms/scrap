@@ -52,4 +52,14 @@ int Heap::Size() const
 }
 
 
+Object* Heap::GetObject(unsigned index)
+{
+	if (index >= _objs.size()) {
+		THROW(IndexOutOfRangeException,
+			"Attempted to retireve object with index out of range");
+	}
+	
+	return _objs[index];
+}
+
 }

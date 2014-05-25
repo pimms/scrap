@@ -4,11 +4,6 @@
 #include "Class.h"
 #include "Method.h"
 #include "Variable.h"
-
-
-
-
-
 #include "IndexList.h"
 #include "Bytecode.h"
 #include <cstring>
@@ -75,7 +70,6 @@ void ProgramParser::ReadVersionNumber()
 
 	// TODO
 	// Consider whether or not to continue based on the version number.
-	printf("[ProgramParser] Parsing file with version %i.%i\n", maj, min);
 }
 
 void ProgramParser::ReadEndian()

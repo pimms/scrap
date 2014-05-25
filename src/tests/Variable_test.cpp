@@ -382,6 +382,31 @@ TEST (VariableTest, CastToBool)
 }
 
 
+// Assert that casting a FieldVariable throws an exception.
+template<typename T>
+void AssertCastingFieldIllegal(T val, VarType to)
+{
+	Variable var;
+	var.Set((T) val);
+	
+	var.SetFieldVariableFlag(true);
+	ASSERT_ANY_THROW(var.Cast(to));
+
+	var.SetFieldVariableFlag(false);
+	ASSERT_NO_THROW(var.Cast(to));
+}
+
+TEST (VariableTest, AssertCastingFieldIllegal)
+{
+	AssertCastingFieldIllegal<int>(4, VarType::f);
+	AssertCastingFieldIllegal<float>(4.5, VarType::i);
+	AssertCastingFieldIllegal<double>(4.5, VarType::f);
+	AssertCastingFieldIllegal<long>(4, VarType::i);
+	AssertCastingFieldIllegal<char>(4, VarType::i);
+	AssertCastingFieldIllegal<bool>(true, VarType::i);
+}
+
+
 /* Arithmetic Tests
  *
  * Ensure that all operations give the correct result and
