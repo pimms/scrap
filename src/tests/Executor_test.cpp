@@ -15,13 +15,13 @@
  * [ ] T ARelease
  * [ ] T ALoad
  * [ ] T AStore
- * [ ] A2B
- * [ ] F2T
- * [ ] D2T
- * [ ] L2T
- * [ ] I2T
- * [ ] C2T
- * [ ] B2T
+ * [X] A2B
+ * [X] F2T
+ * [X] D2T
+ * [X] L2T
+ * [X] I2T
+ * [X] C2T
+ * [X] B2T
  * [X] T Add
  * [X] T Sub
  * [X] T Mul
@@ -121,6 +121,9 @@ Stack* ExecuteProgram(Program *program, Heap *heap)
  * the type and the instruction, the instruction must be passed as well.
  * To assert that the value is identical, the type getter method must be
  * passed as well.
+ *		instr			The push instruction
+ *		val				The value to be pushed
+ *		valmethod		The type Variable-value returning the T-value
  */
 template<typename T>
 void TestPushLiteral(byte instr, T val, T(Variable::*valmethod)()const)
@@ -154,6 +157,14 @@ void TestPushLiteral(byte instr, T val, T(Variable::*valmethod)()const)
 	delete program;
 }
 
+/* Tests an arithmetic operation. 
+ * 		pushInstr		The instruction which pushes a literal
+ * 		aritInstr 		The arithmetic bytecode instruction
+ * 		val1 			The first value
+ * 		val2 			The second value
+ * 		opmethod 		The Variable-method corresponding to aritInstr
+ * 		valmethod		The Variable-method returning the value
+ */
 template<typename T>
 void TestArithmetic(byte pushInstr, byte aritInstr, T val1, T val2, 
 					 void(Variable::*opmethod)(const Variable*), 
@@ -200,6 +211,50 @@ void TestArithmetic(byte pushInstr, byte aritInstr, T val1, T val2,
 	delete stack;
 	delete program;
 }
+
+/* Tests conversion between the types "FROM" and "TO".
+ * 		pushInstr		The instruction pushing a value of type "FROM"
+ * 		aritInstr		The conversion byte instruction
+ * 		val				The input value to be converted
+ * 		expectedOutput	The expected output of the conversion
+ * 		expectedType	The expected VarType of the converted variable
+ * 		valmethod		The Variable-method return the FROM-value
+ */
+template<typename FROM, typename TO>
+void TestConversion(byte pushInstr, byte convInstr, FROM val, 
+					TO expectedOutput, VarType expectedType,
+					TO(Variable::*valmethod)()const)
+{
+	/* Execute the program:
+	 * 		<pushInstr> <val>
+	 * 		<convInstr>
+	 */
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	Variable *var = NULL;
+	MethodBody body;
+
+	body.length = 2 + sizeof(FROM);
+	body.code = new byte[body.length];
+	body.code[0] = pushInstr;
+	memcpy(body.code+1, &val, sizeof(FROM));
+	body.code[1+sizeof(FROM)] = convInstr;
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+	ASSERT_EQ(stack->Count(), 1);
+	var = stack->Pop();
+	
+	ASSERT_EQ(var->Type(), expectedType);
+	ASSERT_NEAR((*var.*valmethod)(), expectedOutput, 0.0001);
+
+	delete var;
+	delete stack;
+	delete program;
+}
+
 
 TEST (ExecutorTest, TestPushLiteral)
 {
@@ -421,4 +476,124 @@ TEST (ExecutorTest, TestOr)
 					&Variable::Or, &Variable::Value_l);
 	TestArithmetic<char>(OP_C_PUSH, OP_C_OR, 255, 14, 
 					&Variable::Or, &Variable::Value_c);
+}
+
+TEST (ExecutorTest, TestIntConversion)
+{
+	TestConversion<int,float>(OP_I_PUSH, OP_I2F, 45, 45.f, 
+							VarType::f, &Variable::Value_f);
+	TestConversion<int,double>(OP_I_PUSH, OP_I2D, 45, 45.0, 
+							VarType::d, &Variable::Value_d);
+	TestConversion<int,long>(OP_I_PUSH, OP_I2L, 45, 45, 
+							VarType::l, &Variable::Value_l);
+	TestConversion<int,char>(OP_I_PUSH, OP_I2C, 45, 45, 
+							VarType::c, &Variable::Value_c);
+
+	TestConversion<int,bool>(OP_I_PUSH, OP_I2B, 45, true,
+							VarType::b, &Variable::Value_b);
+	TestConversion<int,bool>(OP_I_PUSH, OP_I2B, 0, false,
+							VarType::b, &Variable::Value_b);
+	TestConversion<int,bool>(OP_I_PUSH, OP_I2B, -45, true,
+							VarType::b, &Variable::Value_b);
+}
+
+TEST (ExecutorTest, TestFloatConversion)
+{
+	TestConversion<float,int>(OP_F_PUSH, OP_F2I, 45.9f, 45, 
+							VarType::i, &Variable::Value_i);
+	TestConversion<float,double>(OP_F_PUSH, OP_F2D, 45.9f, 45.9, 
+							VarType::d, &Variable::Value_d);
+	TestConversion<float,long>(OP_F_PUSH, OP_F2L, 45.9, 45, 
+							VarType::l, &Variable::Value_l);
+	TestConversion<float,char>(OP_F_PUSH, OP_F2C, 45.9, 45, 
+							VarType::c, &Variable::Value_c);
+
+	TestConversion<float,bool>(OP_F_PUSH, OP_F2B, 45.9, true,
+							VarType::b, &Variable::Value_b);
+	TestConversion<float,bool>(OP_F_PUSH, OP_F2B, 0.f, false,
+							VarType::b, &Variable::Value_b);
+	TestConversion<float,bool>(OP_F_PUSH, OP_F2B, -45.f, true,
+							VarType::b, &Variable::Value_b);
+}
+
+TEST (ExecutorTest, TestDoubleConversion)
+{
+	TestConversion<double,int>(OP_D_PUSH, OP_D2I, 45.9, 45, 
+							VarType::i, &Variable::Value_i);
+	TestConversion<double,float>(OP_D_PUSH, OP_D2F, 45.9f, 45.9f, 
+							VarType::f, &Variable::Value_f);
+	TestConversion<double,long>(OP_D_PUSH, OP_D2L, 45.9, 45, 
+							VarType::l, &Variable::Value_l);
+	TestConversion<double,char>(OP_D_PUSH, OP_D2C, 45.9, 45, 
+							VarType::c, &Variable::Value_c);
+	
+	TestConversion<double,bool>(OP_D_PUSH, OP_D2B, 45.9, true,
+							VarType::b, &Variable::Value_b);
+	TestConversion<double,bool>(OP_D_PUSH, OP_D2B, 0.0, false,
+							VarType::b, &Variable::Value_b);
+	TestConversion<double,bool>(OP_D_PUSH, OP_D2B, -45.f, true,
+							VarType::b, &Variable::Value_b);
+}
+
+TEST (ExecutorTest, TestLongConversion)
+{
+	TestConversion<long,float>(OP_L_PUSH, OP_L2F, 45, 45.f, 
+							VarType::f, &Variable::Value_f);
+	TestConversion<long,double>(OP_L_PUSH, OP_L2D, 45, 45.0, 
+							VarType::d, &Variable::Value_d);
+	TestConversion<long,int>(OP_L_PUSH, OP_L2I, 45, 45, 
+							VarType::i, &Variable::Value_i);
+	TestConversion<long,char>(OP_L_PUSH, OP_L2C, 45, 45, 
+							VarType::c, &Variable::Value_c);
+
+	TestConversion<long,bool>(OP_L_PUSH, OP_L2B, 45, true,
+							VarType::b, &Variable::Value_b);
+	TestConversion<long,bool>(OP_L_PUSH, OP_L2B, 0, false,
+							VarType::b, &Variable::Value_b);
+	TestConversion<long,bool>(OP_L_PUSH, OP_L2B, -45, true,
+							VarType::b, &Variable::Value_b);
+}
+
+TEST (ExecutorTest, TestCharConversion)
+{
+	TestConversion<char,float>(OP_C_PUSH, OP_C2F, 45, 45.f, 
+							VarType::f, &Variable::Value_f);
+	TestConversion<char,double>(OP_C_PUSH, OP_C2D, 45, 45.0, 
+							VarType::d, &Variable::Value_d);
+	TestConversion<char,int>(OP_C_PUSH, OP_C2I, 45, 45, 
+							VarType::i, &Variable::Value_i);
+	TestConversion<char,long>(OP_C_PUSH, OP_C2L, 45, 45, 
+							VarType::l, &Variable::Value_l);
+
+	TestConversion<char,bool>(OP_C_PUSH, OP_C2B, 45, true,
+							VarType::b, &Variable::Value_b);
+	TestConversion<char,bool>(OP_C_PUSH, OP_C2B, 0, false,
+							VarType::b, &Variable::Value_b);
+	TestConversion<char,bool>(OP_C_PUSH, OP_C2B, -45, true,
+							VarType::b, &Variable::Value_b);
+}
+
+TEST (ExecutorTest, TestBoolConversion)
+{
+	TestConversion<bool,float>(OP_B_PUSH, OP_B2F, true, 1.f, 
+							VarType::f, &Variable::Value_f);
+	TestConversion<bool,double>(OP_B_PUSH, OP_B2D, true, 1.0, 
+							VarType::d, &Variable::Value_d);
+	TestConversion<bool,int>(OP_B_PUSH, OP_B2I, true, 1, 
+							VarType::i, &Variable::Value_i);
+	TestConversion<bool,long>(OP_B_PUSH, OP_B2L, true, 1, 
+							VarType::l, &Variable::Value_l);
+	TestConversion<bool,char>(OP_B_PUSH, OP_B2C, true, 1, 
+							VarType::c, &Variable::Value_c);
+
+	TestConversion<bool,float>(OP_B_PUSH, OP_B2F, false, 0.f, 
+							VarType::f, &Variable::Value_f);
+	TestConversion<bool,double>(OP_B_PUSH, OP_B2D, false, 0.0, 
+							VarType::d, &Variable::Value_d);
+	TestConversion<bool,int>(OP_B_PUSH, OP_B2I, false, 0, 
+							VarType::i, &Variable::Value_i);
+	TestConversion<bool,long>(OP_B_PUSH, OP_B2L, false, 0, 
+							VarType::l, &Variable::Value_l);
+	TestConversion<bool,char>(OP_B_PUSH, OP_B2C, false, 0, 
+							VarType::c, &Variable::Value_c);
 }
