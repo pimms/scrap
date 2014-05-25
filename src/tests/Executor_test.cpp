@@ -159,3 +159,26 @@ TEST (ExecutorTest, TestPushLiteral)
 	TestPushLiteral<char>(OP_C_PUSH, 0xFE, &Variable::Value_c);
 	TestPushLiteral<bool>(OP_B_PUSH, 0x01, &Variable::Value_b);
 }
+
+TEST (ExecutorTest, TestPop)
+{
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	MethodBody body;
+	int ival = 1337;
+
+	body.length = 2 + sizeof(int);
+	body.code = new byte[body.length];
+	body.code[0] = OP_I_PUSH;
+	memcpy(body.code+1, &ival, sizeof(int));
+	body.code[1+sizeof(int)] = OP_POP;
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+	ASSERT_EQ(stack->Count(), 0);
+	
+	delete stack;
+	delete program;
+}

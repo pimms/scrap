@@ -65,6 +65,9 @@ TEST (ClassTest, TestValidMemberAssignment)
 	ASSERT_NO_THROW(c.AddStaticMethod(stat));
 	ASSERT_NO_THROW(c.AddFieldTemplate(TypeDesc{INT}));
 	ASSERT_NO_THROW(c.AddStaticField(TypeDesc{INT}));
+
+	delete norm;
+	delete stat;
 }
 
 TEST (ClassTest, TestInvalidMemberAssignment)
@@ -78,6 +81,9 @@ TEST (ClassTest, TestInvalidMemberAssignment)
 	ASSERT_ANY_THROW(c.AddStaticMethod(norm));
 	ASSERT_ANY_THROW(c.AddMethod(NULL));
 	ASSERT_ANY_THROW(c.AddStaticMethod(NULL));
+
+	delete norm;
+	delete stat;
 }
 
 TEST (ClassTest, TestLockedMemberAssignment)
@@ -95,6 +101,9 @@ TEST (ClassTest, TestLockedMemberAssignment)
 	ASSERT_ANY_THROW(c.AddStaticMethod(stat));
 	ASSERT_ANY_THROW(c.AddFieldTemplate(TypeDesc{INT}));
 	ASSERT_ANY_THROW(c.AddStaticField(TypeDesc{INT}));
+
+	delete norm;
+	delete stat;
 }
 
 TEST (ClassTest, TestSuperInheritance)
