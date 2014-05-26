@@ -54,30 +54,68 @@
  */
 
 
-/* The test program declares a program with a single class, MainClass and 
- * a single method, "void Main()". The bytecode-length and bytecode is not
+/* The test program is a manual compilation of a program similar to this:
+ *		class MainClass {					// ID = 2
+ *			static MainClass singleton;		// ID = 0
+ *			Foo foo;						// ID = 0
+ *			Bar bar;						// ID = 1
+ *			
+ *			static void Main(); 			// ID = 0
+ *		}
+ *
+ *		class Foo {							// ID = 0
+ *			static bool flag;				// ID = 0
+ *			int num;						// ID = 0
+ *			
+ *			static void TrueFlag() {		// ID = 0
+ *				flag = true;
+ *			}
+ *
+ *			virtual int GetNum() {			// ID = 0
+ *				return 10;
+ *			}
+ *		}
+ *
+ *		class Bar extends Foo {				// ID = 1
+ *			virtual int GetNum() {			// ID = 0
+ *				return 15;
+ *			}
+ *
+ *			void SetNum() {					// ID = 1
+ *				num = 13;
+ *			}
+ *		}
+ *
+ * The bytecode-length and bytecode of the "void Main()" method is not
  * included in the file and must be added before attempting to execute
  * the program.
  */
 #define PROGRAM_BASE_FILE "testfiles/testprog_base"
 
 /* To read the program file successfully, this class overrides 
- * ProgramParser but returns a predefined prgram file rather than
- * actually reading the file. This class will only work properly
- * when reading the test-program base file. 
+ * ProgramParser. The method MainClass::Main(), is not read at all
+ * but returns the pre-defined program defined in the test bodies. 
+ * The remaining methods are read as normal.
+ *
+ * This class will only work properly when reading the test-program 
+ * base file. 
  */
 class TestProgramCreator : public ProgramParser {
 public:
 	TestProgramCreator(MethodBody body) {
 		_body = body;
+		_methodsRead = 0;
 	}	
 
 	MethodBody ReadMethodBody() {
-		return _body;
+		if (_methodsRead++ == 4)
+			return _body;
+		return ProgramParser::ReadMethodBody();
 	}
 
 private:
 	MethodBody _body;
+	int _methodsRead;
 };
 
 Program* CreateProgram(MethodBody body)
@@ -99,7 +137,7 @@ Program* CreateProgram(MethodBody body)
 Stack* ExecuteProgram(Program *program, Heap *heap)
 {
 	ClassList *clist = program->GetClassList();
-	Class *mainClass = clist->GetClass(0);
+	Class *mainClass = clist->GetClass(2);
 	Method *mainMethod = mainClass->GetStaticMethod(0);
 
 	MethodInvocation invocation(heap, mainMethod, mainClass, NULL);
@@ -676,13 +714,13 @@ TEST (ExecutorTest, TestNew)
 {
 	/* After the new-instruction, the object should exist on the stack as a 
 	 * Variable and on the Heap.
-	 * 		new 0
+	 * 		new 2
 	 */
 	Stack *stack = NULL;
 	Heap heap;
 	Program *program = NULL;
 	MethodBody body;
-	unsigned classID = 0;
+	unsigned classID = 2;
 
 	body.length = 1 + sizeof(classID);
 	body.code = new byte[body.length];
@@ -698,7 +736,7 @@ TEST (ExecutorTest, TestNew)
 
 	Object *obj = var->Value_a();
 	ASSERT_EQ(obj->GetClass()->GetClassName(), "MainClass");
-	ASSERT_EQ(obj->GetClass()->GetClassID(), 0);
+	ASSERT_EQ(obj->GetClass()->GetClassID(), 2);
 
 	ASSERT_EQ(heap.Size(), 1);
 

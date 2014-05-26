@@ -23,13 +23,7 @@ public:
 
 	Program* ParseProgramFile(string fileName);
 
-private:
-	BinaryFile *_file;
-	ClassList *_classList;
-
-	unsigned _mainClassID;
-	unsigned _mainMethodID;
-
+protected:
 	virtual void ReadMagicNumber();
 	virtual void ReadVersionNumber();
 	virtual void ReadEndian();
@@ -43,6 +37,13 @@ private:
 	virtual Method* ReadMethod(MethodType methodType, Class *c);
 	virtual MethodBody ReadMethodBody();
 	virtual TypeDesc ReadTypeDesc(bool readName);
+
+private:
+	BinaryFile *_file;
+	ClassList *_classList;
+
+	unsigned _mainClassID;
+	unsigned _mainMethodID;
 };
 
 }
