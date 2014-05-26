@@ -752,14 +752,14 @@ TEST (ExecutorTest, TestRetain)
 {
 	/* After retaining the object, a call to Heap::KillOrphans() should NOT 
 	 * delete the object. OP_RETAIN pops the object from the stack.
-	 * 		new 0
+	 * 		new 2
 	 * 		retain
 	 */
 	Stack *stack = NULL;
 	Heap heap;
 	Program *program = NULL;
 	MethodBody body;
-	unsigned classID = 0;
+	unsigned classID = 2;
 
 	body.length = 2 + sizeof(classID);
 	body.code = new byte[body.length];
@@ -789,14 +789,14 @@ TEST (ExecutorTest, TestRelease)
 {
 	/* After releasing the object, the heap-instance should cleared after a
 	 * call to Heap::KillOrphans().
-	 * 		new 0
+	 * 		new 2
 	 * 		release
 	 */
 	Stack *stack = NULL;
 	Heap heap;
 	Program *program = NULL;
 	MethodBody body;
-	unsigned classID = 0;
+	unsigned classID = 2;
 
 	body.length = 2 + sizeof(classID);
 	body.code = new byte[body.length];
