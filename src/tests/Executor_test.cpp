@@ -133,8 +133,10 @@ Program* CreateProgram(MethodBody body)
  *
  * Note that the contents of the stack, the Stack-instance itself, 
  * and the heap contents must be deleted by the caller.
+ *
+ * The passed debugger will be attached to the method invocation.
  */
-Stack* ExecuteProgram(Program *program, Heap *heap)
+Stack* ExecuteProgram(Program *program, Heap *heap, Debugger *debugger=NULL)
 {
 	ClassList *clist = program->GetClassList();
 	Class *mainClass = clist->GetClass(2);
@@ -142,6 +144,10 @@ Stack* ExecuteProgram(Program *program, Heap *heap)
 
 	MethodInvocation invocation(heap, mainMethod, mainClass, NULL);
 	invocation.SetClassList(clist);
+
+	if (debugger) 
+		invocation.SetDebugger(debugger);
+
 	invocation.Execute();
 
 	// Copy the stack

@@ -14,6 +14,7 @@
 #include "../Bytecode.h"
 #include "../ProgramParser.h"
 #include "../Program.h"
+#include "../Debug.h"
 
 using namespace scrap;
 

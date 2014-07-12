@@ -13,6 +13,7 @@ class Class;
 class ClassList;
 class Stack;
 class Heap;
+class Debugger;
 
 
 /* Method Invocation
@@ -20,6 +21,13 @@ class Heap;
  *
  * When calling an instance method, the Object-instance is wrapped in a Variable
  * and pushed FIRST onto the stack as the "this" parameter.
+ *
+ * MethodInvocations instantiate other MethodInvocations upon ivoking other methods. 
+ * To maintain a consistent heap between methods, the Heap-instance is passed down
+ * to invoked methods. The Stack-instances are however privately created and are 
+ * discarded upon the method's returnal.
+ *
+ * A Debugger-instance may be passed via the "SetDebugger(Debugger*)" method. 
  */
 class MethodInvocation : public ExecutionDelegate {
 public:
@@ -44,6 +52,7 @@ public:
 	Object* InstantiateObject(unsigned classID);
 	void ReturnToCaller();
 
+	/* Getter Methods  */
 #ifdef _SCRAP_TEST_		
 	// Allow modification in test environments
 	Stack* GetStack();	
@@ -51,8 +60,18 @@ public:
 	const Stack* GetStack() const;
 #endif
 
+	const Method* GetMethod() const;
+	const ClassList* GetClassList() const;
+
+
 	// Push return value (top stack value) onto the calling stack
 	void ReturnValue();
+
+	/* A Debugger-instance may be assigned to the MethodInvocation. The Debugger
+	 * will be passed down to any invocations invoked by this invocation.
+	 */
+	void SetDebugger(Debugger *debugger);
+
 
 private:
 	const Class *_class;
@@ -64,6 +83,9 @@ private:
 	Stack _stack;
 	Heap *_heap;
 	Executor _executor;
+
+	Debugger *_debugger;
+
 
 	unsigned _pc;
 	bool _return;

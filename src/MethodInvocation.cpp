@@ -7,6 +7,7 @@
 #include "Variable.h"
 #include "Bytecode.h"
 #include "IndexList.h"
+#include "Debug.h"
 
 
 namespace scrap {
@@ -21,7 +22,8 @@ MethodInvocation::MethodInvocation(Heap *heap, Method *method, Object *object,
 		_pc(0),
 		_return(false),
 		_heap(heap),
-		_executor(this, &_stack, _heap)
+		_executor(this, &_stack, _heap),
+		_debugger(NULL)
 {
 	if (!_heap || !_method || !_object) {
 		THROW(NullPointerException, "NULL-argument to MethodInvocation()");
@@ -50,7 +52,8 @@ MethodInvocation::MethodInvocation(Heap *heap, Method *method, const Class *c,
 		_pc(0),
 		_return(false),
 		_heap(heap),
-		_executor(this, &_stack, _heap)
+		_executor(this, &_stack, _heap),
+		_debugger(NULL)
 {
 	if (!_heap || !_method || !_class) {
 		THROW(NullPointerException, "NULL-argument to MethodInvocation()");
@@ -95,8 +98,23 @@ void MethodInvocation::Execute()
 	_pc = 0;
 	const MethodBody *body = _method->GetMethodBody();
 
+	if (_debugger) {
+		_debugger->DidInvokeNewMethod(this, _caller);
+	}
+
 	while (_pc < body->length && !_return) {
+		if (_debugger) {
+			_debugger->WillExecuteInstruction(this, body->code + _pc);
+		}
+
 		_pc += _executor.Execute(body->code + _pc);
+	}
+
+	if (_return && _debugger) {
+		/* No T_RETURN was executed, the method ran fully to completion.
+		 * The Debugger has therefore not been notified of the returnal of this method.
+		 */
+		_debugger->DidInvokeNewMethod(this, NULL);
 	}
 }
 
@@ -152,7 +170,18 @@ const Stack* MethodInvocation::GetStack() const
 {
 	return &_stack;
 }
-	
+
+const Method* MethodInvocation::GetMethod() const 
+{
+	return _method;
+}
+
+const ClassList* MethodInvocation::GetClassList() const 
+{
+	return _classList;
+}
+
+
 void MethodInvocation::ReturnValue()
 {
 	if (!_caller)
@@ -169,7 +198,17 @@ void MethodInvocation::ReturnValue()
 	}
 
 	_caller->_stack.Push(var);
+
+	if (_debugger) {
+		_debugger->DidReturn(this, var);
+	}
 }
+
+
+void MethodInvocation::SetDebugger(Debugger *debugger) {
+	_debugger = debugger;
+}
+
 
 
 void MethodInvocation::TransferArguments()
