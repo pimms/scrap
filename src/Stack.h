@@ -13,8 +13,7 @@ class Variable;
 
 /* Stack
  * Each method invocation creates a new stack. The stack manages local variables
- * and literals. If the stack contains a non-zero amount of elements upon
- * destruction, a StackNotEmptyException is thrown. 
+ * and literals.  
  */
 class Stack {
 public:
@@ -37,6 +36,9 @@ public:
 #ifdef _SCRAP_TEST_
 	Stack* Copy() const;
 #endif
+	
+	const Variable* Peek(int index) const;
+
 
 private:
 	// All Variables managed by a stack are deleted by the stack

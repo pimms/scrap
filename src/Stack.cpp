@@ -11,11 +11,8 @@ Stack::Stack()
 
 Stack::~Stack()
 {
-	// Poor stack management - upon destruction, the stack must be empty.
-	if (Count() != 0) {
-		THROW(StackNotEmptyException, 
-			"Upon stack destruction, the stack must be empty");
-	}
+	while (Count()) 
+		delete Pop();
 }
 
 
@@ -57,5 +54,13 @@ Stack* Stack::Copy() const
 	return copy;
 }
 #endif
+
+
+const Variable* Stack::Peek(int index) const 
+{
+	if (index >= 0 && index < Count()) 
+		return _deque.at(index);
+	return NULL;
+}
 
 }

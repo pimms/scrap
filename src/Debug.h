@@ -25,6 +25,9 @@ public:
 	virtual void WillExecuteInstruction(const MethodInvocation *invoc, const byte *instr) = 0;
 	virtual void DidInvokeNewMethod(const MethodInvocation *invoc, const MethodInvocation *oldInvoc) { /* ... */ };
 	virtual void DidReturn(const MethodInvocation *invoc, const Variable *returnVariable) { /* ... */ };
+	
+protected:
+	virtual string GetMethodSignature(const MethodInvocation *invoc);
 };
 
 
@@ -43,7 +46,9 @@ public:
 	void DidReturn(const MethodInvocation *invoc, const Variable *returnVariable);
 
 private:
-	void TakeCommands();
+	void TakeCommands(const MethodInvocation *invoc);
+
+	void PrintStackContents(const MethodInvocation *invoc);
 };
 
 }

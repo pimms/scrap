@@ -30,13 +30,7 @@ Executor::Executor(ExecutionDelegate *delegate, Stack *stack, Heap *heap)
 
 Executor::~Executor()
 {
-	for (int i=0; i<NUM_REGISTERS; i++) {
-		if (_reg[i] != NULL) {
-			if (!_reg[i]->IsFieldVariable()) {
-				delete _reg[i];
-			}
-		}
-	}
+
 }
 
 
@@ -1062,7 +1056,25 @@ unsigned Executor::Release(const byte *instr)
 
 unsigned Executor::Invoke(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *var = _stack->Pop();
+	if (var->Type() != VarType::OBJECT) {
+		THROW(InvalidTypeException, "Can only invoke methods on Objects");
+	}
+
+	unsigned methodID = *(unsigned*)(instr+1);
+
+	Object *obj = var->Value_a();
+	Method *mtd = obj->GetClass()->GetMethod(methodID);
+
+	/* Deleting the "Variable"-container causes problems because the Variable
+	 * might still be referenced from a register. TODO: Consider how to 
+	 * resolve this issue.
+	 */
+	delete var;
+
+	_delegate->PerformMethodCall(obj, mtd);
+
+	return (1 + sizeof(methodID));
 }
 
 unsigned Executor::VInvoke(const byte *instr) 
@@ -1268,7 +1280,6 @@ void Executor::GenericLoad(VarType type, byte regIdx)
 {
 	Variable *&reg = GetRegister(regIdx);
 	_stack->Push(reg);
-	reg = NULL;
 }
 
 void Executor::GenericStore(VarType type, byte regIdx)

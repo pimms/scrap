@@ -55,11 +55,10 @@ public:
 	/* Getter Methods  */
 #ifdef _SCRAP_TEST_		
 	// Allow modification in test environments
-	Stack* GetStack();	
-#else
-	const Stack* GetStack() const;
+	Stack* GetMutableStack();	
 #endif
 
+	const Stack* GetStack() const;
 	const Method* GetMethod() const;
 	const ClassList* GetClassList() const;
 

@@ -20,7 +20,6 @@ however NOT optimized for size - as little information as possible is packed
 into the core instructions, and most of them rely on parameters varying from
 1 to 10 additional bytes. 
 
-
 VARIABLE TABLES AND STACKS
 The VM is stack based, so most operations modidy the contents of the stack. 
 The stack is local for each method. There are also four general purpose 
@@ -210,6 +209,8 @@ invoke #methodID 	Invoke a method on object		objref -> [retvalue]
 vinvoke #methodID 	Invoke a virtual method on obj	objref -> [retvalue]
 stinvoke #classID  	Invoke a static method 			-> [retvalue]	
 		 #methodID
+suinvoke #methodID	Invoke a method in the super	objref -> [retvalue]
+stsuinvoke #mthdID 	Invoke a static method in super	-> [retvalue]
 
 # When loading and storing member/static variables, the type of the 
 # field is known beforehand and need not be specified in the opcode.
@@ -232,4 +233,3 @@ bifless #dest		Branch if VALUE1 < VALUE2 		value1 value2 ->
 biflesseq #dest 	Branch if VALUE1 <= VALUE2		value1 value2 ->
 bifequal #dest		Branch if VALUE1 == VALUE2 		value1 value2 ->
 bifnotequal #dest	Branch if VALUE1 != VALUE2 		value1 value2 ->
-

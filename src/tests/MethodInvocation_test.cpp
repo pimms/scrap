@@ -17,7 +17,7 @@ TEST (MethodInvocationTest, TestValidConstructors)
 
 	// The "this" argument must be popped and deleted
 	ASSERT_NO_THROW(inv = new MethodInvocation(&heap, methodNormal, obj, NULL));
-	delete inv->GetStack()->Pop();
+	delete inv->GetMutableStack()->Pop();
 	delete inv;
 	
 	// No implicit arguments on static methods
@@ -81,7 +81,7 @@ TEST (MethodInvocationTest, TestArgumentAndReturnTransfer)
 
 	// The "this" argument should be pushed onto the stack
 	MethodInvocation invA(&heap, methodA, obj, NULL);
-	Stack *stackA = invA.GetStack();
+	Stack *stackA = invA.GetMutableStack();
 	ASSERT_EQ(stackA->Count(), 1);
 
 	// Push the argument to method B
@@ -89,7 +89,7 @@ TEST (MethodInvocationTest, TestArgumentAndReturnTransfer)
 	stackA->Push(var);
 
 	MethodInvocation invB(&heap, methodB, obj, &invA);
-	Stack *stackB = invB.GetStack();
+	Stack *stackB = invB.GetMutableStack();
 	ASSERT_EQ(stackB->Count(), 2);
 	
 	// Pop the argument from B

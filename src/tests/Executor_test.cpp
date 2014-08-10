@@ -151,10 +151,12 @@ Stack* ExecuteProgram(Program *program, Heap *heap, Debugger *debugger=NULL)
 	invocation.Execute();
 
 	// Copy the stack
-	Stack *stack = invocation.GetStack();
+	Stack *stack = invocation.GetMutableStack();
 	Stack *copy = stack->Copy();
 	
-	// Pop the stack to prevent StackNotEmptyException
+	// The contents of the stack will be deleted in ~MethodInvocation, so pop
+	// all the contents out of the original stack so we can continue to
+	// use them.
 	while (stack->Count())
 		stack->Pop();
 
@@ -823,3 +825,145 @@ TEST (ExecutorTest, TestRelease)
 	delete program;
 }
 
+TEST (ExecutorTest, TestInvokeReturnValue) 
+{
+	/* Test that after invoking a method on an object, the
+	 * only contents of the stack is the returned value from
+	 * the invoked method. In this case, method GetNum() is
+	 * expected to return an int.
+	 * new 0
+	 * a_store 0
+	 * a_load 0
+	 * invoke 0
+	 */
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	MethodBody body;
+	unsigned classID = 0;
+	unsigned methodID = 0;
+	byte reg = 0;
+
+	int idx = 0;
+	body.length = 32;
+	body.code = new byte[body.length];
+
+
+	body.code[idx++] = OP_NEW;
+	memcpy(body.code + idx, &classID, sizeof(classID));
+	idx += sizeof(classID);
+
+	body.code[idx++] = OP_A_STORE;
+	memcpy(body.code + idx, &reg, sizeof(reg));
+	idx += sizeof(reg);
+
+	body.code[idx++] = OP_A_LOAD;
+	memcpy(body.code + idx, &reg, sizeof(reg));
+	idx += sizeof(reg);
+
+	body.code[idx++] = OP_INVOKE;
+	memcpy(body.code + idx, &methodID, sizeof(methodID));
+	idx += sizeof(methodID);
+
+	body.length = idx;	
+
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+	ASSERT_EQ(stack->Count(), 1);
+	
+	Variable *var = stack->Pop();
+	ASSERT_TRUE(var != NULL);
+	
+	ASSERT_EQ(var->Type(), VarType::INT);
+	ASSERT_EQ(var->Value_i(), 10);
+
+	// Force release the test-instance
+	heap.GetObject(0)->Release();
+	heap.KillOrphans();
+
+	delete program;
+	delete stack;
+	delete var;
+}
+
+TEST (ExecutorTest, TestInvokeTwice) 
+{
+	/* Create an instance, call GetNum() twice on it and
+	 * release the object.
+	 * new 0		; Create new instance
+	 * a_store 0	; Store in register A
+	 *
+	 * a_load 0		; load the object
+	 * invoke 0		; invoke getnum()
+	 *
+	 * a_load 0
+	 * invoke 0
+	 *
+	 * a_load 0		; load the object
+	 * release		; Release it
+	 */
+	CLISimpleDebugger dbg;
+	Stack *stack = NULL;
+	Heap heap;
+	Program *program = NULL;
+	Variable *var = NULL;
+	MethodBody body;
+	unsigned classID = 0;
+	unsigned methodID = 0;
+	byte reg = 0;
+
+	body.length = 64;
+	body.code = new byte[body.length];
+	int idx = 0;
+
+
+	body.code[idx++] = OP_NEW;
+	memcpy(body.code + idx, &classID, sizeof(classID));
+	idx += sizeof(classID);
+	body.code[idx++] = OP_A_STORE;
+	memcpy(body.code + idx, &reg, sizeof(reg));
+	idx += sizeof(reg);
+
+	body.code[idx++] = OP_A_LOAD;
+	memcpy(body.code + idx, &reg, sizeof(reg));
+	idx += sizeof(reg);
+	body.code[idx++] = OP_INVOKE;
+	memcpy(body.code + idx, &methodID, sizeof(methodID));
+	idx += sizeof(methodID);
+
+	body.code[idx++] = OP_A_LOAD;
+	memcpy(body.code + idx, &reg, sizeof(reg));
+	idx += sizeof(reg);
+	body.code[idx++] = OP_INVOKE;
+	memcpy(body.code + idx, &methodID, sizeof(methodID));
+	idx += sizeof(methodID);
+
+	body.code[idx++] = OP_A_LOAD;
+	memcpy(body.code + idx, &reg, sizeof(reg));
+	idx += sizeof(reg);
+	body.code[idx++] = OP_RELEASE;
+
+	body.length = idx;
+
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program, &heap);
+
+
+	ASSERT_EQ(2, stack->Count());
+
+	for (int i=0; i<2; i++) {
+		var = stack->Pop();
+		ASSERT_EQ(VarType::INT, var->Type());
+		ASSERT_EQ(10, var->Value_i());
+		delete var;
+	}
+
+	heap.GetObject(0)->Release();
+	heap.KillOrphans();
+
+	delete stack;
+	delete program;
+}

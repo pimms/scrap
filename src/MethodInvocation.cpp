@@ -110,11 +110,11 @@ void MethodInvocation::Execute()
 		_pc += _executor.Execute(body->code + _pc);
 	}
 
-	if (_return && _debugger) {
+	if (!_return && _debugger) {
 		/* No T_RETURN was executed, the method ran fully to completion.
 		 * The Debugger has therefore not been notified of the returnal of this method.
 		 */
-		_debugger->DidInvokeNewMethod(this, NULL);
+		_debugger->DidReturn(this, NULL);
 	}
 }
 
@@ -122,12 +122,20 @@ void MethodInvocation::Execute()
 void MethodInvocation::PerformMethodCall(Object *object, Method *method)
 {
 	MethodInvocation invocation(_heap, method, object, this);
+
+	if (_debugger)
+		invocation.SetDebugger(_debugger);
+
 	invocation.Execute();
 }
 
 void MethodInvocation::PerformMethodCall(Class *c, Method *method)
 {
 	MethodInvocation invocation(_heap, method, c, this);
+
+	if (_debugger)
+		invocation.SetDebugger(_debugger);
+
 	invocation.Execute();
 }
 
@@ -142,7 +150,7 @@ void MethodInvocation::BranchToInstruction(unsigned index)
 
 Object* MethodInvocation::InstantiateObject(unsigned classID)
 {
-#ifdef _SCRAP_TEST_
+#ifndef _SCRAP_TEST_
 	// The ClassList may be undefined in testing environments
 	if (!_classList) {
 		THROW(NullPointerException, 
@@ -163,10 +171,14 @@ void MethodInvocation::ReturnToCaller()
 
 
 #ifdef _SCRAP_TEST_
-Stack* MethodInvocation::GetStack() 
-#else
-const Stack* MethodInvocation::GetStack() const 
+Stack* MethodInvocation::GetMutableStack()
+{
+	return &_stack;
+}
 #endif
+
+
+const Stack* MethodInvocation::GetStack() const 
 {
 	return &_stack;
 }
