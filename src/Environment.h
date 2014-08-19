@@ -9,9 +9,6 @@
  */
 namespace scrap {
 
-class Heap;
-class Object;
-class Class;
 
 class Environment {
 public:
@@ -19,7 +16,7 @@ public:
 	~Environment();
 
 private:	
-	Heap *_heap;
+
 
 	void ExecutionLoop();
 };

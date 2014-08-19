@@ -1,10 +1,7 @@
 #include "Executor.h"
 #include "Bytecode.h"
 #include "Stack.h"
-#include "Heap.h"
 #include "Variable.h"
-#include "Object.h"
-#include "Class.h"
 
 
 namespace scrap {
@@ -15,10 +12,9 @@ namespace scrap {
 static map<byte, ExecutorMethod> g_methodMap;
 
 
-Executor::Executor(ExecutionDelegate *delegate, Stack *stack, Heap *heap)
+Executor::Executor(ExecutionDelegate *delegate, Stack *stack)
 	:	_delegate(delegate),
-		_stack(stack),
-		_heap(heap)
+		_stack(stack)
 {
 	if (g_methodMap.size() == 0) {
 		BuildInstructionMap();
@@ -53,73 +49,38 @@ void Executor::BuildInstructionMap()
 {
 	g_methodMap[OP_POP] 		= &Executor::Pop;
 	g_methodMap[OP_COPY] 		= &Executor::Copy;
-	g_methodMap[OP_ARRAYLENGTH]	= &Executor::ArrayLength;
-	g_methodMap[OP_ARRAYLOAD] 	= &Executor::ArrayLoad;
 	g_methodMap[OP_RETURN] 		= &Executor::Return;
-
-	g_methodMap[OP_A_LOAD]		= &Executor::ALoad;
-	g_methodMap[OP_A_RETURN]	= &Executor::AReturn;
-	g_methodMap[OP_A_STORE]		= &Executor::AStore;
-	g_methodMap[OP_A_NEWARRAY]	= &Executor::ANewarray;
-	g_methodMap[OP_A_ARELEASE]	= &Executor::AArelease;
-	g_methodMap[OP_A_ALOAD]		= &Executor::AAload;
-	g_methodMap[OP_A_ASTORE]	= &Executor::AAstore;
 
 	g_methodMap[OP_I_LOAD]		= &Executor::ILoad;
     g_methodMap[OP_I_RETURN]	= &Executor::IReturn;
     g_methodMap[OP_I_STORE]		= &Executor::IStore;
     g_methodMap[OP_I_PUSH]		= &Executor::IPush;
-    g_methodMap[OP_I_NEWARRAY]	= &Executor::INewarray;
-    g_methodMap[OP_I_ARELEASE]	= &Executor::IArelease;
-    g_methodMap[OP_I_ALOAD]		= &Executor::IAload;
-    g_methodMap[OP_I_ASTORE]	= &Executor::IAstore;
 
 	g_methodMap[OP_F_LOAD]		= &Executor::FLoad;
     g_methodMap[OP_F_RETURN]	= &Executor::FReturn;
     g_methodMap[OP_F_STORE]		= &Executor::FStore;
     g_methodMap[OP_F_PUSH]		= &Executor::FPush;
-    g_methodMap[OP_F_NEWARRAY]	= &Executor::FNewarray;
-    g_methodMap[OP_F_ARELEASE]	= &Executor::FArelease;
-    g_methodMap[OP_F_ALOAD]		= &Executor::FAload;
-    g_methodMap[OP_F_ASTORE]	= &Executor::FAstore;
 
 	g_methodMap[OP_D_LOAD]		= &Executor::DLoad;
     g_methodMap[OP_D_RETURN]	= &Executor::DReturn;
     g_methodMap[OP_D_STORE]		= &Executor::DStore;
     g_methodMap[OP_D_PUSH]		= &Executor::DPush;
-    g_methodMap[OP_D_NEWARRAY]	= &Executor::DNewarray;
-    g_methodMap[OP_D_ARELEASE]	= &Executor::DArelease;
-    g_methodMap[OP_D_ALOAD]		= &Executor::DAload;
-    g_methodMap[OP_D_ASTORE]	= &Executor::DAstore;
 
 	g_methodMap[OP_L_LOAD]		= &Executor::LLoad;
     g_methodMap[OP_L_RETURN]	= &Executor::LReturn;
     g_methodMap[OP_L_STORE]		= &Executor::LStore;
     g_methodMap[OP_L_PUSH]		= &Executor::LPush;
-    g_methodMap[OP_L_NEWARRAY]	= &Executor::LNewarray;
-    g_methodMap[OP_L_ARELEASE]	= &Executor::LArelease;
-    g_methodMap[OP_L_ALOAD]		= &Executor::LAload;
-    g_methodMap[OP_L_ASTORE]	= &Executor::LAstore;
 
 	g_methodMap[OP_C_LOAD]		= &Executor::CLoad;
     g_methodMap[OP_C_RETURN]	= &Executor::CReturn;
     g_methodMap[OP_C_STORE]		= &Executor::CStore;
     g_methodMap[OP_C_PUSH]		= &Executor::CPush;
-    g_methodMap[OP_C_NEWARRAY]	= &Executor::CNewarray;
-    g_methodMap[OP_C_ARELEASE]	= &Executor::CArelease;
-    g_methodMap[OP_C_ALOAD]		= &Executor::CAload;
-	g_methodMap[OP_C_ASTORE] 	= &Executor::CAstore;
 
 	g_methodMap[OP_B_LOAD]		= &Executor::BLoad;
     g_methodMap[OP_B_RETURN]	= &Executor::BReturn;
     g_methodMap[OP_B_STORE]		= &Executor::BStore;
     g_methodMap[OP_B_PUSH]		= &Executor::BPush;
-    g_methodMap[OP_B_NEWARRAY]	= &Executor::BNewarray;
-    g_methodMap[OP_B_ARELEASE]	= &Executor::BArelease;
-    g_methodMap[OP_B_ALOAD]		= &Executor::BAload;
-    g_methodMap[OP_B_ASTORE]	= &Executor::BAstore;
 
-	g_methodMap[OP_A2B]			= &Executor::A2B;
     g_methodMap[OP_F2D]			= &Executor::F2D;
     g_methodMap[OP_F2L]			= &Executor::F2L;
     g_methodMap[OP_F2I]			= &Executor::F2I;
@@ -190,17 +151,6 @@ void Executor::BuildInstructionMap()
     g_methodMap[OP_C_AND]		= &Executor::CAnd;
     g_methodMap[OP_C_OR]		= &Executor::COr;
 
-	g_methodMap[OP_NEW] 		= &Executor::New;	
-	g_methodMap[OP_RETAIN] 		= &Executor::Retain;
-	g_methodMap[OP_RELEASE] 	= &Executor::Release;
-	g_methodMap[OP_INVOKE] 		= &Executor::Invoke;
-	g_methodMap[OP_VINVOKE] 	= &Executor::VInvoke;
-	g_methodMap[OP_STINVOKE] 	= &Executor::STInvoke;
-	g_methodMap[OP_LOADFIELD] 	= &Executor::LoadField;
-	g_methodMap[OP_LOADSTATIC] 	= &Executor::LoadStatic;
-	g_methodMap[OP_STOREFIELD] 	= &Executor::StoreField;
-	g_methodMap[OP_STORESTATIC]	= &Executor::StoreStatic;
-
 	g_methodMap[OP_BRANCH] 		= &Executor::Branch;
 	g_methodMap[OP_BIFNULL] 	= &Executor::BifNull;
 	g_methodMap[OP_BIFNOTNULL] 	= &Executor::BifNotNull;
@@ -253,58 +203,10 @@ unsigned Executor::Copy(const byte *instr)
 	return 1;
 }
 
-unsigned Executor::ArrayLength(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::ArrayLoad(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
 unsigned Executor::Return(const byte *instr) 
 {
 	_delegate->ReturnToCaller();
 	return 1;
-}
-
-unsigned Executor::ALoad(const byte *instr) 
-{
-	GenericLoad(VarType::a, instr[1]);
-	return 2;
-}
-
-unsigned Executor::AReturn(const byte *instr) 
-{
-	_delegate->ReturnToCaller();
-	return 1;
-}
-
-unsigned Executor::AStore(const byte *instr) 
-{
-	GenericStore(VarType::a, instr[1]);
-	return 2;
-}
-
-unsigned Executor::ANewarray(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::AArelease(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::AAload(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::AAstore(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
 }
 
 unsigned Executor::ILoad(const byte *instr) 
@@ -334,26 +236,6 @@ unsigned Executor::IPush(const byte *instr)
 	return 5;
 }
 
-unsigned Executor::INewarray(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::IArelease(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::IAload(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::IAstore(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
 unsigned Executor::FLoad(const byte *instr) 
 {
 	GenericLoad(VarType::f, instr[1]);
@@ -379,26 +261,6 @@ unsigned Executor::FPush(const byte *instr)
 	var->Set((float)fval);
 	_stack->Push(var);
 	return 5;
-}
-
-unsigned Executor::FNewarray(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::FArelease(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::FAload(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::FAstore(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
 }
 
 unsigned Executor::DLoad(const byte *instr) 
@@ -428,26 +290,6 @@ unsigned Executor::DPush(const byte *instr)
 	return 9;
 }
 
-unsigned Executor::DNewarray(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::DArelease(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::DAload(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::DAstore(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
 unsigned Executor::LLoad(const byte *instr) 
 {
 	GenericLoad(VarType::l, instr[1]);
@@ -473,26 +315,6 @@ unsigned Executor::LPush(const byte *instr)
 	var->Set((long)lval);
 	_stack->Push(var);
 	return 9;
-}
-
-unsigned Executor::LNewarray(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::LArelease(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::LAload(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::LAstore(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
 }
 
 unsigned Executor::CLoad(const byte *instr) 
@@ -522,26 +344,6 @@ unsigned Executor::CPush(const byte *instr)
 	return 2;
 }
 
-unsigned Executor::CNewarray(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::CArelease(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::CAload(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::CAstore(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
 unsigned Executor::BLoad(const byte *instr) 
 {
 	GenericLoad(VarType::b, instr[1]);
@@ -567,32 +369,6 @@ unsigned Executor::BPush(const byte *instr)
 	var->Set((bool)bval);
 	_stack->Push(var);
 	return 2;
-}
-
-unsigned Executor::BNewarray(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::BArelease(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::BAload(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::BAstore(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::A2B(const byte *instr) 
-{
-	GenericConvert(VarType::a, VarType::b);
-	return 1;
 }
 
 unsigned Executor::F2D(const byte *instr) 
@@ -774,7 +550,6 @@ unsigned Executor::B2C(const byte *instr)
 	GenericConvert(VarType::b, VarType::c);
 	return 1;
 }
-
 
 unsigned Executor::IAdd(const byte *instr) 
 {
@@ -1004,109 +779,6 @@ unsigned Executor::COr(const byte *instr)
 	return 1;
 }
 
-unsigned Executor::New(const byte *instr) 
-{
-	unsigned classID = *((unsigned*)(instr+1));
-	Object *object = _delegate->InstantiateObject(classID);
-	Variable *variable = new Variable(VarType::a);
-	variable->Set(object);
-	_stack->Push(variable);
-	return 5;
-}
-
-unsigned Executor::Retain(const byte *instr) 
-{
-	Variable *var = _stack->Pop();
-	
-	// TODO
-	// Use run time exceptions
-	if (var->Type() != VarType::a) {
-		THROW(InvalidTypeException, "Unable to retain non-Object variables");
-	}
-
-	if (var->Value_a() == NULL) {
-		THROW(NullPointerException, "Cannot retain NULL-objects");
-	}
-
-	var->Value_a()->Retain();
-	if (!var->IsFieldVariable())
-		delete var;
-	return 1;
-}
-
-unsigned Executor::Release(const byte *instr) 
-{
-	Variable *var = _stack->Pop();
-	
-	// TODO
-	// Use run time exceptions
-	if (var->Type() != VarType::a) {
-		THROW(InvalidTypeException, "Unable to release non-Object variables");
-	}
-
-	if (var->Value_a() == NULL) {
-		THROW(NullPointerException, "Cannot release NULL-objects");
-	}
-
-	var->Value_a()->Release();
-	if (!var->IsFieldVariable())
-		delete var;
-	return 1;
-}
-
-unsigned Executor::Invoke(const byte *instr) 
-{
-	Variable *var = _stack->Pop();
-	if (var->Type() != VarType::OBJECT) {
-		THROW(InvalidTypeException, "Can only invoke methods on Objects");
-	}
-
-	unsigned methodID = *(unsigned*)(instr+1);
-
-	Object *obj = var->Value_a();
-	Method *mtd = obj->GetClass()->GetMethod(methodID);
-
-	/* Deleting the "Variable"-container causes problems because the Variable
-	 * might still be referenced from a register. TODO: Consider how to 
-	 * resolve this issue.
-	 */
-	delete var;
-
-	_delegate->PerformMethodCall(obj, mtd);
-
-	return (1 + sizeof(methodID));
-}
-
-unsigned Executor::VInvoke(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::STInvoke(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::LoadField(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::LoadStatic(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::StoreField(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
-unsigned Executor::StoreStatic(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
-}
-
 unsigned Executor::Branch(const byte *instr) 
 {
 	THROW(NotImplementedException, "Instruction method not implemented");
@@ -1306,3 +978,4 @@ void Executor::GenericConvert( VarType from, VarType to)
 }
 
 }
+

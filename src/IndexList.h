@@ -6,89 +6,33 @@
 namespace scrap {
 
 class Variable;
-class Method;
-class Class;
+class Function;
 
-
-struct Field {
-	const TypeDesc typeDesc;
-	Variable *variable;
-};
 
 /* Index Lists
- * Fields and methods are defined within a class using context-unique IDs.
+ * Place commonly used containers for objects in these files.
  *
- *		FieldList and MethodList
- *		In the case of subclasses, the superclass members must be added anew
- * 		in the subclass list.
- *		FieldList and MethodList are currently completely unrelated, but share
- *		some common traits of functionality. Consider merging the shared functionality
- *		into a superclass if more shared functionality is added.
+ * (After the rewrite removing OO from Scrap, only FunctionList 
+ * remains, and IndexList.* served a bigger purpose back then)
  */
 
 
-/* Field List
- * A "template" field list is stored in each Class, and copied to
- * instances upon creation. The variables are then instantiated within
- * the instances using the "InstantiateVariables()" method.
- *
+/* Function List
+ * A list of function is 
  */
-class FieldList {
+class FunctionList {
 public:
-	FieldList();
-	~FieldList();
+	FunctionList();
+	~FunctionList();
 
-	void AddField(TypeDesc desc);
-	Field* GetField(unsigned id);
-
-	void InstantiateVariables();
-	void DeleteVariables();
-
-	// The member list must be empty at the point of insertion
-	void InsertFromSuperclass(const FieldList *fieldList);
-
-private:
-	vector<Field> _fields;
-	unsigned _inheritCount;
-	bool _instantiated;
-};
-
-
-/* Method List
- * Generic method container used for both normal and static methods.
- */
-class MethodList {
-public:
-	MethodList();
-	~MethodList();
-
-	void AddMethod(Method *method);
-	Method* GetMethod(unsigned id) const;
-
-	// The method list must be empty at the point of insertion
-	void InsertFromSuperclass(const MethodList *methodList);
+	void AddFunction(Function *method);
+	Function* GetFunction(unsigned id) const;
+	unsigned GetFunctionCount() const;
 
 private:
 	unsigned _inheritCount;
-	vector<Method*> _methods;
+	vector<Function*> _functions;
 };
 
-
-/* Class List
- * Contains - believe it or not - a list of classes.
- */
-class ClassList {
-public:
-	~ClassList();
-
-	void AddClass(Class *c, unsigned id);
-	Class* GetClass(unsigned id);
-	const Class* GetClass(unsigned id) const;
-	unsigned GetClassCount() const;
-
-private:
-	map<unsigned, Class*> _classes;
-
-};
 
 }

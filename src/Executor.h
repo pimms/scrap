@@ -9,12 +9,8 @@ class Variable;
 
 class Variable;
 class Stack;
-class Heap;
 class Executor;
-
-class Object;
-class Method;
-class Class;
+class Function;
 
 const int NUM_REGISTERS = 4;
 
@@ -23,14 +19,12 @@ typedef unsigned(Executor::*ExecutorMethod)(const byte*);
 
 /* ExecutionDelegate
  * Callback channel for performing non-trivial instructions. 
- * For now only implemented by MethodInvocation.
+ * For now only implemented by FunctionInvocation.
  */
 class ExecutionDelegate {
 public:
-	virtual void PerformMethodCall(Object *object, Method *method) = 0;
-	virtual void PerformMethodCall(Class *cc, Method *method) = 0;
+	virtual void PerforFunctionCall(Function *function) = 0;
 	virtual void BranchToInstruction(unsigned index) = 0;
-	virtual Object* InstantiateObject(unsigned classID) = 0;
 	virtual void ReturnToCaller() = 0;
 };
 
@@ -41,7 +35,7 @@ public:
  */
 class Executor {
 public:
-	Executor(ExecutionDelegate *delegate, Stack *stack, Heap *heap);
+	Executor(ExecutionDelegate *delegate, Stack *stack);
 	~Executor();
 	
 	/* The instr-pointer points to an arbitrary location inside the method's
@@ -52,7 +46,6 @@ public:
 private:
 	ExecutionDelegate *_delegate;
 	Stack *_stack;
-	Heap *_heap;
 
 	Variable *_reg[NUM_REGISTERS];
 
@@ -63,65 +56,31 @@ private:
 
 	unsigned Pop(const byte *instr);
 	unsigned Copy(const byte *instr);
-	unsigned ArrayLength(const byte *instr);
-	unsigned ArrayLoad(const byte *instr);
 	unsigned Return(const byte *instr);
-	unsigned ALoad(const byte *instr);
-	unsigned AReturn(const byte *instr);
-	unsigned AStore(const byte *instr);
-	unsigned ANewarray(const byte *instr);
-	unsigned AArelease(const byte *instr);
-	unsigned AAload(const byte *instr);
-	unsigned AAstore(const byte *instr);
 	unsigned ILoad(const byte *instr);
 	unsigned IReturn(const byte *instr);
 	unsigned IStore(const byte *instr);
 	unsigned IPush(const byte *instr);
-	unsigned INewarray(const byte *instr);
-	unsigned IArelease(const byte *instr);
-	unsigned IAload(const byte *instr);
-	unsigned IAstore(const byte *instr);
 	unsigned FLoad(const byte *instr);
 	unsigned FReturn(const byte *instr);
 	unsigned FStore(const byte *instr);
 	unsigned FPush(const byte *instr);
-	unsigned FNewarray(const byte *instr);
-	unsigned FArelease(const byte *instr);
-	unsigned FAload(const byte *instr);
-	unsigned FAstore(const byte *instr);
 	unsigned DLoad(const byte *instr);
 	unsigned DReturn(const byte *instr);
 	unsigned DStore(const byte *instr);
 	unsigned DPush(const byte *instr);
-	unsigned DNewarray(const byte *instr);
-	unsigned DArelease(const byte *instr);
-	unsigned DAload(const byte *instr);
-	unsigned DAstore(const byte *instr);
 	unsigned LLoad(const byte *instr);
 	unsigned LReturn(const byte *instr);
 	unsigned LStore(const byte *instr);
 	unsigned LPush(const byte *instr);
-	unsigned LNewarray(const byte *instr);
-	unsigned LArelease(const byte *instr);
-	unsigned LAload(const byte *instr);
-	unsigned LAstore(const byte *instr);
 	unsigned CLoad(const byte *instr);
 	unsigned CReturn(const byte *instr);
 	unsigned CStore(const byte *instr);
 	unsigned CPush(const byte *instr);
-	unsigned CNewarray(const byte *instr);
-	unsigned CArelease(const byte *instr);
-	unsigned CAload(const byte *instr);
-	unsigned CAstore(const byte *instr);
 	unsigned BLoad(const byte *instr);
 	unsigned BReturn(const byte *instr);
 	unsigned BStore(const byte *instr);
 	unsigned BPush(const byte *instr);
-	unsigned BNewarray(const byte *instr);
-	unsigned BArelease(const byte *instr);
-	unsigned BAload(const byte *instr);
-	unsigned BAstore(const byte *instr);
-	unsigned A2B(const byte *instr);
 	unsigned F2D(const byte *instr);
 	unsigned F2L(const byte *instr);
 	unsigned F2I(const byte *instr);
@@ -190,16 +149,6 @@ private:
 	unsigned CXor(const byte *instr);
 	unsigned CAnd(const byte *instr);
 	unsigned COr(const byte *instr);
-	unsigned New(const byte *instr);
-	unsigned Retain(const byte *instr);
-	unsigned Release(const byte *instr);
-	unsigned Invoke(const byte *instr);
-	unsigned VInvoke(const byte *instr);
-	unsigned STInvoke(const byte *instr);
-	unsigned LoadField(const byte *instr);
-	unsigned LoadStatic(const byte *instr);
-	unsigned StoreField(const byte *instr);
-	unsigned StoreStatic(const byte *instr);
 	unsigned Branch(const byte *instr);
 	unsigned BifNull(const byte *instr);
 	unsigned BifNotNull(const byte *instr);

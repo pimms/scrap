@@ -12,59 +12,21 @@ caveman terms, I watched Grok run around with a wheel and thought - "how
 did he make that? I should try to make my own." And I never saw Grok or
 his wheel again.
 
-Scrap forbids use of non-class methods, and all code must be contained within
-static class methods or instance methods. The instruction set reflects this.
-All instructions are as high level "as I could get". Low level instructions
-are avoided as far as possible to minimize overhead. The instructions are 
-however NOT optimized for size - as little information as possible is packed
-into the core instructions, and most of them rely on parameters varying from
-1 to 10 additional bytes. 
+Scrap is a fully functional, imperative language. There are no objects, 
+classes or advanced data structures. Data structures (similar to those
+in C) is a stretch goal, but not consideered core functionality.
 
 VARIABLE TABLES AND STACKS
 The VM is stack based, so most operations modidy the contents of the stack. 
 The stack is local for each method. There are also four general purpose 
-registers which may contain any variable supported by the language - primitives
-or objects. The registers will be referred to as $0, $1, $2 and $3.
+registers which may contain any variable supported by the language. 
+The registers will be referred to as $0, $1, $2 and $3.
 
 The stack is private between methods. Parameters are transferred between
 methods by pushing them onto the CALLED stack from the CALLING stack. The
 called method defines how many parameters it requires, and that number of
 elements are MOVED to the called stack. As common practice dictates, parameters
 are pushed in the reverse order.
-
-
-OBJECTS AND REFERENCE COUNTING
-All objects are garbage collected. Garbage collection is done using 
-reference counting. The initial reference counter is 1 for all newly
-created objects. Objects must be explicitly released. Objects are allocated on
-the heap. 
-
-When classes are compiled, they are assigned a "class ID". This is a unique
-program ID for that specific class. Two programs compiled from the same source
-may use entirely different class IDs. This ID is used in the bytecode to 
-create and access objects/statics. 
-
-Fields (instance / static members) and methods are also assigned IDs. These IDs
-may also differ between different programs compiled from the same source. 
-
-
-ARRAYS
-Arrays are immutable single type, single dimensional objects. Arrays are as
-objects reference counted, and deleted when the reference counter reaches 
-0. Arrays can be created as arrays of primitives or objects. In bytecode 
-mnemonics, creation of arrays looks like this:
-	iload 5			
-	newarray int 	// int[] i = new int[5];
-	iload 5
-	newarray 0 		// Foo[] = new Foo[5];
-
-The bytecode uses a descriptive additional byte to define whether the type
-of the array is a primitive or a class. 
-	<newarray><primitive><class>
-
-If the <primitive>-byte is 0, the next four bytes, the <class> dword, is read
-and translated to a class. If <primitive> is NOT 0, it contains a unique ID
-for the type of primitive to use. 
 
 
 INSTRUCTION SET
@@ -89,14 +51,6 @@ Instruction with non-integral parameters:
 	fstore_0 4.32 	# Store float(4.32) in $0
 	fstore_0 $1 	# Store float($1) in $0
 
-Instruction with class and method IDs
-	new 0			// o = new Object();  # class ID = 0
-	loadfield 0		// # Pass member as parameter
-	invoke 0 		// o.sayHello(int n);
-	pop 			// Pop "o" from stack
-
-
-
 
 MNEMONIC 			DESCRIPTION						STACK [before -> after]
 pop 				Pop the top value from stack 	value1 -> 
@@ -105,7 +59,6 @@ return				Return from current method		->
 
 # Variable and stack modification for types: replace T with any of the following:
 # Note that "astore" works for both object and array references.
-# - a	object reference 
 # - i	integer (32 bit)
 # - f 	float (32 bit)
 # - d 	double (64 bit)
@@ -118,23 +71,7 @@ Tstore  #index		Pop stack into register #index 	value1 ->
 Tpush   #literal	Push literal value to stack.	-> literal
 					Not available for (T=a).
 
-# Array instructions - arrays are FIXED SIZE and single type only. 
-# Multi dimensional arrays are NOT supported (yet).
-newarray #type 		Create array T[value1] 			value1 -> arrayref
-Tarelease 			Release an array of type T		arrayref ->
-					(reference count decrement)
-Taload #index		Push array element 			 	arrayref -> value1
-	   				arrayref[#index] to stack
-Tastore_X #index	Store array element				arrayref value1 -> 
-		  			#array[#index] in register X
-arraylength			Push the length of the array 	arrayref -> value1
-arrayload #index	Push the array reference from	-> arrayref
-					register (or 32 bit index) 
-					#index
-
 # Conversion is required to allow for cross-type arithmetics. 
-a2b 				object to bool 					value1(a) -> value2(c)
-
 f2d					float to double 				value1(f) -> value2(d)
 f2l 				float to long					value1(f) -> value2(l)
 f2i					float to int					value1(f) -> value2(i)
@@ -193,31 +130,6 @@ Tmod 				Remainder of value1/value2 		value1 value2 -> result
 Txor 				Exclusive or two numbers 		value1 value2 -> result
 Tand 				Bitwise and of two numbers 		value1 value2 -> result
 Tor 				Bitwise or of two numbers 		value1 value2 -> result
-
-# Object operations
-new #classID 		Create a new instance of a class with ID #classID. The new
-					reference is pushed at the top of the stack.
-													-> objref
-retain 				Retain the object at the top of
-					the stack - increment reference 
-					counter by 1.					objref -> 
-release 			Releases the object reference at the top of the stack. This
-					only decrements the reference count, and the object is not
-					necessarily deleted by this instruction.
-													objref ->
-invoke #methodID 	Invoke a method on object		objref -> [retvalue]
-vinvoke #methodID 	Invoke a virtual method on obj	objref -> [retvalue]
-stinvoke #classID  	Invoke a static method 			-> [retvalue]	
-		 #methodID
-suinvoke #methodID	Invoke a method in the super	objref -> [retvalue]
-stsuinvoke #mthdID 	Invoke a static method in super	-> [retvalue]
-
-# When loading and storing member/static variables, the type of the 
-# field is known beforehand and need not be specified in the opcode.
-loadfield #fieldID 	Push member variable 			-> value1
-loadstatic #fieldID	Push static variable 			-> value1
-storefield #fieldID	Pop into member variable 		value1 ->
-storestatic #fieldID Pop into static variable 		value1 ->
 
 # Branch Instructions
 # The #dest argument is a 32 bit integer, pointing to the destination 

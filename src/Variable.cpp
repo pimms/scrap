@@ -24,9 +24,6 @@ TO CastVarValue(VarValue val, VarType type)
 			return static_cast<TO>(val.c);
 		case BOOL:
 			return static_cast<TO>((bool)val.c);
-		case OBJECT:
-			THROW(InvalidCastException,
-				"Unable to cast to Object* from CastVarValue().");
 		case VOID:
 			THROW(InvalidCastException,
 				"Unable to cast to 'void' from CastVarValue().");
@@ -37,16 +34,6 @@ TO CastVarValue(VarValue val, VarType type)
 bool VarValue::CastAvailable(VarType from, VarType to)
 {
 	switch (from) {
-		// Objects can be casted to other objects (wut) and bool. 
-		case OBJECT:
-			switch (to) {
-				case OBJECT:
-				case BOOL:
-					return true;
-				default:
-					return false;
-			}
-
 		// Integral types can be freely casted among themselves
 		case INT:
 		case FLOAT:
@@ -62,9 +49,6 @@ bool VarValue::CastAvailable(VarType from, VarType to)
 				case CHAR:
 				case BOOL:
 					return true;
-
-				// Nothing but OBJECT can be casted to OBJECT.
-				case OBJECT:
 				default:
 					return false;
 			}
@@ -112,15 +96,6 @@ VarValue VarValue::CastTo(VarValue val, VarType from, VarType to)
 				ret.c = CastVarValue<bool>(val, from);
 			}
 			break;
-		case OBJECT:
-			if (from == VarType::OBJECT) {
-				ret.a = val.a;
-			} else {
-				THROW(InvalidCastException,
-					"Impossible cast destination type: " + VarTypeToString(to));
-			}
-			break;
-
 		default:
 			THROW(InvalidCastException,
 				"Undefined cast destination type: " + VarTypeToString(to));
@@ -180,12 +155,6 @@ bool Variable::Cast(VarType type)
 }
 
 
-void Variable::Set(Object *a)
-{
-	_value.a = a;
-	_type = OBJECT;
-}
-
 void Variable::Set(int i)
 {
 	_value.i = i;
@@ -235,11 +204,6 @@ void Variable::Set(bool c)
 				+ VarTypeToString(type) 		\
 				+ " on object of type "  		\
 				+ VarTypeToString(_type));
-
-Object* Variable::Value_a() const
-{
-	RETURN_VAL_TYPE(a);
-}
 
 int Variable::Value_i() const 
 {
@@ -532,13 +496,6 @@ bool Variable::IsFieldVariable() const
 
 void Variable::ValidOperationCheck(AritOp op, const Variable *var)
 {
-	if (_type != var->Type() || _type == VarType::OBJECT) {
-		THROW(InvalidTypeException, 
-			"Cannot perform operation " + AritOpToString(op) +
-			" with left operand of type " + VarTypeToString(_type) +
-			" and right operand of type " + VarTypeToString(var->Type()));
-	}
-
 	if (!IsOperationAvailable(op, var->Type())) {
 		THROW(InvalidOperationException, 
 			"Cannot perform operation " + AritOpToString(op) +
@@ -559,7 +516,6 @@ bool Variable::IsOperationAvailable(AritOp op, VarType type)
 
 		// No operations can be performed on bool, void or objects
 		case BOOL:
-		case OBJECT:
 		case VOID:
 			return false;
 

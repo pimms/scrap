@@ -36,9 +36,6 @@ typedef unsigned int  MethodID;
 
 // Primitive types
 enum VarType {
-	a 		= 0x00,
-	OBJECT 	= 0x00,		
-
 	i 		= 0x01,
 	INT 	= 0x01,
 

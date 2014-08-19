@@ -10,36 +10,12 @@ ABSTRACT FORMAT OVERVIEW
 	binary, and the XML-like syntax is for clarification purposes only.
 
 	<metadata> ... </metadata>
-	<class name="Foo">
-		<field type="int" name="my_int"/>
-		<field type="float" name="my_float"/>
-		<field type="Object:MyClass" name="my_obj"/>
-		<st_field type="Object:Foo" name="singleton"/>
-		<method name="sayHello">
-			<return type="void"/>
-			<argument type="string" name="name"/>
-			<bytecode> ... </bytecode>
-		</method>
-		<st_method name="createSingleton">
-			<return type="Object:Foo"/>
-			<bytecode> ... </bytecode>
-		</st_method>
-	</class>
-	<class name="Bar">
-		...
-	</class>
+	<function name="sayHello">
+		<return type="void"/>
+		<argument type="string" name="name"/>
+		<bytecode> ... </bytecode>
+	</function>
 
-	Classes, methods and fields are implicitly enumerated in the order in 
-	which they appear. For instance, in the class Foo, the IDs are as 
-	follows. 
-		TYPE 		ID	DEFINITION
-		class 		0	Foo
-		class 		1 	Bar
-		field 		0 	int my_int
-		field 		1 	float my_float
-		st field 	0	Foo singleton
-		method 		0	void sayHello()
-		st method 	0	Foo createSingleton()
 
 HIGH LEVEL FORMAT SPECIFICATION
 	The following fields define the Scrap binary format. The fields are
@@ -49,14 +25,9 @@ HIGH LEVEL FORMAT SPECIFICATION
 		[VER_MAJ]
 		[VER_MIN]
 		[ENDIAN]
-		[MAIN CLASS]
-		[MAIN METHOD]
-		[E CLASS_COUNT]
-			[CLASS ID]
-			[CLASS NAME]
-		[CLASS 1]
-		...
-		[CLASS N]
+		[FUNC_COUNT]
+		[MAIN_FUNC]
+		[FUNC 1..n]
 
 	MAGIC_NUMBER
 		The first five bytes of all Scrap files spell out "SCRAP", 
@@ -70,50 +41,23 @@ HIGH LEVEL FORMAT SPECIFICATION
 		into account. If the byte ENDIAN is 0x01, the file is BIG 
 		ENDIAN. If the byte is 0x02, the file is LITTLE ENDIAN. 
 	CLASS_COUNT
-		32 bit unsigned holding the number of classes 
-	CLASS x
-		See the detailed CLASS-specification below.
-	MAIN CLASS
-		32 bit int, the ID of the main class
-	MAIN METHOD
-		32 bit int, the static method ID of the main class to call first
+		32 bit unsigned holding the number of functions. 
+	MAIN_FUNC
+		A regular function like any other, but is the first function to
+		be called.
+	FUNC 1..n
+		If (FUNC_COUNT > 1), the remaining functions are defined after
+		MAIN_FUNC.
 		
-CLASS SPECIFICATION
-	The following fields define a Scrap class. Again an "E"-prefix
-	means than endianess must be taken into account for the field.
-	Fields encapsulated within {} are conditionally included. Indentation
-	indicates ownership. Fields prefixed with "D" are described in 
-	detail longer down.
-		
-		TYPE						DESCRIPTION
-		-------------------------------------------------------------------------
-		[CLASS ID] 					ID of the class (name is given in the class header)
-		[E SUPER ID]				ID of the superclass
-		[E NUM]						Number of fields
-			[D FIELD] 				
-		[E NUM]						Number of static fields
-			[D FIELD] 			
-		[E NUM]						Number of methods
-			[D METHOD]				
-		[E NUM]						Number of static methods
-			[D METHOD]
-
-	METHOD
+FUNCTION FORMAT DETAILS
+	FUNCTION TEMPLATE	
 		[NAME]						Name of the method
-		[VIRTUAL]					Indicator of whether the method is virtual
 		[NUM]						Number of arguments
 			[NAME]					Name of the argument
 			[TYPE]					Type of the argument
-			{CLASS ID}				Class ID (if type is object)
 		[TYPE]						Return type
-		{CLASS ID}					Class ID (if type is object)
 		[E BYTECODE LENGTH]			Number of bytes in the method body
 		[E BYTECODE]				The bytecode itself
-
-	FIELD	
-		[NAME]						Name of the variable
-		[TYPE]						Type 
-		{CLASS ID}					Class ID (if type is object)
 	
 	xxx NAME
 		Null-terminated ASCII name of the class

@@ -15,7 +15,6 @@ struct VarValue {
 	static VarValue CastTo(VarValue val, VarType from, VarType to);
 
 	union {
-		Object *a;
 		int i;
 		float f;
 		double d;
@@ -29,10 +28,7 @@ struct VarValue {
 /* Variable
  * The core wrapper around a Scrap Variable. 
  *
- * "Variable" objects are EXPENDABLE and STACK MANAGED. Objects are
- * not managed by the Variable in any way bar keeping a reference to one.
- * Deleting a Variable does therefore NOT delete the Object-member, even if
- * it´s reference counter is zero or lower. 
+ * "Variable" objects are EXPENDABLE and STACK MANAGED. 
  */
 class Variable {
 public:
@@ -45,7 +41,6 @@ public:
 	// Attempt to cast the current value to the specified type.
 	bool Cast(VarType type);
 
-	void Set(Object *a);
 	void Set(int i);
 	void Set(float f);
 	void Set(double d);
@@ -55,7 +50,6 @@ public:
 
 	// All value-getter methods throws InvalidTypeException if
 	// their type does not match the getter method called.
-	Object* Value_a() const;
 	int Value_i() const;
 	float Value_f() const;
 	double Value_d() const;
