@@ -123,6 +123,9 @@
 #define OP_C_AND			0xC4 //
 #define OP_C_OR 			0xC5 //
 
+// Functions
+#define OP_CALL 			0xD0
+
 // Branching
 #define OP_BRANCH 			0xE0
 #define OP_BIFNULL			0xE1
@@ -388,7 +391,7 @@ const InstructionInfo g_instructionMap[] = {
 	g_reserved,											//0xCD
 	g_reserved,											//0xCE
 	g_reserved,											//0xCF
-	g_reserved,											//0xD0
+	{"CALL", 		OP_CALL,		ARG_ID},			//0xD0
 	g_reserved,											//0xD1
 	g_reserved,											//0xD2
 	g_reserved,											//0xD3

@@ -151,6 +151,8 @@ void Executor::BuildInstructionMap()
     g_methodMap[OP_C_AND]		= &Executor::CAnd;
     g_methodMap[OP_C_OR]		= &Executor::COr;
 
+	g_methodMap[OP_CALL]		= &Executor::Call;
+
 	g_methodMap[OP_BRANCH] 		= &Executor::Branch;
 	g_methodMap[OP_BIFNULL] 	= &Executor::BifNull;
 	g_methodMap[OP_BIFNOTNULL] 	= &Executor::BifNotNull;
@@ -777,6 +779,15 @@ unsigned Executor::COr(const byte *instr)
 {
 	GenericOr(VarType::c);
 	return 1;
+}
+
+unsigned Executor::Call(const byte *instr)
+{
+	unsigned *uptr = (unsigned*)(instr + 1);
+	unsigned functionId = *uptr;
+	
+	_delegate->PerformFunctionCall(functionId);
+	return 5;
 }
 
 unsigned Executor::Branch(const byte *instr) 

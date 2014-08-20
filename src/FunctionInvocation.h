@@ -10,6 +10,7 @@ namespace scrap {
 class Function;
 class Stack;
 class Debugger;
+class Program;
 
 
 /* Function Invocation
@@ -22,13 +23,24 @@ class Debugger;
  */
 class FunctionInvocation : public ExecutionDelegate {
 public:
-	FunctionInvocation(Function *function, FunctionInvocation *caller);
+	/* Default constructor. 
+	 * @param program
+	 * 		In cases where the function is not fully self contained (no	access 
+	 * 		to global variables, no function calls), it can be NULL.
+	 * @param function
+	 * 		The function to be invoked.
+	 * @param caller
+	 * 		The calling function, if applicable. If not NULL, the expected arguments
+	 * 		are pushed onto the constructing invocations' stack.
+	 */
+	FunctionInvocation(Program *program, Function *function, FunctionInvocation *caller);
+
 	~FunctionInvocation();
 
 	void Execute();
 
 	/* Execution Delegate */
-	void PerformFunctionCall(Function *function);
+	void PerformFunctionCall(unsigned funcIndex);
 	void BranchToInstruction(unsigned index);
 	void ReturnToCaller();
 
@@ -51,6 +63,7 @@ public:
 
 
 private:
+	Program *_program;
 	Function *_function;
 	FunctionInvocation *_caller;
 

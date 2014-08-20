@@ -31,7 +31,7 @@ Program::~Program()
 
 void Program::Execute()
 {
-	FunctionInvocation main(_mainFunction, NULL);
+	FunctionInvocation main(this, _mainFunction, NULL);
 	main.Execute();
 }
 

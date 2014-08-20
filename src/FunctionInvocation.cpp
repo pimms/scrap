@@ -5,12 +5,14 @@
 #include "Bytecode.h"
 #include "IndexList.h"
 #include "Debug.h"
+#include "Program.h"
 
 
 namespace scrap {
 
-FunctionInvocation::FunctionInvocation(Function *function, FunctionInvocation *caller)
-	:	_function(function),
+FunctionInvocation::FunctionInvocation(Program *program, Function *function, FunctionInvocation *caller)
+	:	_program(program),
+		_function(function),
 		_caller(caller),
 		_pc(0),
 		_return(false),
@@ -57,9 +59,15 @@ void FunctionInvocation::Execute()
 }
 
 
-void FunctionInvocation::PerformFunctionCall(Function *function)
+void FunctionInvocation::PerformFunctionCall(unsigned funcIndex)
 {
-	FunctionInvocation invocation(function, this);
+	FunctionList *flist = _program->GetFunctionList();
+	if (funcIndex >= flist->GetFunctionCount()) {
+		THROW(IndexOutOfRangeException, "Attempted to call function with index out of range");
+	}
+
+	Function *func = flist->GetFunction(funcIndex);
+	FunctionInvocation invocation(_program, func, this);
 
 	if (_debugger)
 		invocation.SetDebugger(_debugger);

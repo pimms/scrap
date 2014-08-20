@@ -23,7 +23,7 @@ typedef unsigned(Executor::*ExecutorMethod)(const byte*);
  */
 class ExecutionDelegate {
 public:
-	virtual void PerformFunctionCall(Function *function) = 0;
+	virtual void PerformFunctionCall(unsigned funcIdx) = 0;
 	virtual void BranchToInstruction(unsigned index) = 0;
 	virtual void ReturnToCaller() = 0;
 };
@@ -149,6 +149,7 @@ private:
 	unsigned CXor(const byte *instr);
 	unsigned CAnd(const byte *instr);
 	unsigned COr(const byte *instr);
+	unsigned Call(const byte *instr);
 	unsigned Branch(const byte *instr);
 	unsigned BifNull(const byte *instr);
 	unsigned BifNotNull(const byte *instr);

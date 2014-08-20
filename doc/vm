@@ -131,6 +131,9 @@ Txor 				Exclusive or two numbers 		value1 value2 -> result
 Tand 				Bitwise and of two numbers 		value1 value2 -> result
 Tor 				Bitwise or of two numbers 		value1 value2 -> result
 
+# Function instruction
+call #funcID		Invoke function 				-> return_value 
+
 # Branch Instructions
 # The #dest argument is a 32 bit integer, pointing to the destination 
 # byte instruction. There is obviously no guarantee that the destination

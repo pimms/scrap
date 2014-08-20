@@ -6,7 +6,7 @@
  * [X] Copy
  * [X] Return
  * [X] T Load
- * [ ] T Return
+ * [X] T Return
  * [X] T Store
  * [X] T Push
  * [X] F2T
@@ -111,8 +111,7 @@ Program* CreateProgram(FunctionBody body)
 Stack* ExecuteProgram(Program *program, Debugger *debugger=NULL)
 {
 	Function *mainFunction = program->GetMainFunction();
-
-	FunctionInvocation invocation(mainFunction, NULL);
+	FunctionInvocation invocation(program, mainFunction, NULL);
 
 	if (debugger) 
 		invocation.SetDebugger(debugger);
@@ -678,4 +677,37 @@ TEST (ExecutorTest, TestLoadAndStore)
 	TestLoadAndStore<long>(OP_L_PUSH, OP_L_STORE, OP_L_LOAD, 45958);
 	TestLoadAndStore<bool>(OP_B_PUSH, OP_B_STORE, OP_B_LOAD, true);
 	TestLoadAndStore<char>(OP_C_PUSH, OP_C_STORE, OP_C_LOAD, 243);
+}
+
+TEST (ExecutorTest, TestReturn)
+{
+	/* Call a function and ensure that the return value 
+	 * exists and is 5.
+	 * 		call 0     # GetNumber()
+	 */
+	Stack *stack = NULL;
+	Program *program = NULL;
+	FunctionBody body;
+	
+	unsigned funcId = 0;
+
+	body.length = 1 + sizeof(unsigned);
+	body.code = new byte[body.length];
+	body.code[0] = OP_CALL;
+	memcpy(body.code+1, &funcId, sizeof(unsigned));
+
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program);
+
+	ASSERT_EQ(stack->Count(), 1);
+
+	Variable *v1;
+	v1 = stack->Pop();
+
+	ASSERT_EQ(v1->Type(), VarType::INT);
+	ASSERT_EQ(v1->Value_i(), 5);
+
+	delete v1;
+	delete stack;
+	delete program;
 }

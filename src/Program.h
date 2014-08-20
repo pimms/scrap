@@ -8,7 +8,9 @@ class Function;
 class FunctionList;
 
 /* Program
- * The highest level execution unit.
+ * The highest level class in the program-abstraction. The Program
+ * class is responsible for storing and managing globally accessible
+ * objects.
  */
 class Program {
 public:
