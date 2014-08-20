@@ -37,6 +37,7 @@ test.kdev4
 # Built executable
 scrap
 test
+tests
 build/
 testfiles/temp
 

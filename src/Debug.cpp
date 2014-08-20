@@ -1,10 +1,8 @@
 #include "Debug.h"
-#include "MethodInvocation.h"
+#include "FunctionInvocation.h"
 #include "Variable.h"
-#include "Object.h"
-#include "Method.h"
+#include "Function.h"
 #include "Executor.h"
-#include "Class.h"
 #include "IndexList.h"
 #include "Bytecode.h"
 
@@ -19,39 +17,25 @@ namespace scrap {
 Debugger
 ================
 */
-string Debugger::GetMethodSignature(const MethodInvocation *invoc) 
+string Debugger::GetFunctionSignature(const FunctionInvocation *invoc) 
 {
-	string retval = "";
+	const Function *method = invoc->GetFunction();
+	string funcSig = method->GetFunctionAttributes().GetName();
 
-	const Method *method = invoc->GetMethod();
-	string methodName = method->GetMethodAttributes().GetName();
-
-	const Class *cls = method->GetClass();
-	string className = cls->GetClassName();
-
-	vector<TypeDesc> args = method->GetMethodAttributes().GetArguments();
-
-	retval += methodName + "." + className;
+	vector<TypeDesc> args = method->GetFunctionAttributes().GetArguments();
 
 	// Add each of the arguments
-	retval += "(";
+	funcSig += "(";
 	for (int i=0; i<args.size(); i++) {
-		if (i)
-			retval += ", ";
-		
-		if (args[i].type != VarType::OBJECT) {
-			retval += VarTypeToString(args[i].type).c_str();
-		} else {
-			const Class *c = invoc->GetClassList()->GetClass(args[i].classID);
-			if (c != NULL) {
-				retval += c->GetClassName().c_str();
-			} else {
-				retval += "<UnkownClass>";
-			}
+		if (i) {
+			funcSig += ", ";
 		}
+		
+		funcSig += VarTypeToString(args[i].type).c_str();
 	}
-	retval += ")";
-	return retval;
+
+	funcSig += ")";
+	return funcSig;
 }
 
 
@@ -72,7 +56,7 @@ CLISimpleDebugger::~CLISimpleDebugger()
 }
 
 
-void CLISimpleDebugger::WillExecuteInstruction(const MethodInvocation *invoc, const byte *instr) 
+void CLISimpleDebugger::WillExecuteInstruction(const FunctionInvocation *invoc, const byte *instr) 
 {
 	const InstructionInfo info = g_instructionMap[instr[0]];	
 	printf("will exec:  %s\n", info.name);
@@ -81,15 +65,15 @@ void CLISimpleDebugger::WillExecuteInstruction(const MethodInvocation *invoc, co
 	printf("exec %s\n", info.name);
 }
 
-void CLISimpleDebugger::DidInvokeNewMethod(const MethodInvocation *invoc, const MethodInvocation *oldInvoc) 
+void CLISimpleDebugger::DidInvokeNewFunction(const FunctionInvocation *invoc, const FunctionInvocation *oldInvoc) 
 {
-	printf("Method invoked: %s\n", GetMethodSignature(invoc).c_str());
+	printf("Function invoked: %s\n", GetFunctionSignature(invoc).c_str());
 	TakeCommands(invoc);
 }
 
-void CLISimpleDebugger::DidReturn(const MethodInvocation *invoc, const Variable *returnVariable) 
+void CLISimpleDebugger::DidReturn(const FunctionInvocation *invoc, const Variable *returnVariable) 
 {
-	printf("Method returned: %s\n", GetMethodSignature(invoc).c_str());
+	printf("Function returned: %s\n", GetFunctionSignature(invoc).c_str());
 	TakeCommands(invoc);
 }
 
@@ -100,7 +84,7 @@ void CLISimpleDebugger::DidReturn(const MethodInvocation *invoc, const Variable 
 CLISimpleDebugger Private 
 ================
 */
-void CLISimpleDebugger::TakeCommands(const MethodInvocation *invoc)
+void CLISimpleDebugger::TakeCommands(const FunctionInvocation *invoc)
 {
 	string line;
 	bool cont = true;
@@ -129,9 +113,9 @@ void CLISimpleDebugger::TakeCommands(const MethodInvocation *invoc)
 }
 
 
-void CLISimpleDebugger::PrintStackContents(const MethodInvocation *invoc)
+void CLISimpleDebugger::PrintStackContents(const FunctionInvocation *invoc)
 {
-	MethodInvocation *i;
+	FunctionInvocation *i;
 	const Stack *stack = invoc->GetStack();
 
 	printf("%i elements\n", stack->Count());
@@ -162,10 +146,6 @@ void CLISimpleDebugger::PrintStackContents(const MethodInvocation *invoc)
 					break;
 				case VarType::CHAR:
 					printf("{ %c }", var->Value_c());
-					break;
-				case VarType::OBJECT:
-					printf("%s { %i, ... }", var->Value_a()->GetClass()->GetClassName().c_str(),
-											 var->Value_a()->RetainCount());
 					break;
 			}
 			

@@ -5,18 +5,23 @@
 namespace scrap {
 
 class Function;
+class FunctionList;
 
 /* Program
  * The highest level execution unit.
  */
 class Program {
 public:
-	Program();
+	Program(FunctionList *funcList, unsigned mainFuncIndex);
 	~Program();
 
 	void Execute();
 
+	FunctionList* GetFunctionList() const;
+	Function* GetMainFunction() const;
+
 private:
+	FunctionList *_funcList;
 	Function *_mainFunction;
 };
 

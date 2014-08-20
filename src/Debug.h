@@ -4,7 +4,7 @@
 
 namespace scrap {
 
-class MethodInvocation;
+class FunctionInvocation;
 class Variable;
 
 
@@ -14,7 +14,7 @@ class Variable;
  * the executing bytecode is not regarded in any way. (This is mainly because the 
  * Scrap syntax is currently undefined).
  *
- * To attach a Debugger to a program, call "SetDebugger(Debugger*)" on a MethodInvocation
+ * To attach a Debugger to a program, call "SetDebugger(Debugger*)" on a FunctionInvocation
  * instance. All subsequent method-invocations invoked by this instance will use the same
  * Debugger.
  *
@@ -22,12 +22,13 @@ class Variable;
  */
 class Debugger {
 public:
-	virtual void WillExecuteInstruction(const MethodInvocation *invoc, const byte *instr) = 0;
-	virtual void DidInvokeNewMethod(const MethodInvocation *invoc, const MethodInvocation *oldInvoc) { /* ... */ };
-	virtual void DidReturn(const MethodInvocation *invoc, const Variable *returnVariable) { /* ... */ };
+	virtual void WillExecuteInstruction(const FunctionInvocation *invoc, const byte *instr) = 0;
+	virtual void DidInvokeNewFunction(const FunctionInvocation *invoc, 
+									const FunctionInvocation *oldInvoc) { /* ... */ };
+	virtual void DidReturn(const FunctionInvocation *invoc, const Variable *returnVariable) { /* ... */ };
 	
 protected:
-	virtual string GetMethodSignature(const MethodInvocation *invoc);
+	virtual string GetFunctionSignature(const FunctionInvocation *invoc);
 };
 
 
@@ -41,14 +42,14 @@ public:
 	CLISimpleDebugger();
 	~CLISimpleDebugger();
 
-	void WillExecuteInstruction(const MethodInvocation *invoc, const byte *instr);
-	void DidInvokeNewMethod(const MethodInvocation *invoc, const MethodInvocation *oldInvoc);
-	void DidReturn(const MethodInvocation *invoc, const Variable *returnVariable);
+	void WillExecuteInstruction(const FunctionInvocation *invoc, const byte *instr);
+	void DidInvokeNewFunction(const FunctionInvocation *invoc, const FunctionInvocation *oldInvoc);
+	void DidReturn(const FunctionInvocation *invoc, const Variable *returnVariable);
 
 private:
-	void TakeCommands(const MethodInvocation *invoc);
+	void TakeCommands(const FunctionInvocation *invoc);
 
-	void PrintStackContents(const MethodInvocation *invoc);
+	void PrintStackContents(const FunctionInvocation *invoc);
 };
 
 }

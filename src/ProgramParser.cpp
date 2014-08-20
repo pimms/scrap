@@ -1,8 +1,7 @@
 #include "ProgramParser.h"
 #include "Program.h"
 #include "BinaryFile.h"
-#include "Class.h"
-#include "Method.h"
+#include "Function.h"
 #include "Variable.h"
 #include "IndexList.h"
 #include "Bytecode.h"
@@ -12,9 +11,7 @@ namespace scrap {
 
 ProgramParser::ProgramParser()
 	:	_file(NULL),
-		_classList(NULL),
-		_mainClassID(0),
-		_mainMethodID(0)
+		_funcList(NULL)
 { }
 
 ProgramParser::~ProgramParser()
@@ -28,17 +25,14 @@ ProgramParser::~ProgramParser()
 Program* ProgramParser::ParseProgramFile(string fileName)
 {
 	_file = new BinaryFile(fileName, READ);
-	_classList = new ClassList();
+	_funcList = new FunctionList();
 
 	ReadMagicNumber();
 	ReadVersionNumber();
 	ReadEndian();
-	ReadMain();
-	ReadClassList();
+	unsigned mainFuncIdx = ReadFunctions();
 
-	Program *program = new Program();
-	program->SetClassList(_classList);
-	program->SetMainMethod(_mainClassID, _mainMethodID);
+	Program *program = new Program(_funcList, mainFuncIdx);
 
 	if (_file->RemainingBytes() != 0) {
 		delete program;
@@ -84,94 +78,23 @@ void ProgramParser::ReadEndian()
 	_file->SetFileEndianess(endian);
 }
 
-void ProgramParser::ReadMain()
+
+unsigned ProgramParser::ReadFunctions()
 {
-	_mainClassID = _file->ReadUnsigned();
-	_mainMethodID = _file->ReadUnsigned();
+	unsigned funcCount = _file->ReadUnsigned();
+	unsigned mainIndex = _file->ReadUnsigned();
+
+	for (int i=0; i<funcCount; i++) {
+		Function *func = ReadFunction();
+		_funcList->AddFunction(func);
+	}
+
+	return mainIndex;
 }
 
-
-void ProgramParser::ReadClassList()
-{
-	unsigned classCount = _file->ReadUnsigned();
-
-	for (int i=0; i<classCount; i++) {
-		unsigned id = _file->ReadUnsigned();
-		string name = _file->ReadString();
-
-		Class *c = new Class(id, name);
-		_classList->AddClass(c, id);
-	}
-
-	for (int i=0; i<classCount; i++) {
-		ReadClass();
-	}
-}
-
-void ProgramParser::ReadClass()
-{
-	unsigned classID = _file->ReadUnsigned();
-	unsigned superID = _file->ReadUnsigned();
-
-	Class *c = _classList->GetClass(classID);
-
-	if (superID != ID_UNDEFINED) {
-		Class *super = _classList->GetClass(superID);
-		c->SetSuper(super);
-	}
-
-	ReadFields(c);
-	ReadMethods(c);
-}
-
-void ProgramParser::ReadFields(Class *c)
-{
-	unsigned count = 0;
-
-	// Read object fields
-	count = _file->ReadUnsigned();
-	for (int i=0; i<count; i++) {
-		TypeDesc type = ReadField();
-		c->AddFieldTemplate(type);
-	}
-
-	// Read static fields
-	count = _file->ReadUnsigned();
-	for (int i=0; i<count; i++) {
-		TypeDesc type = ReadField();
-		c->AddStaticField(type);
-	}
-}
-
-void ProgramParser::ReadMethods(Class *c)
-{
-	unsigned count = 0;
-
-	// Read instance methods
-	count = _file->ReadUnsigned();
-	for (int i=0; i<count; i++) {
-		Method *method = ReadMethod(METHOD_NORMAL, c);
-		c->AddMethod(method);
-	}
-
-	// Read static methods
-	count = _file->ReadUnsigned();
-	for (int i=0; i<count; i++) {
-		Method *method = ReadMethod(METHOD_STATIC, c);
-		c->AddStaticMethod(method);
-	}
-}
-
-TypeDesc ProgramParser::ReadField()
-{
-	TypeDesc type = ReadTypeDesc(true);
-	return type;
-}
-
-Method* ProgramParser::ReadMethod(MethodType methodType, Class *c)
+Function* ProgramParser::ReadFunction()
 {
 	string name = _file->ReadString();
-	byte isVirtual = _file->ReadByte();
 	
 	vector<TypeDesc> args;
 	TypeDesc retType;
@@ -184,19 +107,18 @@ Method* ProgramParser::ReadMethod(MethodType methodType, Class *c)
 
 	retType = ReadTypeDesc(false);
 
-	MethodType type = (isVirtual) ? METHOD_VIRTUAL : methodType;
-	MethodAttributes attrs(retType, args, name);
-	MethodBody body = ReadMethodBody();
+	FunctionAttributes attrs(retType, args, name);
+	FunctionBody body = ReadFunctionBody();
 
-	Method *method = new Method(type, c, &body, attrs);
+	Function *function = new Function(&body, attrs);
 	delete[] body.code;
 
-	return method;
+	return function;
 }
 
-MethodBody ProgramParser::ReadMethodBody() 
+FunctionBody ProgramParser::ReadFunctionBody() 
 {
-	MethodBody body;
+	FunctionBody body;
 	body.length = _file->ReadUnsigned();
 	body.code = new byte[body.length];
 
@@ -286,7 +208,6 @@ TypeDesc ProgramParser::ReadTypeDesc(bool readName)
 	
 	/* Assert legal VarType-value */
 	switch (type) {
-		case OBJECT:
 		case INT:
 		case DOUBLE:
 		case FLOAT:
@@ -301,10 +222,6 @@ TypeDesc ProgramParser::ReadTypeDesc(bool readName)
 
 	typeDesc.type = (VarType)type;
 	
-	if (typeDesc.type == OBJECT) {
-		typeDesc.classID = _file->ReadUnsigned();
-	}
-
 	if (readName) {
 		typeDesc.name = name;
 	}

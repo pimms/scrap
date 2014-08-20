@@ -39,6 +39,7 @@ public:
 #endif
 
 	const Stack* GetStack() const;
+	const Function* GetFunction() const;
 
 	// Push return value (top stack value) onto the calling stack
 	void ReturnValue();

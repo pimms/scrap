@@ -19,9 +19,9 @@ FunctionList::~FunctionList()
 	}
 }
 
-void FunctionList::AddFunction(Function *method)
+void FunctionList::AddFunction(Function *function)
 {
-	_functions.push_back(method);
+	_functions.push_back(function);
 }
 
 Function* FunctionList::GetFunction(unsigned id) const 
@@ -30,6 +30,11 @@ Function* FunctionList::GetFunction(unsigned id) const
 		THROW(IndexOutOfRangeException,
 		"Attempted to access field with index out of range");
 	return _functions[id];
+}
+
+unsigned FunctionList::GetFunctionCount() const
+{
+	return _functions.size();
 }
 
 

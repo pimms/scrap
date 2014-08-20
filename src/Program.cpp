@@ -6,9 +6,22 @@
 
 namespace scrap {
 
-Program::Program()
-	:	_mainFunction(NULL)
-{ }
+Program::Program(FunctionList *funcList, unsigned mainFuncIndex)
+	:	_mainFunction(NULL),
+		_funcList(funcList)
+{ 
+	_funcList = funcList;
+
+	if (_funcList->GetFunctionCount() <= 0) {
+		THROW(InvalidArgumentException, "No functions in assigned FunctionList");
+	}
+
+	if (mainFuncIndex >= _funcList->GetFunctionCount()) {
+		THROW(InvalidArgumentException, "Invalid main-function index");
+	}
+
+	_mainFunction = _funcList->GetFunction(mainFuncIndex);
+}
 
 Program::~Program()
 {
@@ -18,12 +31,20 @@ Program::~Program()
 
 void Program::Execute()
 {
-	THROW(NotImplementedException, "HOLD YOUR HORSES; NOT THERE YET.");
-
-	/*
 	FunctionInvocation main(_mainFunction, NULL);
 	main.Execute();
-	*/
 }
+
+
+FunctionList* Program::GetFunctionList() const
+{
+	return _funcList;
+}
+
+Function* Program::GetMainFunction() const
+{
+	return _mainFunction;
+}
+
 
 }

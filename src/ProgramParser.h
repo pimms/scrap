@@ -1,15 +1,15 @@
 #pragma once
 
 #include "Scrap.h"
-#include "Method.h"
+#include "Function.h"
 
 namespace scrap {
 
 class BinaryFile;
 class Program;
-class Class;
-class ClassList;
-class Method;
+class Function;
+class FunctionBody;
+class FunctionList;
 
 
 /* Program Parser
@@ -27,23 +27,16 @@ protected:
 	virtual void ReadMagicNumber();
 	virtual void ReadVersionNumber();
 	virtual void ReadEndian();
-	virtual void ReadMain();
 
-	virtual void ReadClassList();
-	virtual void ReadClass();
-	virtual void ReadFields(Class *c);
-	virtual void ReadMethods(Class *c);
-	virtual TypeDesc ReadField();
-	virtual Method* ReadMethod(MethodType methodType, Class *c);
-	virtual MethodBody ReadMethodBody();
+	// Read the functions into _funcList and return the index of the main function
+	virtual unsigned ReadFunctions();
+	virtual Function* ReadFunction();
+	virtual FunctionBody ReadFunctionBody();
 	virtual TypeDesc ReadTypeDesc(bool readName);
 
 private:
 	BinaryFile *_file;
-	ClassList *_classList;
-
-	unsigned _mainClassID;
-	unsigned _mainMethodID;
+	FunctionList *_funcList;
 };
 
 }

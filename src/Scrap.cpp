@@ -29,12 +29,11 @@ namespace scrap {
 string VarTypeToString(VarType t)
 {
 	switch (t) {
-		case OBJECT:
-			return "Object";
 		case INT:
 			return "int";
 		case FLOAT:
 			return "float";
+
 		case DOUBLE:
 			return "double";
 		case LONG:
@@ -80,23 +79,16 @@ string AritOpToString(AritOp op)
 
 
 TypeDesc::TypeDesc() 
-	:	type(VOID),
-		classID(ID_UNDEFINED)
+	:	type(VOID)
 { } 
 
 TypeDesc::TypeDesc(VarType t)
-	:	type(t),
-		classID(ID_UNDEFINED)
+	:	type(t)
 { }
 
-TypeDesc::TypeDesc(VarType t, unsigned id)
-	:	type(t),
-		classID(id)
-{ }
 
-TypeDesc::TypeDesc(VarType t, unsigned id, string name)
+TypeDesc::TypeDesc(VarType t, string name)
 	:	type(t),
-		classID(id),
 		name(name)
 { }
 

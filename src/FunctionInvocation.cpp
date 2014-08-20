@@ -33,14 +33,6 @@ FunctionInvocation::~FunctionInvocation()
 
 void FunctionInvocation::Execute()
 {
-#ifndef _SCRAP_TEST_
-	// The ClassList must be defined in non-testing environments
-	if (!_classList) {
-		THROW(NullPointerException, "The ClassList must be defined in the "
-			"executing FunctionInvocation instance.");
-	}
-#endif
-
 	_pc = 0;
 	const FunctionBody *body = _function->GetFunctionBody();
 
@@ -64,16 +56,6 @@ void FunctionInvocation::Execute()
 	}
 }
 
-
-void FunctionInvocation::PerformFunctionCall(Function *function)
-{
-	FunctionInvocation invocation(function, this);
-
-	if (_debugger)
-		invocation.SetDebugger(_debugger);
-	
-	invocation.Execute();
-}
 
 void FunctionInvocation::PerformFunctionCall(Function *function)
 {

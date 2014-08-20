@@ -5,64 +5,30 @@ TEST (BytecodeTest, TestInstructionMap)
 {
 	ASSERT_EQ(g_instructionMap[OP_POP].instr,			OP_POP);
 	ASSERT_EQ(g_instructionMap[OP_COPY].instr, 			OP_COPY);
-	ASSERT_EQ(g_instructionMap[OP_ARRAYLENGTH].instr, 	OP_ARRAYLENGTH);
-	ASSERT_EQ(g_instructionMap[OP_ARRAYLOAD].instr, 	OP_ARRAYLOAD);
-	ASSERT_EQ(g_instructionMap[OP_A_LOAD].instr, 		OP_A_LOAD);
-	ASSERT_EQ(g_instructionMap[OP_A_RETURN].instr, 		OP_A_RETURN);
-	ASSERT_EQ(g_instructionMap[OP_A_STORE].instr,		OP_A_STORE);
-	ASSERT_EQ(g_instructionMap[OP_A_NEWARRAY].instr,	OP_A_NEWARRAY);
-	ASSERT_EQ(g_instructionMap[OP_A_ARELEASE].instr,	OP_A_ARELEASE);
-	ASSERT_EQ(g_instructionMap[OP_A_ALOAD].instr, 		OP_A_ALOAD);
-	ASSERT_EQ(g_instructionMap[OP_A_ASTORE].instr, 		OP_A_ASTORE);
 	ASSERT_EQ(g_instructionMap[OP_I_LOAD].instr, 		OP_I_LOAD);
 	ASSERT_EQ(g_instructionMap[OP_I_RETURN].instr, 		OP_I_RETURN);
 	ASSERT_EQ(g_instructionMap[OP_I_STORE].instr,		OP_I_STORE);
 	ASSERT_EQ(g_instructionMap[OP_I_PUSH].instr,		OP_I_PUSH);
-	ASSERT_EQ(g_instructionMap[OP_I_NEWARRAY].instr,	OP_I_NEWARRAY);
-	ASSERT_EQ(g_instructionMap[OP_I_ARELEASE].instr,	OP_I_ARELEASE);
-	ASSERT_EQ(g_instructionMap[OP_I_ALOAD].instr, 		OP_I_ALOAD);
-	ASSERT_EQ(g_instructionMap[OP_I_ASTORE].instr, 		OP_I_ASTORE);
 	ASSERT_EQ(g_instructionMap[OP_F_LOAD].instr, 		OP_F_LOAD);
 	ASSERT_EQ(g_instructionMap[OP_F_RETURN].instr, 		OP_F_RETURN);
 	ASSERT_EQ(g_instructionMap[OP_F_STORE].instr,		OP_F_STORE);
 	ASSERT_EQ(g_instructionMap[OP_F_PUSH].instr,		OP_F_PUSH);
-	ASSERT_EQ(g_instructionMap[OP_F_NEWARRAY].instr,	OP_F_NEWARRAY);
-	ASSERT_EQ(g_instructionMap[OP_F_ARELEASE].instr,	OP_F_ARELEASE);
-	ASSERT_EQ(g_instructionMap[OP_F_ALOAD].instr, 		OP_F_ALOAD);
-	ASSERT_EQ(g_instructionMap[OP_F_ASTORE].instr, 		OP_F_ASTORE);
 	ASSERT_EQ(g_instructionMap[OP_D_LOAD].instr, 		OP_D_LOAD);
 	ASSERT_EQ(g_instructionMap[OP_D_RETURN].instr, 		OP_D_RETURN);
 	ASSERT_EQ(g_instructionMap[OP_D_STORE].instr,		OP_D_STORE);
 	ASSERT_EQ(g_instructionMap[OP_D_PUSH].instr,		OP_D_PUSH);
-	ASSERT_EQ(g_instructionMap[OP_D_NEWARRAY].instr,	OP_D_NEWARRAY);
-	ASSERT_EQ(g_instructionMap[OP_D_ARELEASE].instr,	OP_D_ARELEASE);
-	ASSERT_EQ(g_instructionMap[OP_D_ALOAD].instr, 		OP_D_ALOAD);
-	ASSERT_EQ(g_instructionMap[OP_D_ASTORE].instr, 		OP_D_ASTORE);
 	ASSERT_EQ(g_instructionMap[OP_L_LOAD].instr, 		OP_L_LOAD);
 	ASSERT_EQ(g_instructionMap[OP_L_RETURN].instr, 		OP_L_RETURN);
 	ASSERT_EQ(g_instructionMap[OP_L_STORE].instr,		OP_L_STORE);
 	ASSERT_EQ(g_instructionMap[OP_L_PUSH].instr,		OP_L_PUSH);
-	ASSERT_EQ(g_instructionMap[OP_L_NEWARRAY].instr,	OP_L_NEWARRAY);
-	ASSERT_EQ(g_instructionMap[OP_L_ARELEASE].instr,	OP_L_ARELEASE);
-	ASSERT_EQ(g_instructionMap[OP_L_ALOAD].instr, 		OP_L_ALOAD);
-	ASSERT_EQ(g_instructionMap[OP_L_ASTORE].instr, 		OP_L_ASTORE);
 	ASSERT_EQ(g_instructionMap[OP_C_LOAD].instr, 		OP_C_LOAD);
 	ASSERT_EQ(g_instructionMap[OP_C_RETURN].instr, 		OP_C_RETURN);
 	ASSERT_EQ(g_instructionMap[OP_C_STORE].instr,		OP_C_STORE);
 	ASSERT_EQ(g_instructionMap[OP_C_PUSH].instr,		OP_C_PUSH);
-	ASSERT_EQ(g_instructionMap[OP_C_NEWARRAY].instr,	OP_C_NEWARRAY);
-	ASSERT_EQ(g_instructionMap[OP_C_ARELEASE].instr,	OP_C_ARELEASE);
-	ASSERT_EQ(g_instructionMap[OP_C_ALOAD].instr, 		OP_C_ALOAD);
-	ASSERT_EQ(g_instructionMap[OP_C_ASTORE].instr, 		OP_C_ASTORE);
 	ASSERT_EQ(g_instructionMap[OP_B_LOAD].instr, 		OP_B_LOAD);
 	ASSERT_EQ(g_instructionMap[OP_B_RETURN].instr, 		OP_B_RETURN);
 	ASSERT_EQ(g_instructionMap[OP_B_STORE].instr,		OP_B_STORE);
 	ASSERT_EQ(g_instructionMap[OP_B_PUSH].instr,		OP_B_PUSH);
-	ASSERT_EQ(g_instructionMap[OP_B_NEWARRAY].instr,	OP_B_NEWARRAY);
-	ASSERT_EQ(g_instructionMap[OP_B_ARELEASE].instr,	OP_B_ARELEASE);
-	ASSERT_EQ(g_instructionMap[OP_B_ALOAD].instr, 		OP_B_ALOAD);
-	ASSERT_EQ(g_instructionMap[OP_B_ASTORE].instr, 		OP_B_ASTORE);
-	ASSERT_EQ(g_instructionMap[OP_A2B].instr,			OP_A2B);
 	ASSERT_EQ(g_instructionMap[OP_F2D].instr,			OP_F2D);
 	ASSERT_EQ(g_instructionMap[OP_F2L].instr,			OP_F2L);
 	ASSERT_EQ(g_instructionMap[OP_F2I].instr,			OP_F2I);
@@ -131,16 +97,6 @@ TEST (BytecodeTest, TestInstructionMap)
 	ASSERT_EQ(g_instructionMap[OP_C_XOR].instr,			OP_C_XOR);
 	ASSERT_EQ(g_instructionMap[OP_C_AND].instr,			OP_C_AND);
 	ASSERT_EQ(g_instructionMap[OP_C_OR].instr, 			OP_C_OR);
-	ASSERT_EQ(g_instructionMap[OP_NEW].instr,			OP_NEW);
-	ASSERT_EQ(g_instructionMap[OP_RETAIN].instr,		OP_RETAIN);
-	ASSERT_EQ(g_instructionMap[OP_RELEASE].instr, 		OP_RELEASE);
-	ASSERT_EQ(g_instructionMap[OP_INVOKE].instr, 		OP_INVOKE);
-	ASSERT_EQ(g_instructionMap[OP_VINVOKE].instr,		OP_VINVOKE);
-	ASSERT_EQ(g_instructionMap[OP_STINVOKE].instr,		OP_STINVOKE);
-	ASSERT_EQ(g_instructionMap[OP_LOADFIELD].instr,		OP_LOADFIELD);
-	ASSERT_EQ(g_instructionMap[OP_LOADSTATIC].instr,	OP_LOADSTATIC);
-	ASSERT_EQ(g_instructionMap[OP_STOREFIELD].instr,	OP_STOREFIELD);
-	ASSERT_EQ(g_instructionMap[OP_STORESTATIC].instr,	OP_STORESTATIC);
 	ASSERT_EQ(g_instructionMap[OP_UNDEFINED].instr,		OP_UNDEFINED);
 
 	ASSERT_EQ(g_instructionMap[OP_BRANCH].instr, 		OP_BRANCH);
@@ -158,72 +114,37 @@ TEST (BytecodeTest, TestArglen)
 {
 	ASSERT_EQ(arglen(OP_POP), 			0);
 	ASSERT_EQ(arglen(OP_COPY), 			0);
-	ASSERT_EQ(arglen(OP_ARRAYLENGTH), 	0);
-	ASSERT_EQ(arglen(OP_ARRAYLOAD), 	4);
-
-	ASSERT_EQ(arglen(OP_A_LOAD), 		4);
-	ASSERT_EQ(arglen(OP_A_RETURN), 		0);
-	ASSERT_EQ(arglen(OP_A_STORE), 		4);
-	ASSERT_EQ(arglen(OP_A_NEWARRAY), 	5);
-	ASSERT_EQ(arglen(OP_A_ARELEASE), 	0);
-	ASSERT_EQ(arglen(OP_A_ALOAD), 		5);
-	ASSERT_EQ(arglen(OP_A_ASTORE), 		5);
 
 	ASSERT_EQ(arglen(OP_I_LOAD), 		4);
 	ASSERT_EQ(arglen(OP_I_RETURN), 		0);
 	ASSERT_EQ(arglen(OP_I_STORE), 		4);
 	ASSERT_EQ(arglen(OP_I_PUSH), 		4);
-	ASSERT_EQ(arglen(OP_I_NEWARRAY), 	0);
-	ASSERT_EQ(arglen(OP_I_ARELEASE), 	0);
-	ASSERT_EQ(arglen(OP_I_ALOAD), 		5);
-	ASSERT_EQ(arglen(OP_I_ASTORE), 		5);
 
 	ASSERT_EQ(arglen(OP_F_LOAD), 		4);
 	ASSERT_EQ(arglen(OP_F_RETURN), 		0);
 	ASSERT_EQ(arglen(OP_F_STORE), 		4);
 	ASSERT_EQ(arglen(OP_F_PUSH), 		4);
-	ASSERT_EQ(arglen(OP_F_NEWARRAY), 	0);
-	ASSERT_EQ(arglen(OP_F_ARELEASE), 	0);
-	ASSERT_EQ(arglen(OP_F_ALOAD), 		5);
-	ASSERT_EQ(arglen(OP_F_ASTORE), 		5);
 
 	ASSERT_EQ(arglen(OP_D_LOAD), 		4);
 	ASSERT_EQ(arglen(OP_D_RETURN), 		0);
 	ASSERT_EQ(arglen(OP_D_STORE), 		4);
 	ASSERT_EQ(arglen(OP_D_PUSH), 		8);
-	ASSERT_EQ(arglen(OP_D_NEWARRAY), 	0);
-	ASSERT_EQ(arglen(OP_D_ARELEASE), 	0);
-	ASSERT_EQ(arglen(OP_D_ALOAD), 		5);
-	ASSERT_EQ(arglen(OP_D_ASTORE), 		5);
 
 	ASSERT_EQ(arglen(OP_L_LOAD), 		4);
 	ASSERT_EQ(arglen(OP_L_RETURN), 		0);
 	ASSERT_EQ(arglen(OP_L_STORE), 		4);
 	ASSERT_EQ(arglen(OP_L_PUSH), 		8);
-	ASSERT_EQ(arglen(OP_L_NEWARRAY), 	0);
-	ASSERT_EQ(arglen(OP_L_ARELEASE), 	0);
-	ASSERT_EQ(arglen(OP_L_ALOAD), 		5);
-	ASSERT_EQ(arglen(OP_L_ASTORE), 		5);
 
 	ASSERT_EQ(arglen(OP_C_LOAD), 		4);
 	ASSERT_EQ(arglen(OP_C_RETURN), 		0);
 	ASSERT_EQ(arglen(OP_C_STORE), 		4);
 	ASSERT_EQ(arglen(OP_C_PUSH), 		1);
-	ASSERT_EQ(arglen(OP_C_NEWARRAY), 	0);
-	ASSERT_EQ(arglen(OP_C_ARELEASE), 	0);
-	ASSERT_EQ(arglen(OP_C_ALOAD), 		5);
-	ASSERT_EQ(arglen(OP_C_ASTORE), 		5);
 
 	ASSERT_EQ(arglen(OP_B_LOAD), 		4);
 	ASSERT_EQ(arglen(OP_B_RETURN), 		0);
 	ASSERT_EQ(arglen(OP_B_STORE), 		4);
 	ASSERT_EQ(arglen(OP_B_PUSH), 		1);
-	ASSERT_EQ(arglen(OP_B_NEWARRAY), 	0);
-	ASSERT_EQ(arglen(OP_B_ARELEASE), 	0);
-	ASSERT_EQ(arglen(OP_B_ALOAD), 		5);
-	ASSERT_EQ(arglen(OP_B_ASTORE), 		5);
 
-	ASSERT_EQ(arglen(OP_A2B),			0);
 	ASSERT_EQ(arglen(OP_F2D),			0);
 	ASSERT_EQ(arglen(OP_F2L),			0);
 	ASSERT_EQ(arglen(OP_F2I),			0);
@@ -294,16 +215,6 @@ TEST (BytecodeTest, TestArglen)
 	ASSERT_EQ(arglen(OP_C_XOR),			0);
 	ASSERT_EQ(arglen(OP_C_AND),			0);
 	ASSERT_EQ(arglen(OP_C_OR),			0);
-	ASSERT_EQ(arglen(OP_NEW), 			4);
-	ASSERT_EQ(arglen(OP_RETAIN), 		0);
-	ASSERT_EQ(arglen(OP_RELEASE), 		0);
-	ASSERT_EQ(arglen(OP_INVOKE), 		4);
-	ASSERT_EQ(arglen(OP_VINVOKE), 		4);
-	ASSERT_EQ(arglen(OP_STINVOKE), 		8);
-	ASSERT_EQ(arglen(OP_LOADFIELD), 	4);
-	ASSERT_EQ(arglen(OP_LOADSTATIC), 	4);
-	ASSERT_EQ(arglen(OP_STOREFIELD), 	4);
-	ASSERT_EQ(arglen(OP_STORESTATIC), 	4);
 
 	ASSERT_EQ(arglen(OP_BRANCH),		4);
 	ASSERT_EQ(arglen(OP_BIFNULL),		4);
@@ -314,7 +225,5 @@ TEST (BytecodeTest, TestArglen)
 	ASSERT_EQ(arglen(OP_BIFLESSEQ),		4);
 	ASSERT_EQ(arglen(OP_BIFEQUAL),		4);
 	ASSERT_EQ(arglen(OP_BIFNOTEQUAL),	4);
-
-
 }
 

@@ -4,18 +4,11 @@
  *
  * [X] Pop
  * [X] Copy
- * [ ] ArrayLength
- * [ ] ArrayLoad
  * [X] Return
  * [X] T Load
  * [ ] T Return
  * [X] T Store
  * [X] T Push
- * [ ] T NewArray
- * [ ] T ARelease
- * [ ] T ALoad
- * [ ] T AStore
- * [X] A2B
  * [X] F2T
  * [X] D2T
  * [X] L2T
@@ -32,16 +25,6 @@
  * [X] T Xor
  * [X] T And
  * [X] T Or
- * [X] New
- * [X] Retain
- * [X] Release
- * [ ] Invoke
- * [ ] VInvoke
- * [ ] STInvoke
- * [ ] LoadField
- * [ ] LoadStatic
- * [ ] StoreField
- * [ ] StoreStatic
  * [ ] Branch
  * [ ] BifNull
  * [ ] BifNotNull
@@ -55,36 +38,21 @@
 
 
 /* The test program is a manual compilation of a program similar to this:
- *		class MainClass {					// ID = 2
- *			static MainClass singleton;		// ID = 0
- *			Foo foo;						// ID = 0
- *			Bar bar;						// ID = 1
- *			
- *			static void Main(); 			// ID = 0
- *		}
  *
- *		class Foo {							// ID = 0
- *			static bool flag;				// ID = 0
- *			int num;						// ID = 0
- *			
- *			static void TrueFlag() {		// ID = 0
- *				flag = true;
- *			}
+ * int GetNumber() 
+ * {
+ * 		return 5;
+ * }
  *
- *			virtual int GetNum() {			// ID = 0
- *				return 10;
- *			}
- *		}
+ * int Multiply(int a, int b)
+ * {
+ * 		return a * b;
+ * }
  *
- *		class Bar extends Foo {				// ID = 1
- *			virtual int GetNum() {			// ID = 0
- *				return 15;
- *			}
- *
- *			void SetNum() {					// ID = 1
- *				num = 13;
- *			}
- *		}
+ * void main() 
+ * {
+ *		// Code not defined in file
+ * }
  *
  * The bytecode-length and bytecode of the "void Main()" method is not
  * included in the file and must be added before attempting to execute
@@ -102,23 +70,27 @@
  */
 class TestProgramCreator : public ProgramParser {
 public:
-	TestProgramCreator(MethodBody body) {
+	TestProgramCreator(FunctionBody body) 
+	{
 		_body = body;
 		_methodsRead = 0;
 	}	
 
-	MethodBody ReadMethodBody() {
-		if (_methodsRead++ == 4)
+	FunctionBody ReadFunctionBody() 
+	{
+		// The third method is the main() method. This is also the last
+		// method in the program. 
+		if (++_methodsRead == 3)
 			return _body;
-		return ProgramParser::ReadMethodBody();
+		return ProgramParser::ReadFunctionBody();
 	}
 
 private:
-	MethodBody _body;
+	FunctionBody _body;
 	int _methodsRead;
 };
 
-Program* CreateProgram(MethodBody body)
+Program* CreateProgram(FunctionBody body)
 {
 	TestProgramCreator creator(body);
 	return creator.ParseProgramFile(PROGRAM_BASE_FILE);
@@ -131,19 +103,16 @@ Program* CreateProgram(MethodBody body)
  *
  * The method is extracted from the Program and executed manually.
  *
- * Note that the contents of the stack, the Stack-instance itself, 
- * and the heap contents must be deleted by the caller.
+ * Note that the contents of the stack and the Stack-instance itself
+ *  must be deleted by the caller.
  *
  * The passed debugger will be attached to the method invocation.
  */
-Stack* ExecuteProgram(Program *program, Heap *heap, Debugger *debugger=NULL)
+Stack* ExecuteProgram(Program *program, Debugger *debugger=NULL)
 {
-	ClassList *clist = program->GetClassList();
-	Class *mainClass = clist->GetClass(2);
-	Method *mainMethod = mainClass->GetStaticMethod(0);
+	Function *mainFunction = program->GetMainFunction();
 
-	MethodInvocation invocation(heap, mainMethod, mainClass, NULL);
-	invocation.SetClassList(clist);
+	FunctionInvocation invocation(mainFunction, NULL);
 
 	if (debugger) 
 		invocation.SetDebugger(debugger);
@@ -154,7 +123,7 @@ Stack* ExecuteProgram(Program *program, Heap *heap, Debugger *debugger=NULL)
 	Stack *stack = invocation.GetMutableStack();
 	Stack *copy = stack->Copy();
 	
-	// The contents of the stack will be deleted in ~MethodInvocation, so pop
+	// The contents of the stack will be deleted in ~FunctionInvocation, so pop
 	// all the contents out of the original stack so we can continue to
 	// use them.
 	while (stack->Count())
@@ -181,10 +150,9 @@ void TestPushLiteral(byte instr, T val, T(Variable::*valmethod)()const)
 	 * 		Tpush <val>
 	 */
 	Stack *stack = NULL;
-	Heap heap;
 	Program *program = NULL;
 	Variable *var = NULL;
-	MethodBody body;
+	FunctionBody body;
 
 	body.length = 1 + sizeof(T);
 	body.code = new byte[body.length];
@@ -192,7 +160,7 @@ void TestPushLiteral(byte instr, T val, T(Variable::*valmethod)()const)
 	memcpy(body.code+1, &val, sizeof(T));
 
 	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
+	stack = ExecuteProgram(program);
 
 	ASSERT_EQ(stack->Count(), 1);
 	
@@ -224,10 +192,9 @@ void TestArithmetic(byte pushInstr, byte aritInstr, T val1, T val2,
 	 * 		<aritInstr>
 	 */
 	Stack *stack = NULL;
-	Heap heap;
 	Program *program = NULL;
 	Variable *var = NULL;
-	MethodBody body;
+	FunctionBody body;
 
 	body.length = 3 + 2*sizeof(T);
 	body.code = new byte[body.length];
@@ -238,7 +205,7 @@ void TestArithmetic(byte pushInstr, byte aritInstr, T val1, T val2,
 	body.code[2+2*sizeof(T)] = aritInstr;
 	
 	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
+	stack = ExecuteProgram(program);
 
 	ASSERT_EQ(stack->Count(), 1);
 	Variable *result = stack->Pop();
@@ -277,10 +244,9 @@ void TestConversion(byte pushInstr, byte convInstr, FROM val,
 	 * 		<convInstr>
 	 */
 	Stack *stack = NULL;
-	Heap heap;
 	Program *program = NULL;
 	Variable *var = NULL;
-	MethodBody body;
+	FunctionBody body;
 
 	body.length = 2 + sizeof(FROM);
 	body.code = new byte[body.length];
@@ -289,7 +255,7 @@ void TestConversion(byte pushInstr, byte convInstr, FROM val,
 	body.code[1+sizeof(FROM)] = convInstr;
 
 	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
+	stack = ExecuteProgram(program);
 
 	ASSERT_EQ(stack->Count(), 1);
 	var = stack->Pop();
@@ -304,7 +270,7 @@ void TestConversion(byte pushInstr, byte convInstr, FROM val,
 
 /* Pushes a variable, stores it in a register and pops it back onto the stack.
  * Unfortunately, getting access directly to the registers is hard as the
- * Executor class managing the registers is managed by the MethodInvocation,
+ * Executor class managing the registers is managed by the FunctionInvocation,
  * so testing that storing and loading works simultaneously is a good 
  * secondary solution.
  * 		pushInstr		The instruction pushing a value
@@ -316,10 +282,9 @@ template<typename T>
 void TestLoadAndStore(byte pushInstr, byte storeInstr, byte loadInstr, T val)
 {
 	Stack *stack = NULL;
-	Heap heap;
 	Program *program = NULL;
 	Variable *var = NULL;
-	MethodBody body;
+	FunctionBody body;
 
 	
 	// Tpush <val>
@@ -333,7 +298,7 @@ void TestLoadAndStore(byte pushInstr, byte storeInstr, byte loadInstr, T val)
 		body.code[2+sizeof(T)] = (byte)i;
 
 		program = CreateProgram(body);
-		stack = ExecuteProgram(program, &heap);
+		stack = ExecuteProgram(program);
 
 		ASSERT_EQ(stack->Count(), 0);
 
@@ -355,7 +320,7 @@ void TestLoadAndStore(byte pushInstr, byte storeInstr, byte loadInstr, T val)
 		body.code[4+sizeof(T)] = (byte)i;
 
 		program = CreateProgram(body);
-		stack = ExecuteProgram(program, &heap);
+		stack = ExecuteProgram(program);
 
 		ASSERT_EQ(stack->Count(), 1);
 		var = stack->Pop();
@@ -384,9 +349,8 @@ TEST (ExecutorTest, TestPop)
 	 * 		pop
 	 */
 	Stack *stack = NULL;
-	Heap heap;
 	Program *program = NULL;
-	MethodBody body;
+	FunctionBody body;
 	int ival = 1337;
 
 	body.length = 2 + sizeof(int);
@@ -396,7 +360,7 @@ TEST (ExecutorTest, TestPop)
 	body.code[1+sizeof(int)] = OP_POP;
 
 	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
+	stack = ExecuteProgram(program);
 
 	ASSERT_EQ(stack->Count(), 0);
 	
@@ -413,9 +377,8 @@ TEST (ExecutorTest, TestCopy)
 	 * 		copy
 	 */
 	Stack *stack = NULL;
-	Heap heap;
 	Program *program = NULL;
-	MethodBody body;
+	FunctionBody body;
 	int ival = 1337;
 
 	body.length = 2 + sizeof(int);
@@ -425,7 +388,7 @@ TEST (ExecutorTest, TestCopy)
 	body.code[1+sizeof(int)] = OP_COPY;
 
 	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
+	stack = ExecuteProgram(program);
 
 	ASSERT_EQ(stack->Count(), 2);
 
@@ -452,9 +415,8 @@ TEST (ExecutorTest, TestVoidReturn)
 	 * 		fpush 	3.14
 	 */
 	Stack *stack = NULL;
-	Heap heap;
 	Program *program = NULL;
-	MethodBody body;
+	FunctionBody body;
 	float fval = 3.14;
 
 	body.length = 2 + sizeof(float);
@@ -464,7 +426,7 @@ TEST (ExecutorTest, TestVoidReturn)
 	memcpy(body.code+2, &fval, sizeof(float));
 
 	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
+	stack = ExecuteProgram(program);
 
 	ASSERT_EQ(stack->Count(), 0);
 
@@ -716,254 +678,4 @@ TEST (ExecutorTest, TestLoadAndStore)
 	TestLoadAndStore<long>(OP_L_PUSH, OP_L_STORE, OP_L_LOAD, 45958);
 	TestLoadAndStore<bool>(OP_B_PUSH, OP_B_STORE, OP_B_LOAD, true);
 	TestLoadAndStore<char>(OP_C_PUSH, OP_C_STORE, OP_C_LOAD, 243);
-}
-
-TEST (ExecutorTest, TestNew)
-{
-	/* After the new-instruction, the object should exist on the stack as a 
-	 * Variable and on the Heap.
-	 * 		new 2
-	 */
-	Stack *stack = NULL;
-	Heap heap;
-	Program *program = NULL;
-	MethodBody body;
-	unsigned classID = 2;
-
-	body.length = 1 + sizeof(classID);
-	body.code = new byte[body.length];
-	body.code[0] = OP_NEW;
-	memcpy(body.code+1, &classID, sizeof(unsigned));
-
-	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
-
-	ASSERT_EQ(stack->Count(), 1);
-	Variable *var = stack->Pop();
-	ASSERT_EQ(var->Type(), VarType::a);
-
-	Object *obj = var->Value_a();
-	ASSERT_EQ(obj->GetClass()->GetClassName(), "MainClass");
-	ASSERT_EQ(obj->GetClass()->GetClassID(), 2);
-
-	ASSERT_EQ(heap.Size(), 1);
-
-	obj->Release();
-	heap.KillOrphans();
-	
-	delete var;
-	delete stack;
-	delete program;
-}
-
-TEST (ExecutorTest, TestRetain)
-{
-	/* After retaining the object, a call to Heap::KillOrphans() should NOT 
-	 * delete the object. OP_RETAIN pops the object from the stack.
-	 * 		new 2
-	 * 		retain
-	 */
-	Stack *stack = NULL;
-	Heap heap;
-	Program *program = NULL;
-	MethodBody body;
-	unsigned classID = 2;
-
-	body.length = 2 + sizeof(classID);
-	body.code = new byte[body.length];
-	body.code[0] = OP_NEW;
-	memcpy(body.code+1, &classID, sizeof(unsigned));
-	body.code[1+sizeof(unsigned)] = OP_RETAIN;
-
-	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
-
-	ASSERT_EQ(stack->Count(), 0);
-	ASSERT_EQ(heap.Size(), 1);
-
-	heap.GetObject(0)->Release();
-	heap.KillOrphans();
-	ASSERT_EQ(heap.Size(), 1);
-
-	heap.GetObject(0)->Release();
-	heap.KillOrphans();
-	ASSERT_EQ(heap.Size(), 0);
-	
-	delete stack;
-	delete program;
-}
-
-TEST (ExecutorTest, TestRelease)
-{
-	/* After releasing the object, the heap-instance should cleared after a
-	 * call to Heap::KillOrphans().
-	 * 		new 2
-	 * 		release
-	 */
-	Stack *stack = NULL;
-	Heap heap;
-	Program *program = NULL;
-	MethodBody body;
-	unsigned classID = 2;
-
-	body.length = 2 + sizeof(classID);
-	body.code = new byte[body.length];
-	body.code[0] = OP_NEW;
-	memcpy(body.code+1, &classID, sizeof(unsigned));
-	body.code[1+sizeof(unsigned)] = OP_RELEASE;
-
-	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
-
-	ASSERT_EQ(stack->Count(), 0);
-	ASSERT_EQ(heap.Size(), 1);
-
-	heap.KillOrphans();
-	ASSERT_EQ(heap.Size(), 0);
-
-	delete stack;
-	delete program;
-}
-
-TEST (ExecutorTest, TestInvokeReturnValue) 
-{
-	/* Test that after invoking a method on an object, the
-	 * only contents of the stack is the returned value from
-	 * the invoked method. In this case, method GetNum() is
-	 * expected to return an int.
-	 * new 0
-	 * a_store 0
-	 * a_load 0
-	 * invoke 0
-	 */
-	Stack *stack = NULL;
-	Heap heap;
-	Program *program = NULL;
-	MethodBody body;
-	unsigned classID = 0;
-	unsigned methodID = 0;
-	byte reg = 0;
-
-	int idx = 0;
-	body.length = 32;
-	body.code = new byte[body.length];
-
-
-	body.code[idx++] = OP_NEW;
-	memcpy(body.code + idx, &classID, sizeof(classID));
-	idx += sizeof(classID);
-
-	body.code[idx++] = OP_A_STORE;
-	memcpy(body.code + idx, &reg, sizeof(reg));
-	idx += sizeof(reg);
-
-	body.code[idx++] = OP_A_LOAD;
-	memcpy(body.code + idx, &reg, sizeof(reg));
-	idx += sizeof(reg);
-
-	body.code[idx++] = OP_INVOKE;
-	memcpy(body.code + idx, &methodID, sizeof(methodID));
-	idx += sizeof(methodID);
-
-	body.length = idx;	
-
-
-	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
-
-	ASSERT_EQ(stack->Count(), 1);
-	
-	Variable *var = stack->Pop();
-	ASSERT_TRUE(var != NULL);
-	
-	ASSERT_EQ(var->Type(), VarType::INT);
-	ASSERT_EQ(var->Value_i(), 10);
-
-	// Force release the test-instance
-	heap.GetObject(0)->Release();
-	heap.KillOrphans();
-
-	delete program;
-	delete stack;
-	delete var;
-}
-
-TEST (ExecutorTest, TestInvokeTwice) 
-{
-	/* Create an instance, call GetNum() twice on it and
-	 * release the object.
-	 * new 0		; Create new instance
-	 * a_store 0	; Store in register A
-	 *
-	 * a_load 0		; load the object
-	 * invoke 0		; invoke getnum()
-	 *
-	 * a_load 0
-	 * invoke 0
-	 *
-	 * a_load 0		; load the object
-	 * release		; Release it
-	 */
-	CLISimpleDebugger dbg;
-	Stack *stack = NULL;
-	Heap heap;
-	Program *program = NULL;
-	Variable *var = NULL;
-	MethodBody body;
-	unsigned classID = 0;
-	unsigned methodID = 0;
-	byte reg = 0;
-
-	body.length = 64;
-	body.code = new byte[body.length];
-	int idx = 0;
-
-
-	body.code[idx++] = OP_NEW;
-	memcpy(body.code + idx, &classID, sizeof(classID));
-	idx += sizeof(classID);
-	body.code[idx++] = OP_A_STORE;
-	memcpy(body.code + idx, &reg, sizeof(reg));
-	idx += sizeof(reg);
-
-	body.code[idx++] = OP_A_LOAD;
-	memcpy(body.code + idx, &reg, sizeof(reg));
-	idx += sizeof(reg);
-	body.code[idx++] = OP_INVOKE;
-	memcpy(body.code + idx, &methodID, sizeof(methodID));
-	idx += sizeof(methodID);
-
-	body.code[idx++] = OP_A_LOAD;
-	memcpy(body.code + idx, &reg, sizeof(reg));
-	idx += sizeof(reg);
-	body.code[idx++] = OP_INVOKE;
-	memcpy(body.code + idx, &methodID, sizeof(methodID));
-	idx += sizeof(methodID);
-
-	body.code[idx++] = OP_A_LOAD;
-	memcpy(body.code + idx, &reg, sizeof(reg));
-	idx += sizeof(reg);
-	body.code[idx++] = OP_RELEASE;
-
-	body.length = idx;
-
-
-	program = CreateProgram(body);
-	stack = ExecuteProgram(program, &heap);
-
-
-	ASSERT_EQ(2, stack->Count());
-
-	for (int i=0; i<2; i++) {
-		var = stack->Pop();
-		ASSERT_EQ(VarType::INT, var->Type());
-		ASSERT_EQ(10, var->Value_i());
-		delete var;
-	}
-
-	heap.GetObject(0)->Release();
-	heap.KillOrphans();
-
-	delete stack;
-	delete program;
 }

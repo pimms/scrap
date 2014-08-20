@@ -25,7 +25,7 @@ public:
 	FunctionList();
 	~FunctionList();
 
-	void AddFunction(Function *method);
+	void AddFunction(Function *function);
 	Function* GetFunction(unsigned id) const;
 	unsigned GetFunctionCount() const;
 

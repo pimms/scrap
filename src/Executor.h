@@ -23,7 +23,7 @@ typedef unsigned(Executor::*ExecutorMethod)(const byte*);
  */
 class ExecutionDelegate {
 public:
-	virtual void PerforFunctionCall(Function *function) = 0;
+	virtual void PerformFunctionCall(Function *function) = 0;
 	virtual void BranchToInstruction(unsigned index) = 0;
 	virtual void ReturnToCaller() = 0;
 };

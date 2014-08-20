@@ -63,13 +63,11 @@ enum VarType {
 struct TypeDesc {
 	TypeDesc();
 	TypeDesc(VarType t);
-	TypeDesc(VarType t, unsigned classID);
-	TypeDesc(VarType t, unsigned classID, string argName);
+	TypeDesc(VarType t, string argName);
 
 	VarType type;
 
 	// Must contain class data in the case of "type == OBJECT".
-	unsigned classID;
 
 	// A name may optionally be included for fields and arguments
 	string name;

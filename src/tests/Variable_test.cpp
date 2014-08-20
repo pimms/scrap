@@ -12,17 +12,7 @@
 
 TEST (VariableTest, AvailableCasts)
 {
-	// OBJECT can be casted to OBJECT and BOOL
-	EXPECT_EQ(VarValue::CastAvailable(VarType::OBJECT, VarType::OBJECT), 	true);
-	EXPECT_EQ(VarValue::CastAvailable(VarType::OBJECT, VarType::INT), 		false);
-	EXPECT_EQ(VarValue::CastAvailable(VarType::OBJECT, VarType::FLOAT), 	false);
-	EXPECT_EQ(VarValue::CastAvailable(VarType::OBJECT, VarType::DOUBLE), 	false);
-	EXPECT_EQ(VarValue::CastAvailable(VarType::OBJECT, VarType::LONG), 		false);
-	EXPECT_EQ(VarValue::CastAvailable(VarType::OBJECT, VarType::CHAR), 		false);
-	EXPECT_EQ(VarValue::CastAvailable(VarType::OBJECT, VarType::BOOL), 		true);
- 
 	// Int can be casted to all bar OBJECT
-	EXPECT_EQ(VarValue::CastAvailable(VarType::INT, VarType::OBJECT), 		false);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::INT, VarType::INT), 			true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::INT, VarType::FLOAT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::INT, VarType::DOUBLE), 		true);
@@ -31,7 +21,6 @@ TEST (VariableTest, AvailableCasts)
 	EXPECT_EQ(VarValue::CastAvailable(VarType::INT, VarType::BOOL), 		true);
 
 	// Float can be casted to all bar OBJECT
-	EXPECT_EQ(VarValue::CastAvailable(VarType::FLOAT, VarType::OBJECT), 	false);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::FLOAT, VarType::INT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::FLOAT, VarType::FLOAT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::FLOAT, VarType::DOUBLE), 	true);
@@ -40,7 +29,6 @@ TEST (VariableTest, AvailableCasts)
 	EXPECT_EQ(VarValue::CastAvailable(VarType::FLOAT, VarType::BOOL), 		true);
 
 	// Double can be casted to all bar OBJECT
-	EXPECT_EQ(VarValue::CastAvailable(VarType::DOUBLE, VarType::OBJECT), 	false);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::DOUBLE, VarType::INT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::DOUBLE, VarType::FLOAT), 	true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::DOUBLE, VarType::DOUBLE), 	true);
@@ -49,7 +37,6 @@ TEST (VariableTest, AvailableCasts)
 	EXPECT_EQ(VarValue::CastAvailable(VarType::DOUBLE, VarType::BOOL), 		true);
 	
 	// Long can be casted to all bar OBJECT
-	EXPECT_EQ(VarValue::CastAvailable(VarType::LONG, VarType::OBJECT), 		false);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::LONG, VarType::INT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::LONG, VarType::FLOAT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::LONG, VarType::DOUBLE), 		true);
@@ -58,7 +45,6 @@ TEST (VariableTest, AvailableCasts)
 	EXPECT_EQ(VarValue::CastAvailable(VarType::LONG, VarType::BOOL), 		true);
 
 	// Char can be casted to all bar OBJECT
-	EXPECT_EQ(VarValue::CastAvailable(VarType::CHAR, VarType::OBJECT), 		false);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::CHAR, VarType::INT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::CHAR, VarType::FLOAT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::CHAR, VarType::DOUBLE), 		true);
@@ -67,43 +53,13 @@ TEST (VariableTest, AvailableCasts)
 	EXPECT_EQ(VarValue::CastAvailable(VarType::CHAR, VarType::BOOL), 		true);
 
 	// Bool can be casted to all bar OBJECT
-	EXPECT_EQ(VarValue::CastAvailable(VarType::BOOL, VarType::OBJECT), 		false);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::BOOL, VarType::INT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::BOOL, VarType::FLOAT), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::BOOL, VarType::DOUBLE), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::BOOL, VarType::LONG), 		true);
 	EXPECT_EQ(VarValue::CastAvailable(VarType::BOOL, VarType::CHAR), 		true);
-	EXPECT_EQ(VarValue::CastAvailable(VarType::BOOL, VarType::BOOL), 		true);
-}
-
-TEST (VariableTest, CastFromObject)
-{
-	Variable var(VarType::OBJECT);
 	
-	var.Set((Object*)NULL);
-	EXPECT_EQ(var.Cast(VarType::OBJECT), true);
-	EXPECT_EQ(var.Value_a(), (Object*)NULL);
-	EXPECT_EQ(var.Type(), VarType::OBJECT);
-
-	EXPECT_EQ(var.Cast(VarType::BOOL), true);
-	EXPECT_EQ(var.Value_b(), false);
-	EXPECT_EQ(var.Type(), VarType::BOOL);
-
-	var.Set((Object*)0xDEADBEEF);
-	EXPECT_EQ(var.Cast(VarType::OBJECT), true);
-	EXPECT_EQ(var.Value_a(), (Object*)0xDEADBEEF);
-	EXPECT_EQ(var.Type(), VarType::OBJECT);
-
-	EXPECT_EQ(var.Cast(VarType::BOOL), true);
-	EXPECT_EQ(var.Value_b(), true);
-	EXPECT_EQ(var.Type(), VarType::BOOL);
-
-	var.Set((Object*)0xDEADBEEF);
-	EXPECT_EQ(var.Cast(VarType::INT), false);
-	EXPECT_EQ(var.Cast(VarType::FLOAT), false);
-	EXPECT_EQ(var.Cast(VarType::DOUBLE), false);
-	EXPECT_EQ(var.Cast(VarType::LONG), false);
-	EXPECT_EQ(var.Cast(VarType::CHAR), false);
+	EXPECT_EQ(VarValue::CastAvailable(VarType::BOOL, VarType::BOOL), 		true);
 }
 
 TEST (VariableTest, CastFromInt) 
@@ -135,9 +91,6 @@ TEST (VariableTest, CastFromInt)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
-
-	var.Set((int) 4);
-	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromFloat) 
@@ -169,9 +122,6 @@ TEST (VariableTest, CastFromFloat)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
-
-	var.Set((float) 4.f);
-	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromDouble) 
@@ -203,9 +153,6 @@ TEST (VariableTest, CastFromDouble)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
-
-	var.Set((double) 4.0);
-	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromLong) 
@@ -237,9 +184,6 @@ TEST (VariableTest, CastFromLong)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
-
-	var.Set((long) 4);
-	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromChar) 
@@ -271,9 +215,6 @@ TEST (VariableTest, CastFromChar)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
-
-	var.Set((char) 4);
-	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastFromBool) 
@@ -305,9 +246,6 @@ TEST (VariableTest, CastFromBool)
 	EXPECT_EQ(var.Cast(VarType::BOOL), true);
 	EXPECT_EQ(var.Value_b(), true);
 	EXPECT_EQ(var.Type(), VarType::BOOL);
-
-	var.Cast(VarType::BOOL);
-	EXPECT_EQ(var.Cast(VarType::OBJECT), false);
 }
 
 TEST (VariableTest, CastToBool)
@@ -477,8 +415,6 @@ TEST (VariableTest, TestAdd)
 	TM_ADD(d, double);
 	TM_ADD(l, long);
 	TM_ADD(c, char);
-
-	TM_INVALID_OP(a, Add);
 }
 
 TEST (VariableTest, TestSub)
@@ -488,8 +424,6 @@ TEST (VariableTest, TestSub)
 	TM_SUB(d, double);
 	TM_SUB(l, long);
 	TM_SUB(c, char);
-
-	TM_INVALID_OP(a, Sub);
 }
 
 TEST (VariableTest, TestMul)
@@ -499,8 +433,6 @@ TEST (VariableTest, TestMul)
 	TM_MUL(d, double);
 	TM_MUL(l, long);
 	TM_MUL(c, char);
-
-	TM_INVALID_OP(a, Mul);
 }
 
 TEST (VariableTest, TestDiv)
@@ -510,8 +442,6 @@ TEST (VariableTest, TestDiv)
 	TM_DIV(d, double);
 	TM_DIV(l, long);
 	TM_DIV(c, char);
-
-	TM_INVALID_OP(a, Div);
 }
 
 TEST (VariableTest, TestShr)
@@ -522,7 +452,6 @@ TEST (VariableTest, TestShr)
 
 	TM_INVALID_OP(f, Shr);
 	TM_INVALID_OP(d, Shr);
-	TM_INVALID_OP(a, Shr);
 }
 
 TEST (VariableTest, TestShl)
@@ -533,7 +462,6 @@ TEST (VariableTest, TestShl)
 
 	TM_INVALID_OP(f, Shl);
 	TM_INVALID_OP(d, Shl);
-	TM_INVALID_OP(a, Shl);
 }
 
 TEST (VariableTest, TestMod)
@@ -544,7 +472,6 @@ TEST (VariableTest, TestMod)
 
 	TM_INVALID_OP(f, Mod);
 	TM_INVALID_OP(d, Mod);
-	TM_INVALID_OP(a, Mod);
 }
 
 TEST (VariableTest, TestXor)
@@ -555,7 +482,6 @@ TEST (VariableTest, TestXor)
 
 	TM_INVALID_OP(f, Xor);
 	TM_INVALID_OP(d, Xor);
-	TM_INVALID_OP(a, Xor);
 }
 
 TEST (VariableTest, TestAnd)
@@ -566,7 +492,6 @@ TEST (VariableTest, TestAnd)
 
 	TM_INVALID_OP(f, And);
 	TM_INVALID_OP(d, And);
-	TM_INVALID_OP(a, And);
 }
 
 TEST (VariableTest, TestOr)
@@ -577,5 +502,4 @@ TEST (VariableTest, TestOr)
 
 	TM_INVALID_OP(f, Or);
 	TM_INVALID_OP(d, Or);
-	TM_INVALID_OP(a, Or);
 }

@@ -1,5 +1,4 @@
 #include "Variable.h"
-#include "Object.h"
 
 #include <cstring>
 
@@ -90,11 +89,7 @@ VarValue VarValue::CastTo(VarValue val, VarType from, VarType to)
 		case BOOL:
 			// Avoid using CastVarValues(), as it has no way
 			// of checking the destination type.
-			if (from == VarType::OBJECT) {
-				ret.c = (bool)val.a;
-			} else {
-				ret.c = CastVarValue<bool>(val, from);
-			}
+			ret.c = CastVarValue<bool>(val, from);
 			break;
 		default:
 			THROW(InvalidCastException,
@@ -116,7 +111,7 @@ Variable::Variable(VarType type)
 }
 
 Variable::Variable()
-	: 	Variable(VarType::OBJECT)
+	: 	Variable(VarType::INT)
 {
 }
 
@@ -249,7 +244,7 @@ VarType Variable::Type() const
 	THROW(NotImplementedException,								\
 		"Operation \"" + AritOpToString(AritOp::ADD) 			\
 		+ "\" not implemented for type " 						\
-		+ VarTypeToString(_type));a
+		+ VarTypeToString(_type));
 
 // Macro for checking if the value _VAR._V of type _T is 0,
 // in which case a DivisionByZeroException is thrown.
