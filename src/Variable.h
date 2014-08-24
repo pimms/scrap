@@ -5,6 +5,9 @@
 namespace scrap {
 
 class Object;
+class Variable;
+
+typedef bool (Variable::*VariableCompMethod)(const Variable*) const;
 
 
 struct VarValue {
@@ -28,7 +31,8 @@ struct VarValue {
 /* Variable
  * The core wrapper around a Scrap Variable. 
  *
- * "Variable" objects are EXPENDABLE and STACK MANAGED. 
+ * "Variable" objects are EXPENDABLE and STACK MANAGED. Variables contain
+ * nuerical values. 
  */
 class Variable {
 public:
@@ -80,22 +84,31 @@ public:
 	void And(const Variable *var);
 	void Or(const Variable *var);
 
-	void SetFieldVariableFlag(bool fieldFlag);
-	bool IsFieldVariable() const;
+	/* Comparison of numerical Variable objects managed internally
+	 * by casting both values to an "long (64b)" if both types 
+	 * are integral, and "long double (64b)" if either value is floating 
+	 * point. In the latter case, two values are considered equal if
+	 * the absolute difference between them is less than 0.0000001.
+	 */
+	bool operator==(const Variable *var) const;
+	bool operator!=(const Variable *var) const;
+	bool operator>=(const Variable *var) const;
+	bool operator>(const Variable *var) const;
+	bool operator<=(const Variable *var) const;
+	bool operator<(const Variable *var) const;
 
 private:
 	VarValue _value;
 	VarType _type;
-
-	// If the variable belongs to an object or class, it cannot be 
-	// deleted where normal variables would be.
-	bool _fieldVar;
 
 	// Throws either an InvalidOperationException 
 	// InvalidTypeException if the operation cannot be performed.
 	void ValidOperationCheck(AritOp op, const Variable *var);
 
 	static bool IsOperationAvailable(AritOp op, VarType type);
+
+	long GetIntegralComparable() const;
+	long double GetFloatingPointComparable() const;
 };
 
 }

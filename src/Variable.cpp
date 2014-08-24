@@ -1,9 +1,10 @@
 #include "Variable.h"
 
 #include <cstring>
+#include <cmath>
+#include <ctgmath>
 
 namespace scrap {
-
 
 // Cast a VarValue of type "type" to <TO>. NO CHECKING IS PERFORMED
 // TO SEE IF THIS IS A LEGAL CAST, THE CALLER MUST CHECK THIS. 
@@ -102,8 +103,7 @@ VarValue VarValue::CastTo(VarValue val, VarType from, VarType to)
 
 
 Variable::Variable(VarType type)
-	:	_type(type),
-		_fieldVar(false)
+	:	_type(type)
 {
 	// All variables are initiated with zero in some form. Booleans
 	// are false, ints 0 and objects NULL by default.
@@ -127,19 +127,12 @@ Variable* Variable::Copy()
 	cpy->_type = _type;
 	cpy->_value = _value;
 
-	// Field variable status is not copied
-	cpy->_fieldVar = false;
-
 	return cpy;
 }
 
 
 bool Variable::Cast(VarType type)
 {
-	if (IsFieldVariable()) {
-		THROW(InvalidOperationException, "Unable to convert Field variables");
-	}
-
 	if (!VarValue::CastAvailable(_type, type))
 		return false;
 
@@ -477,14 +470,62 @@ void Variable::Or(const Variable *var)
 }
 
 
-void Variable::SetFieldVariableFlag(bool fieldFlag)
+/* Default comparison macro. 
+ * @param OPERATOR
+ * 		A literal operator. Example: "!=", ">", "<=".
+ */
+#define COMPARE(OPERATOR)									\
+	if (_type == FLOAT || var->Type() == FLOAT				\
+			|| _type == DOUBLE || var->Type() == DOUBLE) {	\
+		long double a = GetFloatingPointComparable();		\
+		long double b = var->GetFloatingPointComparable();	\
+		return a OPERATOR b;								\
+	} else {												\
+		long a = GetIntegralComparable();					\
+		long b = var->GetIntegralComparable();				\
+		return a OPERATOR b;								\
+	}
+
+
+bool Variable::operator==(const Variable *var) const
 {
-	_fieldVar = fieldFlag;
+	const long double MAX_DIFF = 0.0000001;
+
+	if (_type == FLOAT || var->Type() == FLOAT
+			|| _type == DOUBLE || var->Type() == DOUBLE) {
+		long double a = GetFloatingPointComparable();
+		long double b = var->GetFloatingPointComparable();
+		return (std::abs(a - b) < MAX_DIFF);
+	} else {
+		long a = GetIntegralComparable();
+		long b = var->GetIntegralComparable();
+		return (a == b);
+	}
 }
 
-bool Variable::IsFieldVariable() const
+bool Variable::operator!=(const Variable *var) const
 {
-	return _fieldVar;
+	return !((*this) == var);
+}
+
+bool Variable::operator>=(const Variable *var) const
+{
+	COMPARE(>=);
+}
+
+bool Variable::operator>(const Variable *var) const
+{
+	COMPARE(>);
+}
+
+bool Variable::operator<=(const Variable *var) const
+{
+	COMPARE(<=);
+}
+
+bool Variable::operator<(const Variable *var) const
+{
+	COMPARE(<);
 }
 
 
@@ -526,6 +567,55 @@ bool Variable::IsOperationAvailable(AritOp op, VarType type)
 					return false;
 			}
 	}
+}
+
+
+long Variable::GetIntegralComparable() const
+{
+	switch (_type) {
+		case INT:
+			return (long)Value_i();
+		case CHAR:
+			return (long)Value_c();
+		case BOOL:
+			return (long)Value_b();
+		case LONG:
+			return Value_l();
+		case FLOAT:
+			printf("WARNING: GetIntegralComparable() called on Variable(FLOAT)\n");
+			return (long long)Value_f();
+		case DOUBLE:
+			printf("WARNING: GetIntegralComparable() called on Variable(DOUBLE)\n");
+			return (long long)Value_d();
+
+		default:
+			return 0L;
+	}
+
+	return 0L;
+}
+
+long double Variable::GetFloatingPointComparable() const
+{
+	switch (_type) {
+		case INT:
+			return (long double)Value_i();
+		case CHAR:
+			return (long double)Value_c();
+		case BOOL:
+			return (long double)Value_b();
+		case LONG:
+			return (long double)Value_l();
+		case FLOAT:
+			return (long double)Value_f();
+		case DOUBLE:
+			return (long double)Value_d();
+
+		default:
+			return 0.0;
+	}
+
+	return 0.0;
 }
 
 }

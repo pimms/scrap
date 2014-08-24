@@ -1,7 +1,6 @@
 #include "Executor.h"
 #include "Bytecode.h"
 #include "Stack.h"
-#include "Variable.h"
 
 
 namespace scrap {
@@ -187,9 +186,7 @@ Variable*& Executor::GetRegister(byte reg)
 unsigned Executor::Pop(const byte *instr) 
 {
 	Variable *var = _stack->Pop();
-	if (!var->IsFieldVariable()) {
-		delete var;
-	}
+	delete var;
 
 	return 1;
 }
@@ -791,48 +788,60 @@ unsigned Executor::Call(const byte *instr)
 }
 
 unsigned Executor::Branch(const byte *instr) 
-{
-	THROW(NotImplementedException, "Instruction method not implemented");
+{	
+	unsigned ip= *((unsigned*)(instr + 1));
+
+	_delegate->BranchToInstruction(ip);
+
+	return 0;
 }
 
 unsigned Executor::BifNull(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *cmp = new Variable();
+	cmp->Set(0);
+	_stack->Push(cmp);
+
+	return ConditionalBranch(instr, &Variable::operator==);
 }
 
 unsigned Executor::BifNotNull(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	Variable *cmp = new Variable();
+	cmp->Set(0);
+	_stack->Push(cmp);
+
+	return ConditionalBranch(instr, &Variable::operator!=);
 }
 
 unsigned Executor::BifGreater(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	return ConditionalBranch(instr, &Variable::operator>);
 }
 
 unsigned Executor::BifGreaterEQ(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	return ConditionalBranch(instr, &Variable::operator>=);
 }
 
 unsigned Executor::BifLess(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	return ConditionalBranch(instr, &Variable::operator<);
 }
 
 unsigned Executor::BifLessEQ(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	return ConditionalBranch(instr, &Variable::operator<=);
 }
 
 unsigned Executor::BifEqual(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	return ConditionalBranch(instr, &Variable::operator==);
 }
 
 unsigned Executor::BifNotEqual(const byte *instr) 
 {
-	THROW(NotImplementedException, "Instruction method not implemented");
+	return ConditionalBranch(instr, &Variable::operator!=);
 }
 
 
@@ -844,8 +853,7 @@ void Executor::GenericAdd(VarType type)
 
 	_stack->Push(v1);
 	
-	if (!v2->IsFieldVariable())
-		delete v2;
+	delete v2;
 }
 
 void Executor::GenericSub(VarType type)
@@ -856,8 +864,7 @@ void Executor::GenericSub(VarType type)
 	
 	_stack->Push(v1);
 	
-	if (!v2->IsFieldVariable())
-		delete v2;
+	delete v2;
 }
 
 void Executor::GenericMul(VarType type)
@@ -868,8 +875,7 @@ void Executor::GenericMul(VarType type)
 	
 	_stack->Push(v1);
 	
-	if (!v2->IsFieldVariable())
-		delete v2;
+	delete v2;
 }
 
 void Executor::GenericDiv(VarType type)
@@ -880,8 +886,7 @@ void Executor::GenericDiv(VarType type)
 	
 	_stack->Push(v1);
 	
-	if (!v2->IsFieldVariable())
-		delete v2;
+	delete v2;
 }
 
 
@@ -894,8 +899,7 @@ void Executor::GenericMod(VarType type)
 	
 	_stack->Push(var1);
 	
-	if (!var2->IsFieldVariable())
-		delete var2;
+	delete var2;
 }
 
 void Executor::GenericAnd(VarType type) 
@@ -906,8 +910,7 @@ void Executor::GenericAnd(VarType type)
 	
 	_stack->Push(var1);
 	
-	if (!var2->IsFieldVariable())
-		delete var2;
+	delete var2;
 }
 
 void Executor::GenericXor(VarType type)
@@ -918,8 +921,7 @@ void Executor::GenericXor(VarType type)
 	
 	_stack->Push(var1);
 	
-	if (!var2->IsFieldVariable())
-		delete var2;
+	delete var2;
 }
 
 void Executor::GenericOr(VarType type) 
@@ -930,8 +932,7 @@ void Executor::GenericOr(VarType type)
 	
 	_stack->Push(var1);
 	
-	if (!var2->IsFieldVariable())
-		delete var2;
+	delete var2;
 }
 
 void Executor::GenericShl(VarType type) 
@@ -942,8 +943,7 @@ void Executor::GenericShl(VarType type)
 	
 	_stack->Push(var1);
 	
-	if (!var2->IsFieldVariable())
-		delete var2;
+	delete var2;
 }
 
 void Executor::GenericShr(VarType type) 
@@ -954,8 +954,26 @@ void Executor::GenericShr(VarType type)
 	
 	_stack->Push(var1);
 	
-	if (!var2->IsFieldVariable())
-		delete var2;
+	delete var2;
+}
+
+
+unsigned Executor::ConditionalBranch(const byte *instr, VariableCompMethod method)
+{
+	Variable *var2 = _stack->Pop();
+	Variable *var1 = _stack->Pop();
+
+	bool condition = (*var1.*method)(var2);
+
+	delete var2;
+	delete var1;
+
+	if (condition) {
+		Branch(instr);
+		return 0;
+	}
+
+	return 5;
 }
 
 
@@ -989,4 +1007,3 @@ void Executor::GenericConvert( VarType from, VarType to)
 }
 
 }
-

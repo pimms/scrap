@@ -137,8 +137,7 @@ call #funcID		Invoke function 				-> return_value
 # Branch Instructions
 # The #dest argument is a 32 bit integer, pointing to the destination 
 # byte instruction. There is obviously no guarantee that the destination
-# is valid. When multiple stack variables are used, they must be of the
-# identical type.
+# is valid. 
 branch #dest 		Branch 							->
 bifnull	#dest		Branch if VALUE1 is 0 			value1 -> 
 bifnotnull #dest	Branch if VALUE1 is not 0		value1 ->

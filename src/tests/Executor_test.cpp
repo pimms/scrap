@@ -25,15 +25,15 @@
  * [X] T Xor
  * [X] T And
  * [X] T Or
- * [ ] Branch
- * [ ] BifNull
- * [ ] BifNotNull
- * [ ] BifGreater
- * [ ] BifGreaterEq
- * [ ] BifLess
- * [ ] BifLessEq
- * [ ] BifEqual
- * [ ] BifNotEqual
+ * [X] Branch
+ * [X] BifNull
+ * [X] BifNotNull
+ * [X] BifGreater
+ * [X] BifGreaterEq
+ * [X] BifLess
+ * [X] BifLessEq
+ * [X] BifEqual
+ * [X] BifNotEqual
  */
 
 
@@ -329,6 +329,129 @@ void TestLoadAndStore(byte pushInstr, byte storeInstr, byte loadInstr, T val)
 		delete program;
 	}
 }
+
+/* Pushes two variables and executes a branching instruction. In all cases, the
+ * branching instruction should evaluate to "expRes" and skip the instruction directly
+ * following the branching instruction.
+ * 		pushInstr		Instruction pushing a value of type T
+ * 		val1			The first operand
+ * 		val2			The second operand
+ * 		branchInstr		The conditional branching instruction
+ */
+template<typename T>
+void TestConditionalBranch(byte pushInstr, T val1, T val2, byte branchInstr, bool expRes)
+{
+	Stack *stack = NULL;
+	Program *program = NULL;
+	FunctionBody body;
+	Variable *var = NULL;
+	unsigned l = 0;
+	const byte finalValue = 127;
+
+	body.code = new byte[64];
+
+	// Push val1
+	body.code[l++] = pushInstr;
+	memcpy(body.code + l, &val1, sizeof(T));
+	l += sizeof(T);
+
+	// Push val 2
+	body.code[l++] = pushInstr;
+	memcpy(body.code + l, &val2, sizeof(T));
+	l += sizeof(T);
+
+	// Perform branching instruction: Skip the 5 bytes which are
+	// the branch instruction and the single byte which is a RETURN.
+	unsigned dest = l + 5 + 1;
+	body.code[l++] = branchInstr;
+	memcpy(body.code + l, &dest, sizeof(dest));
+	l += sizeof(dest);
+
+	body.code[l++] = OP_RETURN;
+
+	// This is the instruction the branch jumps to. After executing
+	// it, a byte-value should have been pushed onto the stack.
+	body.code[l++] = OP_C_PUSH;
+	body.code[l++] = (byte)finalValue;
+	
+	body.length = l;
+
+	/* Execute the program */
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program);
+
+	if (expRes == true) {
+		ASSERT_EQ(1, stack->Count());
+		var = stack->Pop();
+		ASSERT_EQ(CHAR, var->Type());
+		ASSERT_EQ(finalValue, var->Value_c());
+		delete var;
+	} else {
+		ASSERT_EQ(0, stack->Count());
+	}
+
+	delete program;
+	delete stack;
+}
+
+/* Ensures that values of all types behave correctly during execution of the 
+ * instruction BIFNULL and BIFNOTNULL. 
+ * 		pushInstr 		Instruction pushing a value of type T
+ * 		val				Value of type T
+ * 		branchInstr		Must be either OP_BIFNULL or OP_BIFNOTNULL
+ */
+template<typename T>
+void TestNullBranch(byte pushInstr, T val, byte branchInstr, bool expRes)
+{
+	/*	Tpush		val
+	 *	branchInstr	<n>
+	 *	return
+	 *n:
+	 *	cpush		125
+	 */
+	Program *program = NULL;
+	Stack *stack = NULL;
+	Variable *var = NULL;
+	FunctionBody body;
+	unsigned dest = 1 + sizeof(T) + 1 + sizeof(unsigned) + 1;
+	const byte finalValue = 125;
+
+	unsigned l = 0;
+	body.code = new byte[64];
+
+	body.code[l++] = pushInstr;
+	memcpy(body.code + l, &val, sizeof(val));
+	l += sizeof(val);
+
+	body.code[l++] = branchInstr;
+	memcpy(body.code + l, &dest, sizeof(dest));
+	l += sizeof(dest);
+
+	body.code[l++] = OP_RETURN;
+
+	body.code[l++] = OP_C_PUSH;
+	body.code[l++] = finalValue;
+
+	body.length = l;
+
+	/* Execute the program */
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program);
+
+	if (expRes) {
+		ASSERT_EQ(1, stack->Count());
+		var = stack->Pop();
+		ASSERT_EQ(CHAR, var->Type());
+		ASSERT_EQ(finalValue, var->Value_c());
+	} else {
+		ASSERT_EQ(0, stack->Count());
+	}
+
+	delete var;
+	delete stack;
+	delete program;
+}
+
 
 TEST (ExecutorTest, TestPushLiteral)
 {
@@ -710,4 +833,234 @@ TEST (ExecutorTest, TestReturn)
 	delete v1;
 	delete stack;
 	delete program;
+}
+
+TEST (ExecutorTest, TestBranch)
+{
+	Program *program = NULL;
+	Stack *stack = NULL;
+	Variable *var = NULL;
+	FunctionBody body;
+	unsigned dest = 6;
+	byte finalValue = 126;
+	
+	unsigned l = 0;
+	body.code = new byte[64];
+
+	body.code[l++] = OP_BRANCH;
+	memcpy(body.code + l, &dest, sizeof(dest));
+	l += sizeof(dest);
+
+	body.code[l++] = OP_RETURN;
+
+	body.code[l++] = OP_C_PUSH;
+	body.code[l++] = finalValue;
+
+	body.length = l;
+
+	/* Create and execute the program */
+	program = CreateProgram(body);
+	stack = ExecuteProgram(program);
+
+	ASSERT_EQ(1, stack->Count());
+	var = stack->Pop();
+	ASSERT_EQ(CHAR, var->Type());
+	ASSERT_EQ(finalValue, var->Value_c());
+
+	delete var;
+	delete stack;
+	delete program;
+}
+
+TEST (ExecutorTest, TestBranchLess)
+{
+	TestConditionalBranch<int>(OP_I_PUSH, 3, 5, OP_BIFLESS, true);
+	TestConditionalBranch<int>(OP_I_PUSH, 5, 3, OP_BIFLESS, false);
+
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5, 3.5001, OP_BIFLESS, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5001, 3.5, OP_BIFLESS, false);
+
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5, 3.5001, OP_BIFLESS, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5001, 3.5, OP_BIFLESS, false);
+
+	TestConditionalBranch<long>(OP_L_PUSH, 3, 5, OP_BIFLESS, true);
+	TestConditionalBranch<long>(OP_L_PUSH, 5, 3, OP_BIFLESS, false);
+
+	TestConditionalBranch<char>(OP_C_PUSH, 3, 5, OP_BIFLESS, true);
+	TestConditionalBranch<char>(OP_C_PUSH, 5, 3, OP_BIFLESS, false);
+}
+
+TEST (ExecutorTest, TestBranchLessEq) 
+{
+	TestConditionalBranch<int>(OP_I_PUSH, 3, 5, OP_BIFLESSEQ, true);
+	TestConditionalBranch<int>(OP_I_PUSH, 3, 3, OP_BIFLESSEQ, true);
+	TestConditionalBranch<int>(OP_I_PUSH, 5, 3, OP_BIFLESSEQ, false);
+
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5, 3.5001, OP_BIFLESSEQ, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5, 3.5, OP_BIFLESSEQ, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5001, 3.5, OP_BIFLESSEQ, false);
+
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5, 3.5001, OP_BIFLESSEQ, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5, 3.5, OP_BIFLESSEQ, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5001, 3.5, OP_BIFLESSEQ, false);
+
+	TestConditionalBranch<long>(OP_L_PUSH, 3, 5, OP_BIFLESSEQ, true);
+	TestConditionalBranch<long>(OP_L_PUSH, 3, 3, OP_BIFLESSEQ, true);
+	TestConditionalBranch<long>(OP_L_PUSH, 5, 3, OP_BIFLESSEQ, false);
+
+	TestConditionalBranch<char>(OP_C_PUSH, 3, 5, OP_BIFLESSEQ, true);
+	TestConditionalBranch<char>(OP_C_PUSH, 3, 3, OP_BIFLESSEQ, true);
+	TestConditionalBranch<char>(OP_C_PUSH, 5, 3, OP_BIFLESSEQ, false);
+}
+
+TEST (ExecutorTest, TestBranchGreater)
+{
+	// This is basically TestBranchLess with the 'expRes' arguments inverted.
+	TestConditionalBranch<int>(OP_I_PUSH, 5, 3, OP_BIFGREATER, true);
+	TestConditionalBranch<int>(OP_I_PUSH, 3, 5, OP_BIFGREATER, false);
+
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5001, 3.5, OP_BIFGREATER, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5, 3.5001, OP_BIFGREATER, false);
+
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5001, 3.5, OP_BIFGREATER, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5, 3.5001, OP_BIFGREATER, false);
+
+	TestConditionalBranch<long>(OP_L_PUSH, 5, 3, OP_BIFGREATER, true);
+	TestConditionalBranch<long>(OP_L_PUSH, 3, 5, OP_BIFGREATER, false);
+
+	TestConditionalBranch<char>(OP_C_PUSH, 5, 3, OP_BIFGREATER, true);
+	TestConditionalBranch<char>(OP_C_PUSH, 3, 5, OP_BIFGREATER, false);
+}
+
+TEST (ExecutorTest, TestBranchGreaterEq) 
+{
+	// This is basically TestBranchLessEq with the 'expRes' arguments inverted
+	TestConditionalBranch<int>(OP_I_PUSH, 5, 3, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<int>(OP_I_PUSH, 3, 3, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<int>(OP_I_PUSH, 3, 5, OP_BIFGREATEREQ, false);
+
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5001, 3.5, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5, 3.5, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 3.5, 3.5001, OP_BIFGREATEREQ, false);
+
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5001, 3.5, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5, 3.5, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 3.5, 3.5001, OP_BIFGREATEREQ, false);
+
+	TestConditionalBranch<long>(OP_L_PUSH, 5, 3, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<long>(OP_L_PUSH, 3, 3, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<long>(OP_L_PUSH, 3, 5, OP_BIFGREATEREQ, false);
+
+	TestConditionalBranch<char>(OP_C_PUSH, 5, 3, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<char>(OP_C_PUSH, 3, 3, OP_BIFGREATEREQ, true);
+	TestConditionalBranch<char>(OP_C_PUSH, 3, 5, OP_BIFGREATEREQ, false);
+}
+
+TEST (ExecutorTest, TestBranchEqual)
+{
+	TestConditionalBranch<int>(OP_I_PUSH, 0, -1, OP_BIFEQUAL, false);
+	TestConditionalBranch<int>(OP_I_PUSH, 0, 0, OP_BIFEQUAL, true);
+	TestConditionalBranch<int>(OP_I_PUSH, 0, 1, OP_BIFEQUAL, false);
+
+	TestConditionalBranch<long>(OP_L_PUSH, 0, -1, OP_BIFEQUAL, false);
+	TestConditionalBranch<long>(OP_L_PUSH, 0, 0, OP_BIFEQUAL, true);
+	TestConditionalBranch<long>(OP_L_PUSH, 0, 1, OP_BIFEQUAL, false);
+
+	TestConditionalBranch<char>(OP_C_PUSH, 0, -1, OP_BIFEQUAL, false);
+	TestConditionalBranch<char>(OP_C_PUSH, 0, 0, OP_BIFEQUAL, true);
+	TestConditionalBranch<char>(OP_C_PUSH, 0, 1, OP_BIFEQUAL, false);
+
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, -1.f, OP_BIFEQUAL, false);
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, -0.0001f, OP_BIFEQUAL, false);
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, 0.f, OP_BIFEQUAL, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, 0.0001f, OP_BIFEQUAL, false);
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, 1.f, OP_BIFEQUAL, false);
+
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, -1.0, OP_BIFEQUAL, false);
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, -0.00001, OP_BIFEQUAL, false);
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, 0.0, OP_BIFEQUAL, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, 0.00001, OP_BIFEQUAL, false);
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, 1.0, OP_BIFEQUAL, false);
+}
+
+TEST (ExecutorTest, TestBranchNEqual)
+{
+	// This is TestBranchEqual with 'expRes' inverted
+	TestConditionalBranch<int>(OP_I_PUSH, 0, -1, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<int>(OP_I_PUSH, 0, 0, OP_BIFNOTEQUAL, false);
+	TestConditionalBranch<int>(OP_I_PUSH, 0, 1, OP_BIFNOTEQUAL, true);
+
+	TestConditionalBranch<long>(OP_L_PUSH, 0, -1, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<long>(OP_L_PUSH, 0, 0, OP_BIFNOTEQUAL, false);
+	TestConditionalBranch<long>(OP_L_PUSH, 0, 1, OP_BIFNOTEQUAL, true);
+
+	TestConditionalBranch<char>(OP_C_PUSH, 0, -1, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<char>(OP_C_PUSH, 0, 0, OP_BIFNOTEQUAL, false);
+	TestConditionalBranch<char>(OP_C_PUSH, 0, 1, OP_BIFNOTEQUAL, true);
+
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, -1.f, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, -0.0001f, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, 0.f, OP_BIFNOTEQUAL, false);
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, 0.0001f, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<float>(OP_F_PUSH, 0.f, 1.f, OP_BIFNOTEQUAL, true);
+
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, -1.0, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, -0.00001, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, 0.0, OP_BIFNOTEQUAL, false);
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, 0.00001, OP_BIFNOTEQUAL, true);
+	TestConditionalBranch<double>(OP_D_PUSH, 0.0, 1.0, OP_BIFNOTEQUAL, true);
+}
+
+TEST (ExecutorTest, TestBranchNull)
+{
+	TestNullBranch<int>(OP_I_PUSH, -1, OP_BIFNULL, false);
+	TestNullBranch<int>(OP_I_PUSH,  0, OP_BIFNULL, true);
+	TestNullBranch<int>(OP_I_PUSH,  1, OP_BIFNULL, false);
+
+	TestNullBranch<long>(OP_L_PUSH, -1, OP_BIFNULL, false);
+	TestNullBranch<long>(OP_L_PUSH,  0, OP_BIFNULL, true);
+	TestNullBranch<long>(OP_L_PUSH,  1, OP_BIFNULL, false);
+
+	TestNullBranch<char>(OP_C_PUSH, -1, OP_BIFNULL, false);
+	TestNullBranch<char>(OP_C_PUSH,  0, OP_BIFNULL, true);
+	TestNullBranch<char>(OP_C_PUSH,  1, OP_BIFNULL, false);
+
+	TestNullBranch<float>(OP_F_PUSH, -1.f, OP_BIFNULL, false);
+	TestNullBranch<float>(OP_F_PUSH, -0.00001f, OP_BIFNULL, false);
+	TestNullBranch<float>(OP_F_PUSH,  0.0, OP_BIFNULL, true);
+	TestNullBranch<float>(OP_F_PUSH,  0.00001f, OP_BIFNULL, false);
+	TestNullBranch<float>(OP_F_PUSH,  1.f, OP_BIFNULL, false);
+
+	TestNullBranch<double>(OP_D_PUSH, -1.0, OP_BIFNULL, false);
+	TestNullBranch<double>(OP_D_PUSH, -0.00001, OP_BIFNULL, false);
+	TestNullBranch<double>(OP_D_PUSH,  0.0, OP_BIFNULL, true);
+	TestNullBranch<double>(OP_D_PUSH,  0.00001, OP_BIFNULL, false);
+	TestNullBranch<double>(OP_D_PUSH,  1.0, OP_BIFNULL, false);
+}
+
+TEST (ExecutorTest, TestBranchNotNull)
+{
+	TestNullBranch<int>(OP_I_PUSH, -1, OP_BIFNOTNULL, true);
+	TestNullBranch<int>(OP_I_PUSH,  0, OP_BIFNOTNULL, false);
+	TestNullBranch<int>(OP_I_PUSH,  1, OP_BIFNOTNULL, true);
+
+	TestNullBranch<long>(OP_L_PUSH, -1, OP_BIFNOTNULL, true);
+	TestNullBranch<long>(OP_L_PUSH,  0, OP_BIFNOTNULL, false);
+	TestNullBranch<long>(OP_L_PUSH,  1, OP_BIFNOTNULL, true);
+
+	TestNullBranch<char>(OP_C_PUSH, -1, OP_BIFNOTNULL, true);
+	TestNullBranch<char>(OP_C_PUSH,  0, OP_BIFNOTNULL, false);
+	TestNullBranch<char>(OP_C_PUSH,  1, OP_BIFNOTNULL, true);
+
+	TestNullBranch<float>(OP_F_PUSH, -1.f, OP_BIFNOTNULL, true);
+	TestNullBranch<float>(OP_F_PUSH, -0.00001f, OP_BIFNOTNULL, true);
+	TestNullBranch<float>(OP_F_PUSH,  0.0, OP_BIFNOTNULL, false);
+	TestNullBranch<float>(OP_F_PUSH,  0.00001f, OP_BIFNOTNULL, true);
+	TestNullBranch<float>(OP_F_PUSH,  1.f, OP_BIFNOTNULL, true);
+
+	TestNullBranch<double>(OP_D_PUSH, -1.0, OP_BIFNOTNULL, true);
+	TestNullBranch<double>(OP_D_PUSH, -0.00001, OP_BIFNOTNULL, true);
+	TestNullBranch<double>(OP_D_PUSH,  0.0, OP_BIFNOTNULL, false);
+	TestNullBranch<double>(OP_D_PUSH,  0.00001, OP_BIFNOTNULL, true);
+	TestNullBranch<double>(OP_D_PUSH,  1.0, OP_BIFNOTNULL, true);
 }

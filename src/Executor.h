@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scrap.h"
+#include "Variable.h"
 
 
 namespace scrap {
@@ -39,7 +40,13 @@ public:
 	~Executor();
 	
 	/* The instr-pointer points to an arbitrary location inside the method's
-	 * body. The method returns the number of bytes consumed by the instruction.
+	 * body. The method returns the total number of bytes consumed by the 
+	 * instruction, including it's potential arguments.
+	 *
+	 * When a branching instruction succeeds (conditional or not), 0 is
+	 * returned. This to prevent the caller having to take into account 
+	 * calls made to the ExecutionDelegate (which may not be the same object).
+	 * 		programCounter += executor.Execute(instr + programCounter);
 	 */
 	unsigned Execute(const byte *instr);
 
@@ -173,6 +180,8 @@ private:
 	void GenericOr(VarType type);
 	void GenericShl(VarType type);
 	void GenericShr(VarType type);
+
+	unsigned ConditionalBranch(const byte *instr, VariableCompMethod method);
 	
 	void GenericLoad(VarType type, byte regIdx);
 	void GenericStore(VarType type, byte regIdx);
