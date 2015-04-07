@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 
     while (buf) {
 		free(buf);
-        printf("'%s'\n", buf);
+        printf("LINE: '%s'\n\n", buf);
         buf = file_get_stripped(fp);
     }
 

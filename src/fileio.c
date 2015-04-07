@@ -16,11 +16,11 @@ file_get_line(FILE *fp)
     int ch = 0;
 
     while ((ch = fgetc(fp)) != EOF) {
-        buf[read] = ch;
-        read++;
-
         if (ch == '\n')
             break;
+
+        buf[read] = ch;
+        read++;
 
         if (read >= len) {
             len += len_incr;
@@ -51,21 +51,30 @@ file_get_stripped(FILE *fp)
 void
 strstrip(char *line)
 {
-    const int line_len = strlen(line);
     char *base = line;
     char *head = line;
+
+	printf("--- strstrip\n");
+	printf("    '%s'\n", line);
 
     while (*base) {
         while (*head == ' ' || *head == '\t')
             head++;
 
-        if (head - base > 1) {
-            int remaining = line_len - (head - base + 1);
-            memcpy(base + 1, head, remaining);
+        if (head - base > 0) {
+			printf("hd: '%s'\n", head);
+
+            int head_len = strlen(head) + 1;
+
+			int offset = (base==line || !*head ? 0 : 1);
+            memmove(base + offset, head, head_len);
+
+			*base = ' ';
             base++;
-            *base = ' ';
-            head[remaining] = 0;
-        } else if (*base == '\t')
+			printf("ln: '%s'\n", line);
+        }
+
+		if (*base == '\t')
 			*base = ' ';
 
         base++;
