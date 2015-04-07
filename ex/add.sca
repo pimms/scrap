@@ -1,0 +1,6 @@
+main:
+	mov		ra, 1
+	mov		rb, 2
+	add		ra, rb
+	push	ra
+	call	print

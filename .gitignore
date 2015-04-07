@@ -6,6 +6,7 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
+scrap
 
 # Compiled Static libraries
 *.lai
@@ -21,25 +22,8 @@ install_manifest.txt
 # Vim swap files
 .*.swp
 .*.swo
+.vimrc
 
 # You Complete Me configuration
 .ycm_*.py*
 
-# CScope
-cscope.out
-
-# KDevelop 
-Project.kdev*
-.kdev4
-scrap.kdev4
-test.kdev4
-
-# Built executable
-scrap
-test
-tests
-build/
-testfiles/temp
-
-# Google-test build directory
-gtest/build/
